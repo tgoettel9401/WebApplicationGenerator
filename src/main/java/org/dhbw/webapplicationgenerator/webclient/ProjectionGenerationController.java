@@ -1,18 +1,16 @@
 package org.dhbw.webapplicationgenerator.webclient;
 
 import lombok.AllArgsConstructor;
-import org.apache.commons.io.IOUtils;
-import org.dhbw.webapplicationgenerator.generator.GeneratedProject;
 import org.dhbw.webapplicationgenerator.generator.GenerationRequest;
 import org.dhbw.webapplicationgenerator.generator.ProjectGenerationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.io.*;
-import java.util.zip.ZipOutputStream;
+import java.io.ByteArrayOutputStream;
 
 @RestController
 @AllArgsConstructor
@@ -23,20 +21,19 @@ public class ProjectionGenerationController {
     private final ProjectGenerationService projectGenerationService;
 
     @GetMapping(value = "generate", produces = "application/zip")
-    public @ResponseBody byte[] generate() throws IOException {
-        logger.info("Received generation request");
+    public byte[] generateBaseProject() {
+        logger.info("Received generation request for base project");
         GenerationRequest request = new GenerationRequest();
         request.setTitle("Spring-Base-Project");
-        ZipOutputStream stream = projectGenerationService.generate(request);
-        InputStream in = new FileInputStream("project.zip");
-
-        return IOUtils.toByteArray(in);
+        ByteArrayOutputStream stream = projectGenerationService.generate(request);
+        return stream.toByteArray();
     }
 
     @PostMapping("generate")
-    public ZipOutputStream generate(@RequestBody() GenerationRequest request) {
-        logger.info("Received generation request");
-        return projectGenerationService.generate(request);
+    public byte[] generateByRequest(@RequestBody() GenerationRequest request) {
+        logger.info("Received generation request for project with title {}", request.getTitle());
+        ByteArrayOutputStream stream = projectGenerationService.generate(request);
+        return stream.toByteArray();
     }
 
 }

@@ -10,9 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -26,17 +24,17 @@ public class ProjectGenerationService {
 
     private final ResourceFileHelper resourceFileHelper;
 
-    public ZipOutputStream generate(GenerationRequest request) {
+    public ByteArrayOutputStream generate(GenerationRequest request) {
         logger.info("Generating the new project {}", request.getTitle());
         GeneratedProject baseProject = generateBaseProject();
-        ZipOutputStream zippedFile = zipProject(baseProject);
+        ByteArrayOutputStream zippedFile = zipProject(baseProject);
         return zippedFile;
     }
 
-    private ZipOutputStream zipProject(GeneratedProject project) {
+    private ByteArrayOutputStream zipProject(GeneratedProject project) {
         try {
-            FileOutputStream fileOut = new FileOutputStream("project.zip");
-            ZipOutputStream zipOut = new ZipOutputStream(fileOut);
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ZipOutputStream zipOut = new ZipOutputStream(byteArrayOutputStream);
             for (File file : getAllFiles(project.getFileStructure())) {
                 FileInputStream fileIn = new FileInputStream(file);
                 ZipEntry zipEntry = new ZipEntry(file.getName());
@@ -49,14 +47,14 @@ public class ProjectGenerationService {
                 fileIn.close();
             }
             zipOut.close();
-            fileOut.close();
-            return zipOut;
-
-        } catch (Exception ex) {
+            byteArrayOutputStream.close();
+            return byteArrayOutputStream;
+        } catch (IOException ex) {
             ex.printStackTrace();
             return null;
         }
     }
+
 
     private GeneratedProject generateBaseProject() {
         GeneratedProject project = new GeneratedProject();
