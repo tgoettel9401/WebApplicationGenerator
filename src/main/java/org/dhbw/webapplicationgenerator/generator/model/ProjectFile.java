@@ -12,6 +12,7 @@ public class ProjectFile implements StructureElement {
     private String title;
     private StructureLevel level = StructureLevel.FILE;
     private File file;
+    private String path;
 
     @Override
     public Boolean hasChildren() {

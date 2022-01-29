@@ -9,4 +9,7 @@ public interface StructureElement {
     List<StructureElement> getChildren();
     void addChild(StructureElement child);
     StructureLevel getLevel();
+
+    String getPath();
+
 }

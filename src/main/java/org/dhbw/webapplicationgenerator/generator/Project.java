@@ -4,7 +4,7 @@ import lombok.Data;
 import org.dhbw.webapplicationgenerator.generator.model.StructureElement;
 
 @Data
-public class GeneratedProject {
+public class Project {
 
     private String name;
 

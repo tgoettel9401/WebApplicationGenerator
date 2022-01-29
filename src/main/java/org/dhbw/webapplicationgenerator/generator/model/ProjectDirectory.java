@@ -10,6 +10,7 @@ public class ProjectDirectory implements StructureElement {
 
     private String title;
     private Boolean hasChildren;
+    private String path;
     private List<StructureElement> children = new ArrayList<>();
 
     public Boolean hasChildren() {
