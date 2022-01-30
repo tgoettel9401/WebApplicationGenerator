@@ -26,7 +26,8 @@ public class ProjectController {
         request.setTitle("Spring-Base-Project");
         request.setGroup("org.example");
         request.setArtifact("demo");
-        request.setIncludeWeb(true);
+        request.setHavingWeb(true);
+        request.setHavingJpa(true);
         return projectService.generate(request).toByteArray();
     }
 

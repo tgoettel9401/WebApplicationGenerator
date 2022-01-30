@@ -34,19 +34,30 @@ public class PomXmlGenerator extends FileFolderGenerator {
         return new File(".tmp/pom.xml");
     }
 
-    private void addAdditionalDependencies(StringBuilder buffer, ProjectRequest request) {
-        if (request.isIncludeWeb()) {
-            buffer.append("\t\t<dependency>");
-            buffer.append("\n");
-            buffer.append("\t\t\t<groupId>org.springframework.boot</groupId>");
-            buffer.append("\n");
-            buffer.append("\t\t\t<artifactId>spring-boot-starter-web</artifactId>");
-            buffer.append("\n");
-            buffer.append("\t\t</dependency>");
-            buffer.append("\n");
-        } else {
-            buffer.append("\n");
+    private void addAdditionalDependencies(StringBuilder builder, ProjectRequest request) {
+
+        if (request.isHavingWeb()) {
+            addDependency("org.springframework.boot", "spring-boot-starter-web", builder);
         }
+
+        if (request.isHavingJpa()) {
+            addDependency("org.springframework.boot", "spring-boot-starter-jpa", builder);
+        }
+
+        builder.append("\n");
+
+    }
+
+    private void addDependency(String groupId, String artifactId, StringBuilder builder) {
+        builder.append("\n");
+        builder.append("\t\t<dependency>");
+        builder.append("\n");
+        builder.append("\t\t\t<groupId>").append(groupId).append("</groupId>");
+        builder.append("\n");
+        builder.append("\t\t\t<artifactId>").append(artifactId).append("</artifactId>");
+        builder.append("\n");
+        builder.append("\t\t</dependency>");
+        builder.append("\n");
     }
 
     private File getBasePomXml() {
