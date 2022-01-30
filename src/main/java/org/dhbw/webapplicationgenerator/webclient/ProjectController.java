@@ -25,6 +25,7 @@ public class ProjectController {
         ProjectRequest request = new ProjectRequest();
         request.setTitle("Spring-Base-Project");
         request.setGroup("org.example");
+        request.setDescription("This was generated automatically");
         request.setArtifact("demo");
         request.setHavingWeb(true);
         request.setHavingJpa(true);

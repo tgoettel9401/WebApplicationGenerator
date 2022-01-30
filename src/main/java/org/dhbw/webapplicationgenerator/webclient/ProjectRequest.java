@@ -7,6 +7,7 @@ public class ProjectRequest {
     private String title;
     private String group;
     private String artifact;
+    private String description;
 
     private boolean havingWeb;
     private boolean havingJpa;
