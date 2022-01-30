@@ -4,7 +4,9 @@ import lombok.Data;
 
 @Data
 public class ProjectRequest {
-
     private String title;
+    private String group;
+    private String artifact;
 
+    private boolean includeWeb;
 }

@@ -14,6 +14,12 @@ import java.util.zip.ZipOutputStream;
 @Service
 public class ZipHelper {
 
+    /**
+     * Zips the specified project
+     * @param project Project that should be zipped.
+     * @return ByteArrayOutputStream that contains the Zip-File of the whole project
+     * @throws IOException is thrown if accessing files does not work
+     */
     public ByteArrayOutputStream zip(Project project) throws IOException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream);

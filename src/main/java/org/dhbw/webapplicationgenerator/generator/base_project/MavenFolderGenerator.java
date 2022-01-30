@@ -5,17 +5,29 @@ import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.util.ResourceFileHelper;
 import org.springframework.stereotype.Service;
 
+import java.io.FileNotFoundException;
+import java.util.Optional;
+
 @Service
 @AllArgsConstructor
-public class MavenFolderGenerator extends FolderGenerator {
+public class MavenFolderGenerator extends FileFolderGenerator {
 
     private final ResourceFileHelper resourceFileHelper;
 
+    /**
+     * Creates the Project Directory .mvn
+     * @param parent Parent directory, usually this is the root directory of the project
+     * @return .mvn Directory
+     */
     public ProjectDirectory create(ProjectDirectory parent) {
-        ProjectDirectory mavenFolder = addDirectory(".mvn", parent);
-        ProjectDirectory mavenWrapperFolder = addDirectory("wrapper", mavenFolder);
-        addFile(resourceFileHelper.getFile("maven-wrapper.jar"), mavenWrapperFolder);
-        addFile(resourceFileHelper.getFile("maven-wrapper.properties"), mavenWrapperFolder);
+        ProjectDirectory mavenFolder = addDirectory(".mvn", Optional.of(parent));
+        ProjectDirectory mavenWrapperFolder = addDirectory("wrapper", Optional.of(mavenFolder));
+        try {
+            addFile(resourceFileHelper.getFile("maven-wrapper.jar"), mavenWrapperFolder);
+            addFile(resourceFileHelper.getFile("maven-wrapper.properties"), mavenWrapperFolder);
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+        }
         return mavenFolder;
     }
 

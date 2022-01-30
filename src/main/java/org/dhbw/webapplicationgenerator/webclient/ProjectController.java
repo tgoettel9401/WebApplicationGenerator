@@ -24,6 +24,9 @@ public class ProjectController {
         logger.info("Received generation request for base project");
         ProjectRequest request = new ProjectRequest();
         request.setTitle("Spring-Base-Project");
+        request.setGroup("org.example");
+        request.setArtifact("demo");
+        request.setIncludeWeb(true);
         return projectService.generate(request).toByteArray();
     }
 
