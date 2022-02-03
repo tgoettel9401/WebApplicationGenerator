@@ -6,7 +6,7 @@ import org.dhbw.webapplicationgenerator.generator.base_project.MavenFolderGenera
 import org.dhbw.webapplicationgenerator.generator.base_project.RootFilesGenerator;
 import org.dhbw.webapplicationgenerator.generator.base_project.SourceFolderGenerator;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
-import org.dhbw.webapplicationgenerator.webclient.ProjectRequest;
+import org.dhbw.webapplicationgenerator.webclient.request.ProjectRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;

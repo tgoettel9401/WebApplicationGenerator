@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectFile;
 import org.dhbw.webapplicationgenerator.util.ResourceFileHelper;
-import org.dhbw.webapplicationgenerator.webclient.ProjectRequest;
+import org.dhbw.webapplicationgenerator.webclient.request.ProjectRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.FileNotFoundException;

@@ -1,7 +1,7 @@
 package org.dhbw.webapplicationgenerator.generator;
 
 import lombok.AllArgsConstructor;
-import org.dhbw.webapplicationgenerator.webclient.ProjectRequest;
+import org.dhbw.webapplicationgenerator.webclient.request.ProjectRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

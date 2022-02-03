@@ -1,4 +1,4 @@
-package org.dhbw.webapplicationgenerator.webclient;
+package org.dhbw.webapplicationgenerator.webclient.request;
 
 import lombok.Data;
 
