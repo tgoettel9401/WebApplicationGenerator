@@ -18,7 +18,6 @@ public class MainFileGenerator extends FileFolderGenerator {
     private static final String TMP_PATH = ".tmp/";
     private static final String JAVA_CLASS_ENDING = ".java";
 
-
     public ProjectFile create(ProjectRequest request, ProjectDirectory parent) throws IOException {
         String className = getClassName(request);
         createTmpFolderIfNotExists();

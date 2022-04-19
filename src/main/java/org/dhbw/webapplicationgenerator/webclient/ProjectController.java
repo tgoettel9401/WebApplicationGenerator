@@ -59,9 +59,9 @@ public class ProjectController {
 
     private Set<EntityAttribute> initializeStudentAttributes() {
         Set<EntityAttribute> attributes = new HashSet<>();
-        attributes.add(createAttribute("First-Name", "String"));
-        attributes.add(createAttribute("Last-Name", "String"));
-        attributes.add(createAttribute("Birthday", "LocalDateTime"));
+        attributes.add(createAttribute("firstName", "String"));
+        attributes.add(createAttribute("lastName", "String"));
+        attributes.add(createAttribute("birthday", "LocalDateTime"));
         return attributes;
     }
 
