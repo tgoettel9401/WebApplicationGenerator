@@ -117,13 +117,13 @@ class EntityGeneratorTest {
         ProjectDirectory createdSrcDir = (ProjectDirectory) createdRootDir.getChildren().stream()
                 .filter(child -> child.getTitle().equals("src"))
                 .findFirst().get();
-        ProjectDirectory createdMainDir = (ProjectDirectory) srcDir.getChildren().stream()
+        ProjectDirectory createdMainDir = (ProjectDirectory) createdSrcDir.getChildren().stream()
                 .filter(child -> child.getTitle().equals("main"))
                 .findFirst().get();
-        ProjectDirectory createdJavaDir = (ProjectDirectory) mainDir.getChildren().stream()
+        ProjectDirectory createdJavaDir = (ProjectDirectory) createdMainDir.getChildren().stream()
                 .filter(child -> child.getTitle().equals("java"))
                 .findFirst().get();
-        ProjectDirectory createdGroupDir = javaDir;
+        ProjectDirectory createdGroupDir = createdJavaDir;
         for (String groupPart : request.getGroup().split("\\.")) {
             createdGroupDir = (ProjectDirectory) createdGroupDir.getChildren().stream()
                     .filter(child -> child.getTitle().equals(groupPart)).findFirst()
