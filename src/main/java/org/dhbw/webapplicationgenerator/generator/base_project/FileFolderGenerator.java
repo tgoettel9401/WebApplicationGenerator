@@ -1,7 +1,9 @@
 package org.dhbw.webapplicationgenerator.generator.base_project;
 
+import org.dhbw.webapplicationgenerator.generator.Project;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectFile;
+import org.dhbw.webapplicationgenerator.webclient.request.ProjectRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -13,6 +15,28 @@ import java.util.Optional;
 
 @Service
 public class FileFolderGenerator {
+
+    /**
+     * Returns the main project directory, usually in path /src/main/group/artifact
+     * @param project
+     * @param request
+     * @return
+     */
+    public ProjectDirectory getMainProjectDirectory(Project project, ProjectRequest request) {
+        ProjectDirectory rootDir = (ProjectDirectory) project.getFileStructure();
+        ProjectDirectory srcDir = (ProjectDirectory) rootDir.getChildren().stream().filter(child -> child.getTitle().equals("src"))
+                .findFirst().orElseThrow(() -> new RuntimeException("Creating entity failed due to missing src folder"));
+        ProjectDirectory mainDir = (ProjectDirectory) srcDir.getChildren().stream().filter(child -> child.getTitle().equals("main"))
+                .findFirst().orElseThrow(() -> new RuntimeException("Creating entity failed due to missing main folder"));
+        ProjectDirectory groupDir = (ProjectDirectory) mainDir.getChildren().stream().filter(child1 -> child1.getTitle().equals("java"))
+                .findFirst().orElseThrow(() -> new RuntimeException("Creating entity failed due to missing java folder"));
+        for (String groupPart : request.getGroup().split("\\.")) {
+            groupDir = (ProjectDirectory) groupDir.getChildren().stream().filter(child -> child.getTitle().equals(groupPart)).findFirst()
+                    .orElseThrow(() -> new RuntimeException("Creating entity failed due to missing group folder"));
+        }
+        return (ProjectDirectory) groupDir.getChildren().stream().filter(child -> child.getTitle().equals(request.getArtifact()))
+                .findFirst().orElseThrow(() -> new RuntimeException("Creating entity failed due to missing artifact folder"));
+    }
 
     /**
      * Adds a directory to the specified parent folder

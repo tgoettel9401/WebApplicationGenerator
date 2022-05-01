@@ -1,0 +1,64 @@
+package org.dhbw.webapplicationgenerator.generator.repository;
+
+import org.dhbw.webapplicationgenerator.generator.Project;
+import org.dhbw.webapplicationgenerator.generator.base_project.FileFolderGenerator;
+import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
+import org.dhbw.webapplicationgenerator.webclient.request.ProjectRequest;
+import org.dhbw.webapplicationgenerator.webclient.request.RequestEntity;
+import org.springframework.stereotype.Service;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Optional;
+
+@Service
+public class RepositoryGenerator extends FileFolderGenerator {
+
+    private static final String TMP_PATH = ".tmp/";
+    private static final String JAVA_CLASS_ENDING = ".java";
+
+    public Project create(Project project, ProjectRequest request) {
+
+        ProjectDirectory artifactDir = getMainProjectDirectory(project, request);
+        try {
+            create(request, artifactDir);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return project;
+    }
+
+    private void create(ProjectRequest request, ProjectDirectory parent) throws IOException {
+
+        ProjectDirectory domainDir = addDirectory("repository", Optional.of(parent));
+
+        for (RequestEntity entity : request.getEntities()) {
+            addFile(createRepository(entity, request), domainDir);
+        }
+
+    }
+
+    private File createRepository(RequestEntity entity, ProjectRequest request) throws IOException {
+        File file = new File(String.valueOf(Files.createFile(Path.of(TMP_PATH + entity.getTitle() + "Repository" + JAVA_CLASS_ENDING))));
+        String repositoryPackageName = request.getGroup() + "." + request.getArtifact() + ".repository";
+        String entityPackageName = request.getGroup() + "." + request.getArtifact() + ".domain";
+        FileWriter fileWriter = new FileWriter(file);
+        try (PrintWriter printWriter = new PrintWriter(fileWriter)) {
+            printWriter.println("package " + repositoryPackageName + ";");
+            printWriter.println();
+            printWriter.println("import " + entityPackageName + "." + entity.getTitle() + ";");
+            printWriter.println("import org.springframework.data.jpa.repository.JpaRepository;");
+            printWriter.println();
+            // TODO: Add logic for correct identity column data type
+            printWriter.println("public interface " + entity.getTitle() + "Repository extends JpaRepository<" + entity.getTitle() + ", Long> {");
+            printWriter.println("}");
+            printWriter.println();
+        }
+        return file;
+    }
+
+}

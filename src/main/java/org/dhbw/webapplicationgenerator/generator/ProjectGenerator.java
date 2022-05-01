@@ -2,6 +2,7 @@ package org.dhbw.webapplicationgenerator.generator;
 
 import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.entity.EntityGenerator;
+import org.dhbw.webapplicationgenerator.generator.repository.RepositoryGenerator;
 import org.dhbw.webapplicationgenerator.webclient.request.ProjectRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,7 @@ public class ProjectGenerator {
 
     private final BaseProjectGenerator baseProjectGenerator;
     private final EntityGenerator entityGenerator;
+    private final RepositoryGenerator repositoryGenerator;
 
     /**
      * Generates the Project based on the provided request
@@ -25,7 +27,7 @@ public class ProjectGenerator {
         logger.info("Generating new project with title {}", request.getTitle());
         Project baseProject = this.baseProjectGenerator.create(request);
         Project projectWithEntites = this.entityGenerator.create(baseProject, request);
-        return projectWithEntites;
+        return this.repositoryGenerator.create(projectWithEntites, request);
     }
 
 }

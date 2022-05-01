@@ -24,19 +24,8 @@ public class EntityGenerator extends FileFolderGenerator {
     private static final String JAVA_CLASS_ENDING = ".java";
 
     public Project create(Project project, ProjectRequest request) {
-        ProjectDirectory rootDir = (ProjectDirectory) project.getFileStructure();
-        ProjectDirectory srcDir = (ProjectDirectory) rootDir.getChildren().stream().filter(child -> child.getTitle().equals("src"))
-                .findFirst().orElseThrow(() -> new RuntimeException("Creating entity failed due to missing src folder"));
-        ProjectDirectory mainDir = (ProjectDirectory) srcDir.getChildren().stream().filter(child -> child.getTitle().equals("main"))
-                .findFirst().orElseThrow(() -> new RuntimeException("Creating entity failed due to missing main folder"));
-        ProjectDirectory groupDir = (ProjectDirectory) mainDir.getChildren().stream().filter(child1 -> child1.getTitle().equals("java"))
-                .findFirst().orElseThrow(() -> new RuntimeException("Creating entity failed due to missing java folder"));
-        for (String groupPart : request.getGroup().split("\\.")) {
-            groupDir = (ProjectDirectory) groupDir.getChildren().stream().filter(child -> child.getTitle().equals(groupPart)).findFirst()
-                    .orElseThrow(() -> new RuntimeException("Creating entity failed due to missing group folder"));
-        }
-        ProjectDirectory artifactDir = (ProjectDirectory) groupDir.getChildren().stream().filter(child -> child.getTitle().equals(request.getArtifact()))
-                .findFirst().orElseThrow(() -> new RuntimeException("Creating entity failed due to missing artifact folder"));
+
+        ProjectDirectory artifactDir = getMainProjectDirectory(project, request);
         try {
             create(request, artifactDir);
         } catch (IOException ex) {
@@ -63,9 +52,11 @@ public class EntityGenerator extends FileFolderGenerator {
         try (PrintWriter printWriter = new PrintWriter(fileWriter)) {
             printWriter.println("package " + packageName + ";");
             printWriter.println();
-            // TODO: Add imports
-            // TODO: Add logic for table names in plural.
-            printWriter.println("@Table(name = \"" + entity.getTitle().toLowerCase() + "\")");
+
+            addImports(printWriter, entity);
+            printWriter.println();
+
+            printWriter.println("@Table(name = \"" + plural(entity.getTitle().toLowerCase()) + "\")");
             printWriter.println("@Entity");
             printWriter.println("public class " + entity.getTitle() + " implements Serializable {");
             printWriter.println();
@@ -86,30 +77,49 @@ public class EntityGenerator extends FileFolderGenerator {
         return file;
     }
 
+    private void addImports(PrintWriter writer, RequestEntity entity) {
+        writer.println("import javax.persistence.*;");
+        writer.println("import java.io.Serializable;");
+
+        entity.getAttributes().stream()
+                .map(EntityAttribute::getDataType)
+                .map(DataType::fromName)
+                .distinct()
+                .forEach(type -> writer.println("import " + type.getPackageToImport() + ";"));
+    }
+
     private void addIdAttribute(PrintWriter writer) {
         writer.println("@Id");
         writer.println("@GeneratedValue");
         writer.println("@Column(name = \"id\", nullable = false)");
-        writer.println("private Long id");
+        writer.println("private Long id;");
     }
 
     private void addCustomAttribute(EntityAttribute attribute, PrintWriter writer) {
-        // TODO: Add logic for Dependencies as well. While doing so check that dependencies are existing in request as well.
         writer.println("@Column(name = \"" + attribute.getTitle().toLowerCase(Locale.ROOT) + "\")");
-        writer.println("private " + attribute.getDataType() + " " + attribute.getTitle().toLowerCase(Locale.ROOT));
+        writer.println("private " + attribute.getDataType() + " " + attribute.getTitle().toLowerCase(Locale.ROOT) + ";");
     }
 
     private void addGetter(EntityAttribute attribute, PrintWriter writer) {
-        writer.println("private " + attribute.getDataType() + " get" + attribute.getTitle() + "() {");
-        writer.println("    return " + attribute.getTitle().toLowerCase(Locale.ROOT));
+        writer.println("private " + attribute.getDataType() + " get" + capitalize(attribute.getTitle()) + "() {");
+        writer.println("    return " + attribute.getTitle().toLowerCase(Locale.ROOT) + ";");
         writer.println("}");
     }
 
     private void addSetter(EntityAttribute attribute, PrintWriter writer) {
-        writer.println("private " + attribute.getDataType() + " set" + attribute.getTitle().toLowerCase(Locale.ROOT) + "(" +
+        writer.println("private void set" + capitalize(attribute.getTitle()) + "(" +
                 attribute.getDataType() + " " + attribute.getTitle() + ") {");
-        writer.println("this." + attribute.getTitle().toLowerCase(Locale.ROOT) + " = " + attribute.getTitle().toLowerCase(Locale.ROOT));
+        writer.println("this." + attribute.getTitle().toLowerCase(Locale.ROOT) + " = " + attribute.getTitle().toLowerCase(Locale.ROOT) + ";");
         writer.println("}");
+    }
+
+    private String capitalize(String value) {
+        value = value.toLowerCase(Locale.ROOT);
+        return value.substring(0,1).toUpperCase() + value.substring(1).toLowerCase();
+    }
+
+    private String plural(String value) {
+        return value + "s";
     }
 
 }

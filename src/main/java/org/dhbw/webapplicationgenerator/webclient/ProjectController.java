@@ -61,7 +61,7 @@ public class ProjectController {
         Set<EntityAttribute> attributes = new HashSet<>();
         attributes.add(createAttribute("firstName", "String"));
         attributes.add(createAttribute("lastName", "String"));
-        attributes.add(createAttribute("birthday", "LocalDateTime"));
+        attributes.add(createAttribute("birthday", "LocalDate"));
         return attributes;
     }
 

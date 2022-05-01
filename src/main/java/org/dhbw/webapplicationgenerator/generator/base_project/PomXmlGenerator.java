@@ -71,7 +71,8 @@ public class PomXmlGenerator extends FileFolderGenerator {
             addDependency("org.springframework.boot", "spring-boot-starter-web", builder);
         }
         if (request.isHavingJpa()) {
-            addDependency("org.springframework.boot", "spring-boot-starter-jpa", builder);
+            addDependency("org.springframework.boot", "spring-boot-starter-data-jpa", builder);
+            addDependency("com.h2database", "h2", "runtime", builder);
         }
         builder.append("\n");
     }
@@ -96,7 +97,7 @@ public class PomXmlGenerator extends FileFolderGenerator {
         builder.append("\n");
     }
 
-    private void addDependency(String groupId, String artifactId, StringBuilder builder) {
+    private void addDependency(String groupId, String artifactId, String scope, StringBuilder builder) {
         builder.append("\n");
         builder.append("\t\t<dependency>");
         builder.append("\n");
@@ -104,8 +105,16 @@ public class PomXmlGenerator extends FileFolderGenerator {
         builder.append("\n");
         builder.append("\t\t\t<artifactId>").append(artifactId).append("</artifactId>");
         builder.append("\n");
+        if (!scope.isEmpty()) {
+            builder.append("\t\t\t<scope>").append(scope).append("</scope>");
+            builder.append("\n");
+        }
         builder.append("\t\t</dependency>");
         builder.append("\n");
+    }
+
+    private void addDependency(String groupId, String artifactId, StringBuilder builder) {
+        addDependency(groupId, artifactId, "", builder);
     }
 
     private File getBasePomXml() {
