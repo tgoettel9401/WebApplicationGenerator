@@ -69,6 +69,7 @@ public class PomXmlGenerator extends FileFolderGenerator {
     private void replaceAdditionalDependencies(StringBuilder builder, ProjectRequest request) {
         if (request.isHavingWeb()) {
             addDependency("org.springframework.boot", "spring-boot-starter-web", builder);
+            addDependency("org.springframework.boot", "spring-boot-starter-thymeleaf", builder);
         }
         if (request.isHavingJpa()) {
             addDependency("org.springframework.boot", "spring-boot-starter-data-jpa", builder);

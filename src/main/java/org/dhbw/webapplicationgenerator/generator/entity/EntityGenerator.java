@@ -83,6 +83,8 @@ public class EntityGenerator extends FileFolderGenerator {
 
         entity.getAttributes().stream()
                 .map(EntityAttribute::getDataType)
+                .filter(type -> !type.equals("String"))
+                .filter(type -> !type.equals("Integer"))
                 .map(DataType::fromName)
                 .distinct()
                 .forEach(type -> writer.println("import " + type.getPackageToImport() + ";"));
@@ -111,15 +113,6 @@ public class EntityGenerator extends FileFolderGenerator {
                 attribute.getDataType() + " " + attribute.getTitle() + ") {");
         writer.println("this." + attribute.getTitle().toLowerCase(Locale.ROOT) + " = " + attribute.getTitle().toLowerCase(Locale.ROOT) + ";");
         writer.println("}");
-    }
-
-    private String capitalize(String value) {
-        value = value.toLowerCase(Locale.ROOT);
-        return value.substring(0,1).toUpperCase() + value.substring(1).toLowerCase();
-    }
-
-    private String plural(String value) {
-        return value + "s";
     }
 
 }

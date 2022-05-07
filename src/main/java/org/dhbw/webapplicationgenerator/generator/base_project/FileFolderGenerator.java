@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -36,6 +37,22 @@ public class FileFolderGenerator {
         }
         return (ProjectDirectory) groupDir.getChildren().stream().filter(child -> child.getTitle().equals(request.getArtifact()))
                 .findFirst().orElseThrow(() -> new RuntimeException("Creating entity failed due to missing artifact folder"));
+    }
+
+    /**
+     * Returns the resources directory, usually in path /src/main/resources
+     * @param project
+     * @return
+     */
+    public ProjectDirectory getResourcesDirectory(Project project) {
+        ProjectDirectory rootDir = (ProjectDirectory) project.getFileStructure();
+        ProjectDirectory srcDir = (ProjectDirectory) rootDir.getChildren().stream().filter(child -> child.getTitle().equals("src"))
+                .findFirst().orElseThrow(() -> new RuntimeException("Creating entity failed due to missing src folder"));
+        ProjectDirectory mainDir = (ProjectDirectory) srcDir.getChildren().stream().filter(child -> child.getTitle().equals("main"))
+                .findFirst().orElseThrow(() -> new RuntimeException("Creating entity failed due to missing main folder"));
+        ProjectDirectory resourcesDir = (ProjectDirectory) mainDir.getChildren().stream().filter(child -> child.getTitle().equals("resources"))
+                .findFirst().orElseThrow(() -> new RuntimeException("Creating entity failed due to missing resources folder"));
+        return resourcesDir;
     }
 
     /**
@@ -96,6 +113,15 @@ public class FileFolderGenerator {
                 e.printStackTrace();
             }
         }
+    }
+
+    protected String capitalize(String value) {
+        value = value.toLowerCase(Locale.ROOT);
+        return value.substring(0,1).toUpperCase() + value.substring(1).toLowerCase();
+    }
+
+    protected String plural(String value) {
+        return value + "s";
     }
 
 }
