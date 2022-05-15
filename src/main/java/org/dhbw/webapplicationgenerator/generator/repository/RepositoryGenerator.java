@@ -3,7 +3,7 @@ package org.dhbw.webapplicationgenerator.generator.repository;
 import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.Project;
 import org.dhbw.webapplicationgenerator.generator.base_project.FileFolderGenerator;
-import org.dhbw.webapplicationgenerator.generator.base_project.PackageNameResolver;
+import org.dhbw.webapplicationgenerator.generator.util.PackageNameResolver;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.webclient.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.webclient.request.RequestEntity;
@@ -58,7 +58,6 @@ public class RepositoryGenerator extends FileFolderGenerator {
             printWriter.println("import " + entityPackageName + "." + entity.getTitle() + ";");
             printWriter.println("import org.springframework.data.jpa.repository.JpaRepository;");
             printWriter.println();
-            // TODO: Add logic for correct identity column data type
             printWriter.println("public interface " + entity.getTitle() + "Repository extends JpaRepository<" + entity.getTitle() + ", Long> {");
             printWriter.println("}");
             printWriter.println();

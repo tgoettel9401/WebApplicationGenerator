@@ -3,7 +3,7 @@ package org.dhbw.webapplicationgenerator.generator.entity;
 import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.Project;
 import org.dhbw.webapplicationgenerator.generator.base_project.FileFolderGenerator;
-import org.dhbw.webapplicationgenerator.generator.base_project.PackageNameResolver;
+import org.dhbw.webapplicationgenerator.generator.util.PackageNameResolver;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.webclient.request.EntityAttribute;
 import org.dhbw.webapplicationgenerator.webclient.request.ProjectRequest;
@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -96,9 +97,11 @@ public class EntityGenerator extends FileFolderGenerator {
         entity.getAttributes().stream()
                 .map(EntityAttribute::getDataType)
                 .map(DataType::fromName)
-                .filter(dataType -> !dataType.getPackageToImport().isEmpty()) // Only not empty packagesToImport are imported
+                .map(DataType::getPackageToImport)
+                .flatMap(List::stream)
+                .filter(packageToImport -> !packageToImport.isEmpty())
                 .distinct()
-                .forEach(type -> writer.println("import " + type.getPackageToImport() + ";"));
+                .forEach(packageToImport -> writer.println("import " + packageToImport + ";"));
     }
 
     private void addIdAttribute(PrintWriter writer) {
@@ -110,6 +113,12 @@ public class EntityGenerator extends FileFolderGenerator {
 
     private void addCustomAttribute(EntityAttribute attribute, PrintWriter writer) {
         writer.println("@Column(name = \"" + attribute.getTitle().toLowerCase(Locale.ROOT) + "\")");
+
+        // Add DateTimeFormat if the attribute is a LocalDate
+        if (attribute.getDataType().equals("LocalDate")) {
+            writer.println("@DateTimeFormat(pattern = \"yyyy-MM-dd\")");
+        }
+
         writer.println("private " + attribute.getDataType() + " " + attribute.getTitle().toLowerCase(Locale.ROOT) + ";");
     }
 

@@ -1,6 +1,7 @@
 package org.dhbw.webapplicationgenerator.generator;
 
 import lombok.AllArgsConstructor;
+import org.dhbw.webapplicationgenerator.generator.base_project.ExceptionGenerator;
 import org.dhbw.webapplicationgenerator.generator.entity.EntityGenerator;
 import org.dhbw.webapplicationgenerator.generator.frontend.FrontendControllerGenerator;
 import org.dhbw.webapplicationgenerator.generator.frontend.FrontendGenerator;
@@ -21,6 +22,7 @@ public class ProjectGenerator {
     private final EntityGenerator entityGenerator;
     private final RepositoryGenerator repositoryGenerator;
     private final WebMvcConfigGenerator mvcConfigGenerator;
+    private final ExceptionGenerator exceptionGenerator;
     private final FrontendControllerGenerator frontendControllerGenerator;
     private final FrontendGenerator frontendGenerator;
 
@@ -35,7 +37,8 @@ public class ProjectGenerator {
         Project projectWithEntites = this.entityGenerator.create(baseProject, request);
         Project projectWithRepositories =  this.repositoryGenerator.create(projectWithEntites, request);
         Project projectWithMvcConfig = this.mvcConfigGenerator.create(projectWithRepositories, request);
-        Project projectWithFrontendController = this.frontendControllerGenerator.create(projectWithMvcConfig, request);
+        Project projectWithExceptions = this.exceptionGenerator.create(projectWithMvcConfig, request);
+        Project projectWithFrontendController = this.frontendControllerGenerator.create(projectWithExceptions, request);
         return this.frontendGenerator.create(projectWithFrontendController, request);
     }
 

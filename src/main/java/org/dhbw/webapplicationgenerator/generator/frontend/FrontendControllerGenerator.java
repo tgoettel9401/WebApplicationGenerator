@@ -3,7 +3,7 @@ package org.dhbw.webapplicationgenerator.generator.frontend;
 import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.Project;
 import org.dhbw.webapplicationgenerator.generator.base_project.FileFolderGenerator;
-import org.dhbw.webapplicationgenerator.generator.base_project.PackageNameResolver;
+import org.dhbw.webapplicationgenerator.generator.util.PackageNameResolver;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.util.ResourceFileHelper;
 import org.dhbw.webapplicationgenerator.webclient.request.ProjectRequest;
@@ -64,6 +64,7 @@ public class FrontendControllerGenerator extends FileFolderGenerator {
 
             printWriter.println("import " + packageNameResolver.resolveEntity(request) + "." + entity.getTitle() + ";");
             printWriter.println("import " + packageNameResolver.resolveRepository(request) + "." + repositoryName + ";");
+            printWriter.println("import " + packageNameResolver.resolveException(request) + ".NotFoundException;");
             printWriter.println("import org.springframework.stereotype.Controller;");
             printWriter.println("import org.springframework.ui.Model;");
             printWriter.println("import org.springframework.web.bind.annotation.*;");
@@ -80,11 +81,13 @@ public class FrontendControllerGenerator extends FileFolderGenerator {
                     entity.getTitle().toLowerCase(Locale.ROOT) + "Repository;");
             printWriter.println("");
 
+            // Constructor
             String repositoryVariableName = entity.getTitle().toLowerCase(Locale.ROOT) + "Repository";
-            printWriter.println("public " + controllerName + "(" + repositoryName + repositoryVariableName + ") {");
+            printWriter.println("public " + controllerName + "(" + repositoryName + " " + repositoryVariableName + ") {");
             printWriter.println("this." + repositoryVariableName + " = " + repositoryVariableName + ";");
             printWriter.println("}");
 
+            // Show all entities
             printWriter.println("@GetMapping()");
             printWriter.println("public String index(Model model) {");
             printWriter.println("model.addAttribute(\"" + plural(entity.getTitle().toLowerCase(Locale.ROOT)) +
@@ -93,6 +96,7 @@ public class FrontendControllerGenerator extends FileFolderGenerator {
             printWriter.println("}");
             printWriter.println("");
 
+            // Create new entity
             printWriter.println("@GetMapping(\"/create\")");
             printWriter.println("public String create(Model model) {");
             printWriter.println(entity.getTitle() + " " + entity.getTitle().toLowerCase(Locale.ROOT) + " = new " +
@@ -103,6 +107,38 @@ public class FrontendControllerGenerator extends FileFolderGenerator {
             printWriter.println("}");
             printWriter.println("");
 
+            // Update an existing entity
+            printWriter.println("@GetMapping(\"/edit/{id}\")");
+            printWriter.println("public String update(Model model, @PathVariable(\"id\") Long " +
+                    entity.getTitle().toLowerCase(Locale.ROOT) + "Id)  throws NotFoundException {");
+            printWriter.println(entity.getTitle() + " " + entity.getTitle().toLowerCase(Locale.ROOT) + " = " +
+                    repositoryVariableName + ".findById(" + entity.getTitle().toLowerCase(Locale.ROOT) +
+                    "Id).orElseThrow(() -> new NotFoundException(\"" + capitalize(entity.getTitle().toLowerCase(Locale.ROOT)) +
+                    "\", " + entity.getTitle().toLowerCase(Locale.ROOT) + "Id));");
+            printWriter.println("model.addAttribute(\"" + entity.getTitle().toLowerCase(Locale.ROOT) + "\", " +
+                    entity.getTitle().toLowerCase(Locale.ROOT) + ");");
+            printWriter.println("return \"" + entity.getTitle().toLowerCase(Locale.ROOT) + "Details\";");
+            printWriter.println("}");
+            printWriter.println("");
+
+            // Saving an entity
+            printWriter.println("@PostMapping(\"save\")");
+            printWriter.println("public RedirectView save(@ModelAttribute " + entity.getTitle() + " " +
+                    entity.getTitle().toLowerCase(Locale.ROOT) + ") {");
+            printWriter.println(repositoryVariableName + ".save(" + entity.getTitle().toLowerCase(Locale.ROOT) + ");");
+            printWriter.println("return new RedirectView(\"/" + plural(entity.getTitle().toLowerCase(Locale.ROOT))  + "\");");
+            printWriter.println("}");
+            printWriter.println("");
+
+            // Deleting an entity
+            printWriter.println("@GetMapping(\"delete/{id}\")");
+            printWriter.println("public RedirectView delete(@PathVariable(\"id\") Long " +
+                    entity.getTitle().toLowerCase(Locale.ROOT) + "Id) {");
+            printWriter.println(repositoryVariableName + ".deleteById(" +entity.getTitle().toLowerCase(Locale.ROOT) + "Id);");
+            printWriter.println("return new RedirectView(\"/" + plural(entity.getTitle().toLowerCase(Locale.ROOT))  + "\");");
+            printWriter.println("}");
+
+            // Close the final curly bracket
             printWriter.println("}");
 
         }

@@ -2,18 +2,22 @@ package org.dhbw.webapplicationgenerator.generator.entity;
 
 import lombok.Getter;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 @Getter
 public enum DataType {
-    LOCAL_DATE("LocalDate", "java.time.LocalDate", "date"),
-    STRING("String", "", "text"),
-    INTEGER("Integer", "", "number"),
-    UNKNOWN("", "", "");
+    LOCAL_DATE("LocalDate", Arrays.asList("java.time.LocalDate", "org.springframework.format.annotation.DateTimeFormat"), "date"),
+    STRING("String", new ArrayList<>(), "text"),
+    INTEGER("Integer", new ArrayList<>(), "number"),
+    UNKNOWN("", new ArrayList<>(), "");
 
     private String name;
-    private String packageToImport;
+    private List<String> packageToImport;
     private String inputType;
 
-    DataType (String name, String packageToImport, String inputType) {
+    DataType (String name, List<String> packageToImport, String inputType) {
         this.name = name;
         this.packageToImport = packageToImport;
         this.inputType = inputType;
