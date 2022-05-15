@@ -11,7 +11,6 @@ import org.dhbw.webapplicationgenerator.webclient.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.webclient.request.RequestEntity;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.HTML;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -55,6 +54,7 @@ public class FrontendGenerator extends FileFolderGenerator {
 
         for (RequestEntity entity : request.getEntities()) {
             addFile(createOverviewFile(entity), templatesDir);
+            addFile(createDetailsFile(entity), templatesDir);
         }
 
     }
@@ -89,7 +89,7 @@ public class FrontendGenerator extends FileFolderGenerator {
     }
 
     private File createOverviewFile(RequestEntity entity) throws IOException {
-        String fileName = plural(entity.getEntityName()) + HTML_FILE_ENDING;
+        String fileName = plural(entity.getEntityName().toLowerCase(Locale.ROOT)) + HTML_FILE_ENDING;
         File file = new File(String.valueOf(Files.createFile(Path.of(TMP_PATH + fileName))));
         FileWriter fileWriter = new FileWriter(file);
         try (PrintWriter printWriter = new PrintWriter(fileWriter)) {
@@ -99,7 +99,8 @@ public class FrontendGenerator extends FileFolderGenerator {
             printWriter.println("<body>");
             printWriter.println("<div class=\"container-fluid\" style=\"margin-top: 10px\">");
             printWriter.println("<h1>" + plural(entity.getEntityName()) + "</h1> <br>");
-            printWriter.println("<a th:href=\"@{/courses/create}\"><input type=\"button\" class=\"btn btn-primary\" value=\"New\"\n" +
+            printWriter.println("<a th:href=\"@{/" + plural(entity.getTitle().toLowerCase(Locale.ROOT)) +
+                    "/create}\"><input type=\"button\" class=\"btn btn-primary\" value=\"New\"\n" +
                     " style=\"margin-bottom: 10px\"></a>");
 
             printWriter.println("<table class=\"table table-bordered\">");
@@ -143,6 +144,55 @@ public class FrontendGenerator extends FileFolderGenerator {
             printWriter.println("</div>");
             printWriter.println("</div>");
             printWriter.println("</body>");
+        }
+        return file;
+    }
+
+    private File createDetailsFile(RequestEntity entity) throws IOException {
+        String fileName = entity.getEntityName().toLowerCase(Locale.ROOT) + "Details" + HTML_FILE_ENDING;
+        File file = new File(String.valueOf(Files.createFile(Path.of(TMP_PATH + fileName))));
+        FileWriter fileWriter = new FileWriter(file);
+        try (PrintWriter printWriter = new PrintWriter(fileWriter)) {
+
+            // Header
+            printWriter.println("<html lang=\"en\" xmlns:th=\"http://www.thymeleaf.org\">");
+            printWriter.println("<div th:insert=\"main.html\"></div>");
+            printWriter.println("<body>");
+            printWriter.println("<div class=\"container-fluid\" style=\"margin-top: 10px\">");
+
+            // Update or Create
+            printWriter.println("<h1 th:if=\"${" + entity.getTitle().toLowerCase(Locale.ROOT) +
+                    ".getId() != null}\">Update an existing " + entity.getTitle() + "</h1>");
+            printWriter.println("<h1 th:if=\"${" + entity.getTitle().toLowerCase(Locale.ROOT) +
+                    ".getId() == null}\">Create a new " + entity.getTitle() + "</h1>");
+
+            printWriter.println("<form th:action=\"@{'/" + plural(entity.getTitle().toLowerCase(Locale.ROOT)) +
+                    "/save'}\" th:object=\"${" + entity.getTitle().toLowerCase(Locale.ROOT) + "}\" method=\"post\">");
+            printWriter.println("<input type=\"hidden\" name=\"id\" th:value=\"${" +
+                    entity.getTitle().toLowerCase(Locale.ROOT) + ".getId()}\">");
+
+            for (EntityAttribute attribute : entity.getAttributes()) {
+                printWriter.println("<label for=\"" + attribute.getTitle().toLowerCase(Locale.ROOT) + "\">" +
+                        capitalize(attribute.getTitle().toLowerCase(Locale.ROOT)) + "</label>");
+                DataType dataType = DataType.fromName(attribute.getDataType());
+                printWriter.println("<input type=\"" + dataType.getInputType() + "\" id=\"" + attribute.getTitle().toLowerCase(Locale.ROOT) + "\" name=\"" +
+                        attribute.getTitle().toLowerCase(Locale.ROOT) + "\" class=\"input-group\" th:value=\"${" +
+                        entity.getTitle().toLowerCase(Locale.ROOT) + ".get" +
+                        capitalize(attribute.getTitle().toLowerCase(Locale.ROOT)) + "()}\">");
+                printWriter.println("<br>");
+            }
+
+            printWriter.println("<a th:href=\"@{/" + plural(entity.getTitle().toLowerCase(Locale.ROOT)) +
+                    "}\"><input type=\"button\" class=\"btn btn-warning\" value=\"Cancel\"></a>");
+
+            printWriter.println("<input type=\"submit\" class=\"btn btn-primary\" value=\"Save\"> <br>");
+
+            printWriter.println("</form>");
+            printWriter.println("<div th:insert=\"footer.html\">");
+            printWriter.println("</div>");
+            printWriter.println("</div>");
+            printWriter.println("</body>");
+
         }
         return file;
     }

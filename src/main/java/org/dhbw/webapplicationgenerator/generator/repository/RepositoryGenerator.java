@@ -1,7 +1,9 @@
 package org.dhbw.webapplicationgenerator.generator.repository;
 
+import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.Project;
 import org.dhbw.webapplicationgenerator.generator.base_project.FileFolderGenerator;
+import org.dhbw.webapplicationgenerator.generator.base_project.PackageNameResolver;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.webclient.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.webclient.request.RequestEntity;
@@ -16,10 +18,13 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class RepositoryGenerator extends FileFolderGenerator {
 
     private static final String TMP_PATH = ".tmp/";
     private static final String JAVA_CLASS_ENDING = ".java";
+
+    private final PackageNameResolver packageNameResolver;
 
     public Project create(Project project, ProjectRequest request) {
 
@@ -44,8 +49,8 @@ public class RepositoryGenerator extends FileFolderGenerator {
 
     private File createRepository(RequestEntity entity, ProjectRequest request) throws IOException {
         File file = new File(String.valueOf(Files.createFile(Path.of(TMP_PATH + entity.getTitle() + "Repository" + JAVA_CLASS_ENDING))));
-        String repositoryPackageName = request.getGroup() + "." + request.getArtifact() + ".repository";
-        String entityPackageName = request.getGroup() + "." + request.getArtifact() + ".domain";
+        String repositoryPackageName = packageNameResolver.resolveRepository(request);
+        String entityPackageName = packageNameResolver.resolveEntity(request);
         FileWriter fileWriter = new FileWriter(file);
         try (PrintWriter printWriter = new PrintWriter(fileWriter)) {
             printWriter.println("package " + repositoryPackageName + ";");

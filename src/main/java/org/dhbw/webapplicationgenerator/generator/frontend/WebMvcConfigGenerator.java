@@ -1,7 +1,9 @@
 package org.dhbw.webapplicationgenerator.generator.frontend;
 
+import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.Project;
 import org.dhbw.webapplicationgenerator.generator.base_project.FileFolderGenerator;
+import org.dhbw.webapplicationgenerator.generator.base_project.PackageNameResolver;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.webclient.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.webclient.request.RequestEntity;
@@ -18,10 +20,13 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
+@AllArgsConstructor
 public class WebMvcConfigGenerator extends FileFolderGenerator {
 
     private static final String TMP_PATH = ".tmp/";
     private static final String JAVA_CLASS_ENDING = ".java";
+
+    private final PackageNameResolver packageNameResolver;
 
     public Project create(Project project, ProjectRequest request) {
 
@@ -38,7 +43,7 @@ public class WebMvcConfigGenerator extends FileFolderGenerator {
 
         ProjectDirectory configDir = addDirectory("config", Optional.of(parent));
 
-        String packageName = request.getGroup() + "." + request.getArtifact() + ".config";
+        String packageName = packageNameResolver.resolveConfig(request);
 
         addFile(createWebMvcConfigFile(request.getEntities(), packageName), configDir);
 

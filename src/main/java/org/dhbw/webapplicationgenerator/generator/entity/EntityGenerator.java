@@ -1,7 +1,9 @@
 package org.dhbw.webapplicationgenerator.generator.entity;
 
+import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.Project;
 import org.dhbw.webapplicationgenerator.generator.base_project.FileFolderGenerator;
+import org.dhbw.webapplicationgenerator.generator.base_project.PackageNameResolver;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.webclient.request.EntityAttribute;
 import org.dhbw.webapplicationgenerator.webclient.request.ProjectRequest;
@@ -18,10 +20,13 @@ import java.util.Locale;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class EntityGenerator extends FileFolderGenerator {
 
     private static final String TMP_PATH = ".tmp/";
     private static final String JAVA_CLASS_ENDING = ".java";
+
+    private final PackageNameResolver packageNameResolver;
 
     public Project create(Project project, ProjectRequest request) {
 
@@ -38,7 +43,7 @@ public class EntityGenerator extends FileFolderGenerator {
 
         ProjectDirectory domainDir = addDirectory("domain", Optional.of(parent));
 
-        String packageName = request.getGroup() + "." + request.getArtifact() + ".domain";
+        String packageName = packageNameResolver.resolveEntity(request);
 
         for (RequestEntity entity : request.getEntities()) {
             addFile(createEntity(entity, packageName), domainDir);
@@ -67,6 +72,14 @@ public class EntityGenerator extends FileFolderGenerator {
                 addCustomAttribute(attribute, printWriter);
             }
 
+            // Getter and Setter for ID
+            EntityAttribute idAttribute = new EntityAttribute();
+            idAttribute.setTitle("id");
+            idAttribute.setDataType("Long");
+            addGetter(idAttribute, printWriter);
+            addSetter(idAttribute, printWriter);
+
+            // Getter and Setter for other attributes
             for (EntityAttribute attribute : entity.getAttributes()) {
                 addGetter(attribute, printWriter);
                 addSetter(attribute, printWriter);
@@ -80,12 +93,10 @@ public class EntityGenerator extends FileFolderGenerator {
     private void addImports(PrintWriter writer, RequestEntity entity) {
         writer.println("import javax.persistence.*;");
         writer.println("import java.io.Serializable;");
-
         entity.getAttributes().stream()
                 .map(EntityAttribute::getDataType)
-                .filter(type -> !type.equals("String"))
-                .filter(type -> !type.equals("Integer"))
                 .map(DataType::fromName)
+                .filter(dataType -> !dataType.getPackageToImport().isEmpty()) // Only not empty packagesToImport are imported
                 .distinct()
                 .forEach(type -> writer.println("import " + type.getPackageToImport() + ";"));
     }
@@ -103,13 +114,13 @@ public class EntityGenerator extends FileFolderGenerator {
     }
 
     private void addGetter(EntityAttribute attribute, PrintWriter writer) {
-        writer.println("private " + attribute.getDataType() + " get" + capitalize(attribute.getTitle()) + "() {");
+        writer.println("public " + attribute.getDataType() + " get" + capitalize(attribute.getTitle()) + "() {");
         writer.println("    return " + attribute.getTitle().toLowerCase(Locale.ROOT) + ";");
         writer.println("}");
     }
 
     private void addSetter(EntityAttribute attribute, PrintWriter writer) {
-        writer.println("private void set" + capitalize(attribute.getTitle()) + "(" +
+        writer.println("public void set" + capitalize(attribute.getTitle()) + "(" +
                 attribute.getDataType() + " " + attribute.getTitle() + ") {");
         writer.println("this." + attribute.getTitle().toLowerCase(Locale.ROOT) + " = " + attribute.getTitle().toLowerCase(Locale.ROOT) + ";");
         writer.println("}");
