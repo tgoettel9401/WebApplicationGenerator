@@ -7,7 +7,7 @@ import org.dhbw.webapplicationgenerator.generator.entity.DataType;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.util.ResourceFileHelper;
 import org.dhbw.webapplicationgenerator.webclient.request.EntityAttribute;
-import org.dhbw.webapplicationgenerator.webclient.request.ProjectRequest;
+import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.dhbw.webapplicationgenerator.webclient.request.RequestEntity;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +30,7 @@ public class FrontendGenerator extends FileFolderGenerator {
 
     private final ResourceFileHelper resourceFileHelper;
 
-    public Project create(Project project, ProjectRequest request) {
+    public Project create(Project project, CreationRequest request) {
 
         ProjectDirectory resourcesDir = getResourcesDirectory(project);
 
@@ -42,7 +42,7 @@ public class FrontendGenerator extends FileFolderGenerator {
         return project;
     }
 
-    private void createFrontend(ProjectRequest request, ProjectDirectory parent) throws IOException {
+    private void createFrontend(CreationRequest request, ProjectDirectory parent) throws IOException {
 
         ProjectDirectory templatesDir = addDirectory("templates", Optional.of(parent));
 

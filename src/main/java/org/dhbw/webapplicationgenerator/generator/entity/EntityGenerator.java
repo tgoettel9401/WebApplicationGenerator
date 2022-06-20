@@ -6,7 +6,7 @@ import org.dhbw.webapplicationgenerator.generator.base_project.FileFolderGenerat
 import org.dhbw.webapplicationgenerator.generator.util.PackageNameResolver;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.webclient.request.EntityAttribute;
-import org.dhbw.webapplicationgenerator.webclient.request.ProjectRequest;
+import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.dhbw.webapplicationgenerator.webclient.request.RequestEntity;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +29,7 @@ public class EntityGenerator extends FileFolderGenerator {
 
     private final PackageNameResolver packageNameResolver;
 
-    public Project create(Project project, ProjectRequest request) {
+    public Project create(Project project, CreationRequest request) {
 
         ProjectDirectory artifactDir = getMainProjectDirectory(project, request);
         try {
@@ -40,7 +40,7 @@ public class EntityGenerator extends FileFolderGenerator {
         return project;
     }
 
-    private void create(ProjectRequest request, ProjectDirectory parent) throws IOException {
+    private void create(CreationRequest request, ProjectDirectory parent) throws IOException {
 
         ProjectDirectory domainDir = addDirectory("domain", Optional.of(parent));
 

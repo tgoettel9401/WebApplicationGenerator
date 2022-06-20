@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectFile;
 import org.dhbw.webapplicationgenerator.util.ResourceFileHelper;
-import org.dhbw.webapplicationgenerator.webclient.request.ProjectRequest;
+import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.FileNotFoundException;
@@ -23,7 +23,7 @@ public class RootFilesGenerator extends FileFolderGenerator {
      * @param parent Parent directory, usually this is the root directory of the project
      * @return List of Files in the root directory
      */
-    public List<ProjectFile> create(ProjectRequest request, ProjectDirectory parent) {
+    public List<ProjectFile> create(CreationRequest request, ProjectDirectory parent) {
         List<ProjectFile> files = new ArrayList<>();
         try {
             files.add(addFile(resourceFileHelper.getFile("HELP.md"), parent));

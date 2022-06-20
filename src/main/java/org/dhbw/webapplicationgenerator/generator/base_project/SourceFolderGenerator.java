@@ -3,7 +3,7 @@ package org.dhbw.webapplicationgenerator.generator.base_project;
 import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.util.ResourceFileHelper;
-import org.dhbw.webapplicationgenerator.webclient.request.ProjectRequest;
+import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.FileNotFoundException;
@@ -22,14 +22,14 @@ public class SourceFolderGenerator extends FileFolderGenerator {
      * @param parent Parent directory, usually this is the root directory of the project
      * @return Src-Directory
      */
-    public ProjectDirectory create(ProjectRequest request, ProjectDirectory parent) {
+    public ProjectDirectory create(CreationRequest request, ProjectDirectory parent) {
         ProjectDirectory srcDir = addDirectory("src", Optional.of(parent));
         addTestDir(request, srcDir);
         addMainDir(request, srcDir);
         return srcDir;
     }
 
-    private ProjectDirectory addTestDir(ProjectRequest request, ProjectDirectory srcDir) {
+    private ProjectDirectory addTestDir(CreationRequest request, ProjectDirectory srcDir) {
         ProjectDirectory testDir = addDirectory("test", Optional.of(srcDir));
         ProjectDirectory javaPackageDir = addDirectory("java", Optional.of(testDir));
         ProjectDirectory groupPackageDir = addGroupPackage(request, javaPackageDir);
@@ -41,7 +41,7 @@ public class SourceFolderGenerator extends FileFolderGenerator {
         return testDir;
     }
 
-    private ProjectDirectory addMainDir(ProjectRequest request, ProjectDirectory srcDir) {
+    private ProjectDirectory addMainDir(CreationRequest request, ProjectDirectory srcDir) {
         ProjectDirectory mainDir = addDirectory("main", Optional.of(srcDir));
         ProjectDirectory resourcesDir = addDirectory("resources", Optional.of(mainDir));
         try {
@@ -59,13 +59,13 @@ public class SourceFolderGenerator extends FileFolderGenerator {
         return mainDir;
     }
 
-    private ProjectDirectory addGroupPackage(ProjectRequest request, ProjectDirectory javaPackageDir) {
-        String[] groupParts = request.getGroup().split("\\.");
+    private ProjectDirectory addGroupPackage(CreationRequest request, ProjectDirectory javaPackageDir) {
+        String[] groupParts = request.getProject().getGroup().split("\\.");
         ProjectDirectory currentChildDir = javaPackageDir;
         for (String groupPart : groupParts) {
             currentChildDir = addDirectory(groupPart, Optional.of(currentChildDir));
         }
-        return addDirectory(request.getArtifact(), Optional.of(currentChildDir));
+        return addDirectory(request.getProject().getArtifact(), Optional.of(currentChildDir));
     }
 
 }

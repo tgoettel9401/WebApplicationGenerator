@@ -7,7 +7,7 @@ import org.dhbw.webapplicationgenerator.generator.frontend.FrontendControllerGen
 import org.dhbw.webapplicationgenerator.generator.frontend.FrontendGenerator;
 import org.dhbw.webapplicationgenerator.generator.frontend.WebMvcConfigGenerator;
 import org.dhbw.webapplicationgenerator.generator.repository.RepositoryGenerator;
-import org.dhbw.webapplicationgenerator.webclient.request.ProjectRequest;
+import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -31,8 +31,8 @@ public class ProjectGenerator {
      * @param request Request for creating the project
      * @return Project based on the provided request
      */
-    public Project generate(ProjectRequest request) {
-        logger.info("Generating new project with title {}", request.getTitle());
+    public Project generate(CreationRequest request) {
+        logger.info("Generating new project with title {}", request.getProject().getTitle());
         Project baseProject = this.baseProjectGenerator.create(request);
         Project projectWithEntites = this.entityGenerator.create(baseProject, request);
         Project projectWithRepositories =  this.repositoryGenerator.create(projectWithEntites, request);

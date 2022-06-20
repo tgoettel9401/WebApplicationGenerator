@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.Project;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.generator.util.PackageNameResolver;
-import org.dhbw.webapplicationgenerator.webclient.request.ProjectRequest;
+import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -24,7 +24,7 @@ public class ExceptionGenerator extends FileFolderGenerator{
 
     private final PackageNameResolver packageNameResolver;
 
-    public Project create(Project project, ProjectRequest request) {
+    public Project create(Project project, CreationRequest request) {
 
         ProjectDirectory mainDir = getMainProjectDirectory(project, request);
 
@@ -36,7 +36,7 @@ public class ExceptionGenerator extends FileFolderGenerator{
         return project;
     }
 
-    private void create(ProjectRequest request, ProjectDirectory parent) throws IOException {
+    private void create(CreationRequest request, ProjectDirectory parent) throws IOException {
 
         // Create exceptions package
         ProjectDirectory exceptionDir = addDirectory("exception", Optional.of(parent));

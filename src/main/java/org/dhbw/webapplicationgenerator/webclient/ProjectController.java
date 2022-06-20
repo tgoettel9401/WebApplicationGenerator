@@ -2,7 +2,7 @@ package org.dhbw.webapplicationgenerator.webclient;
 
 import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.webclient.request.EntityAttribute;
-import org.dhbw.webapplicationgenerator.webclient.request.ProjectRequest;
+import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.dhbw.webapplicationgenerator.webclient.request.RequestEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,11 +27,11 @@ public class ProjectController {
     @GetMapping(value = "generate", produces = "application/zip")
     public byte[] generateBaseProject() throws IOException {
         logger.info("Received generation request for base project");
-        ProjectRequest request = new ProjectRequest();
-        request.setTitle("Spring-Base-Project");
-        request.setGroup("org.example");
-        request.setDescription("This was generated automatically");
-        request.setArtifact("demo");
+        CreationRequest request = new CreationRequest();
+        request.getProject().setTitle("Spring-Base-Project");
+        request.getProject().setGroup("org.example");
+        request.getProject().setDescription("This was generated automatically");
+        request.getProject().setArtifact("demo");
         request.setHavingWeb(true);
         request.setHavingJpa(true);
         request.setEntities(initializeEntities());
@@ -39,8 +39,8 @@ public class ProjectController {
     }
 
     @PostMapping("generate")
-    public byte[] generateByRequest(@RequestBody() ProjectRequest request) throws IOException {
-        logger.info("Received generation request for project with title {}", request.getTitle());
+    public byte[] generateByRequest(@RequestBody() CreationRequest request) throws IOException {
+        logger.info("Received generation request for project with title {}", request.getProject().getTitle());
         ByteArrayOutputStream stream = projectService.generate(request);
         return stream.toByteArray();
     }

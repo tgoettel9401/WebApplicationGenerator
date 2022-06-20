@@ -3,8 +3,9 @@ package org.dhbw.webapplicationgenerator.generator.entity;
 import org.dhbw.webapplicationgenerator.generator.Project;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectFile;
+import org.dhbw.webapplicationgenerator.webclient.exception.WagException;
 import org.dhbw.webapplicationgenerator.webclient.request.EntityAttribute;
-import org.dhbw.webapplicationgenerator.webclient.request.ProjectRequest;
+import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.dhbw.webapplicationgenerator.webclient.request.RequestEntity;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -73,10 +74,10 @@ class EntityGeneratorTest {
         Project baseProject = new Project();
         baseProject.setFileStructure(fileStructure);
 
-        ProjectRequest request = new ProjectRequest();
-        request.setArtifact("artifact");
-        request.setGroup("group");
-        request.setTitle("title");
+        CreationRequest request = new CreationRequest();
+        request.getProject().setArtifact("artifact");
+        request.getProject().setGroup("group");
+        request.getProject().setTitle("title");
 
         Set<RequestEntity> entities = new HashSet<>();
         RequestEntity entity1 = new RequestEntity();
@@ -116,31 +117,30 @@ class EntityGeneratorTest {
         ProjectDirectory createdRootDir = (ProjectDirectory) createdProject.getFileStructure();
         ProjectDirectory createdSrcDir = (ProjectDirectory) createdRootDir.getChildren().stream()
                 .filter(child -> child.getTitle().equals("src"))
-                .findFirst().get();
+                .findFirst().orElseThrow(() -> new WagException("src-Directory not found"));
         ProjectDirectory createdMainDir = (ProjectDirectory) createdSrcDir.getChildren().stream()
                 .filter(child -> child.getTitle().equals("main"))
-                .findFirst().get();
-        ProjectDirectory createdJavaDir = (ProjectDirectory) createdMainDir.getChildren().stream()
-                .filter(child -> child.getTitle().equals("java"))
-                .findFirst().get();
-        ProjectDirectory createdGroupDir = createdJavaDir;
-        for (String groupPart : request.getGroup().split("\\.")) {
+                .findFirst().orElseThrow(() -> new WagException("main-Directory not found"));
+        ProjectDirectory createdGroupDir = (ProjectDirectory) createdMainDir.getChildren().stream()
+                .filter(child1 -> child1.getTitle().equals("java"))
+                .findFirst().orElseThrow(() -> new WagException("java-Directory not found"));
+        for (String groupPart : request.getProject().getGroup().split("\\.")) {
             createdGroupDir = (ProjectDirectory) createdGroupDir.getChildren().stream()
                     .filter(child -> child.getTitle().equals(groupPart)).findFirst()
-                    .orElseThrow(() -> new RuntimeException("Creating entity failed due to missing src folder"));
+                    .orElseThrow(() -> new WagException("Creating entity failed due to missing src folder"));
         }
         ProjectDirectory createdArtifactDir = (ProjectDirectory) createdGroupDir.getChildren().stream()
-                .filter(child -> child.getTitle().equals(request.getArtifact()))
-                .findFirst().get();
+                .filter(child -> child.getTitle().equals(request.getProject().getArtifact()))
+                .findFirst().orElseThrow(() -> new WagException("artifact-Directory not found"));
         ProjectDirectory createdDomainDir = (ProjectDirectory) createdArtifactDir.getChildren().stream()
                 .filter(child -> child.getTitle().equals("domain"))
-                .findFirst().get();
+                .findFirst().orElseThrow(() -> new WagException("domain-Directory not found"));
         ProjectFile createdEntityFile1 = (ProjectFile) createdDomainDir.getChildren().stream()
                 .filter(child -> child.getTitle().equals("FirstEntityClass.java"))
-                .findFirst().get();
+                .findFirst().orElseThrow(() -> new WagException("entity1-File not found"));
         ProjectFile createdEntityFile2 = (ProjectFile) createdDomainDir.getChildren().stream()
                 .filter(child -> child.getTitle().equals("SecondEntityClass.java"))
-                .findFirst().get();
+                .findFirst().orElseThrow(() -> new WagException("entity2-File not found"));
 
         assertThat(createdArtifactDir).isNotNull();
         assertThat(createdArtifactDir.getPath()).isEqualTo("/src/main/java/group/artifact/");
@@ -150,8 +150,6 @@ class EntityGeneratorTest {
         assertThat(createdEntityFile1.getPath()).isEqualTo("/src/main/java/group/artifact/domain/FirstEntityClass.java");
         assertThat(createdEntityFile2).isNotNull();
         assertThat(createdEntityFile2.getPath()).isEqualTo("/src/main/java/group/artifact/domain/SecondEntityClass.java");
-
-        // TODO: Test file content for entity classes.
 
     }
 }

@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectFile;
 import org.dhbw.webapplicationgenerator.util.ResourceFileHelper;
-import org.dhbw.webapplicationgenerator.webclient.request.ProjectRequest;
+import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -17,12 +17,12 @@ public class PomXmlGenerator extends FileFolderGenerator {
 
     private final ResourceFileHelper resourceFileHelper;
 
-    public ProjectFile create(ProjectRequest request, ProjectDirectory parent) {
+    public ProjectFile create(CreationRequest request, ProjectDirectory parent) {
         createTmpFolderIfNotExists();
         return addFile(createPomXml(request), parent);
     }
 
-    private File createPomXml(ProjectRequest request) {
+    private File createPomXml(CreationRequest request) {
         createTmpFolderIfNotExists();
         File baseFile = getBasePomXml();
         try (BufferedReader reader = new BufferedReader(new FileReader(Objects.requireNonNull(baseFile)));
@@ -34,7 +34,7 @@ public class PomXmlGenerator extends FileFolderGenerator {
         return new File(".tmp/pom.xml");
     }
 
-    private void writeUpdatedPomXmlToStream(FileOutputStream stream, BufferedReader reader, ProjectRequest request) throws IOException {
+    private void writeUpdatedPomXmlToStream(FileOutputStream stream, BufferedReader reader, CreationRequest request) throws IOException {
         StringBuilder stringBuilder = new StringBuilder();
 
         String line;
@@ -66,7 +66,7 @@ public class PomXmlGenerator extends FileFolderGenerator {
         stream.write(inputString.getBytes(StandardCharsets.UTF_8));
     }
 
-    private void replaceAdditionalDependencies(StringBuilder builder, ProjectRequest request) {
+    private void replaceAdditionalDependencies(StringBuilder builder, CreationRequest request) {
         if (request.isHavingWeb()) {
             addDependency("org.springframework.boot", "spring-boot-starter-web", builder);
             addDependency("org.springframework.boot", "spring-boot-starter-thymeleaf", builder);
@@ -78,23 +78,23 @@ public class PomXmlGenerator extends FileFolderGenerator {
         builder.append("\n");
     }
 
-    private void replaceGroupId(StringBuilder builder, ProjectRequest request) {
-        builder.append("\t<groupId>").append(request.getGroup()).append("</groupId>");
+    private void replaceGroupId(StringBuilder builder, CreationRequest request) {
+        builder.append("\t<groupId>").append(request.getProject().getGroup()).append("</groupId>");
         builder.append("\n");
     }
 
-    private void replaceArtifactId(StringBuilder builder, ProjectRequest request) {
-        builder.append("\t<artifactId>").append(request.getArtifact()).append("</artifactId>");
+    private void replaceArtifactId(StringBuilder builder, CreationRequest request) {
+        builder.append("\t<artifactId>").append(request.getProject().getArtifact()).append("</artifactId>");
         builder.append("\n");
     }
 
-    private void replaceDescription(StringBuilder builder, ProjectRequest request) {
-        builder.append("\t<description>").append(request.getDescription()).append("</description>");
+    private void replaceDescription(StringBuilder builder, CreationRequest request) {
+        builder.append("\t<description>").append(request.getProject().getDescription()).append("</description>");
         builder.append("\n");
     }
 
-    private void replaceTitle(StringBuilder builder, ProjectRequest request) {
-        builder.append("\t<name>").append(request.getTitle()).append("</name>");
+    private void replaceTitle(StringBuilder builder, CreationRequest request) {
+        builder.append("\t<name>").append(request.getProject().getTitleWithoutSpaces()).append("</name>");
         builder.append("\n");
     }
 

@@ -2,7 +2,7 @@ package org.dhbw.webapplicationgenerator.generator.base_project;
 
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectFile;
-import org.dhbw.webapplicationgenerator.webclient.request.ProjectRequest;
+import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -18,13 +18,13 @@ public class MainFileGenerator extends FileFolderGenerator {
     private static final String TMP_PATH = ".tmp/";
     private static final String JAVA_CLASS_ENDING = ".java";
 
-    public ProjectFile create(ProjectRequest request, ProjectDirectory parent) throws IOException {
+    public ProjectFile create(CreationRequest request, ProjectDirectory parent) throws IOException {
         String className = getClassName(request);
         createTmpFolderIfNotExists();
         File file = new File(String.valueOf(Files.createFile(Path.of(TMP_PATH + className + JAVA_CLASS_ENDING))));
         FileWriter fileWriter = new FileWriter(file);
         try (PrintWriter printWriter = new PrintWriter(fileWriter)){
-            printWriter.println("package " + request.getGroup() + "." + request.getArtifact() + ";");
+            printWriter.println("package " + request.getProject().getGroup() + "." + request.getProject().getArtifact() + ";");
             printWriter.println();
             printWriter.println("import org.springframework.boot.SpringApplication;");
             printWriter.println("import org.springframework.boot.autoconfigure.SpringBootApplication;");
@@ -41,13 +41,13 @@ public class MainFileGenerator extends FileFolderGenerator {
         return addFile(className + JAVA_CLASS_ENDING, file, parent);
     }
 
-    public ProjectFile createTestFile(ProjectRequest request, ProjectDirectory parent) throws IOException {
+    public ProjectFile createTestFile(CreationRequest request, ProjectDirectory parent) throws IOException {
         String className = getClassName(request) + "Tests";
         createTmpFolderIfNotExists();
         File file = new File(String.valueOf(Files.createFile(Path.of(TMP_PATH + className + JAVA_CLASS_ENDING))));
         FileWriter fileWriter = new FileWriter(file);
         try (PrintWriter printWriter = new PrintWriter(fileWriter)){
-            printWriter.println("package " + request.getGroup() + "." + request.getArtifact() + ";");
+            printWriter.println("package " + request.getProject().getGroup() + "." + request.getProject().getArtifact() + ";");
             printWriter.println();
             printWriter.println("import org.junit.jupiter.api.Test;");
             printWriter.println("import org.springframework.boot.test.context.SpringBootTest;");
@@ -64,8 +64,8 @@ public class MainFileGenerator extends FileFolderGenerator {
         return addFile(className + JAVA_CLASS_ENDING, file, parent);
     }
 
-    private String getClassName(ProjectRequest request) {
-        String className = request.getTitle() + "Application";
+    private String getClassName(CreationRequest request) {
+        String className = request.getProject().getTitleWithoutSpaces() + "Application";
         className = className.replace("-", "");
         return className;
     }

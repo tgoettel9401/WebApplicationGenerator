@@ -3,7 +3,7 @@ package org.dhbw.webapplicationgenerator.generator.base_project;
 import org.dhbw.webapplicationgenerator.generator.Project;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectFile;
-import org.dhbw.webapplicationgenerator.webclient.request.ProjectRequest;
+import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -19,11 +19,11 @@ public class FileFolderGenerator {
 
     /**
      * Returns the main project directory, usually in path /src/main/group/artifact
-     * @param project
-     * @param request
-     * @return
+     * @param project current Project object
+     * @param request CreationRequest that has been transmitted from consumer
+     * @return ProjectDirectory for main
      */
-    public ProjectDirectory getMainProjectDirectory(Project project, ProjectRequest request) {
+    public ProjectDirectory getMainProjectDirectory(Project project, CreationRequest request) {
         ProjectDirectory rootDir = (ProjectDirectory) project.getFileStructure();
         ProjectDirectory srcDir = (ProjectDirectory) rootDir.getChildren().stream().filter(child -> child.getTitle().equals("src"))
                 .findFirst().orElseThrow(() -> new RuntimeException("Creating entity failed due to missing src folder"));
@@ -31,18 +31,18 @@ public class FileFolderGenerator {
                 .findFirst().orElseThrow(() -> new RuntimeException("Creating entity failed due to missing main folder"));
         ProjectDirectory groupDir = (ProjectDirectory) mainDir.getChildren().stream().filter(child1 -> child1.getTitle().equals("java"))
                 .findFirst().orElseThrow(() -> new RuntimeException("Creating entity failed due to missing java folder"));
-        for (String groupPart : request.getGroup().split("\\.")) {
+        for (String groupPart : request.getProject().getGroup().split("\\.")) {
             groupDir = (ProjectDirectory) groupDir.getChildren().stream().filter(child -> child.getTitle().equals(groupPart)).findFirst()
                     .orElseThrow(() -> new RuntimeException("Creating entity failed due to missing group folder"));
         }
-        return (ProjectDirectory) groupDir.getChildren().stream().filter(child -> child.getTitle().equals(request.getArtifact()))
+        return (ProjectDirectory) groupDir.getChildren().stream().filter(child -> child.getTitle().equals(request.getProject().getArtifact()))
                 .findFirst().orElseThrow(() -> new RuntimeException("Creating entity failed due to missing artifact folder"));
     }
 
     /**
      * Returns the resources directory, usually in path /src/main/resources
-     * @param project
-     * @return
+     * @param project current Project object
+     * @return ProjectDirectory for resources
      */
     public ProjectDirectory getResourcesDirectory(Project project) {
         ProjectDirectory rootDir = (ProjectDirectory) project.getFileStructure();
@@ -50,9 +50,8 @@ public class FileFolderGenerator {
                 .findFirst().orElseThrow(() -> new RuntimeException("Creating entity failed due to missing src folder"));
         ProjectDirectory mainDir = (ProjectDirectory) srcDir.getChildren().stream().filter(child -> child.getTitle().equals("main"))
                 .findFirst().orElseThrow(() -> new RuntimeException("Creating entity failed due to missing main folder"));
-        ProjectDirectory resourcesDir = (ProjectDirectory) mainDir.getChildren().stream().filter(child -> child.getTitle().equals("resources"))
+        return (ProjectDirectory) mainDir.getChildren().stream().filter(child -> child.getTitle().equals("resources"))
                 .findFirst().orElseThrow(() -> new RuntimeException("Creating entity failed due to missing resources folder"));
-        return resourcesDir;
     }
 
     /**

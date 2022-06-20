@@ -5,7 +5,7 @@ import org.dhbw.webapplicationgenerator.generator.Project;
 import org.dhbw.webapplicationgenerator.generator.base_project.FileFolderGenerator;
 import org.dhbw.webapplicationgenerator.generator.util.PackageNameResolver;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
-import org.dhbw.webapplicationgenerator.webclient.request.ProjectRequest;
+import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.dhbw.webapplicationgenerator.webclient.request.RequestEntity;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +26,7 @@ public class RepositoryGenerator extends FileFolderGenerator {
 
     private final PackageNameResolver packageNameResolver;
 
-    public Project create(Project project, ProjectRequest request) {
+    public Project create(Project project, CreationRequest request) {
 
         ProjectDirectory artifactDir = getMainProjectDirectory(project, request);
         try {
@@ -37,7 +37,7 @@ public class RepositoryGenerator extends FileFolderGenerator {
         return project;
     }
 
-    private void create(ProjectRequest request, ProjectDirectory parent) throws IOException {
+    private void create(CreationRequest request, ProjectDirectory parent) throws IOException {
 
         ProjectDirectory domainDir = addDirectory("repository", Optional.of(parent));
 
@@ -47,7 +47,7 @@ public class RepositoryGenerator extends FileFolderGenerator {
 
     }
 
-    private File createRepository(RequestEntity entity, ProjectRequest request) throws IOException {
+    private File createRepository(RequestEntity entity, CreationRequest request) throws IOException {
         File file = new File(String.valueOf(Files.createFile(Path.of(TMP_PATH + entity.getTitle() + "Repository" + JAVA_CLASS_ENDING))));
         String repositoryPackageName = packageNameResolver.resolveRepository(request);
         String entityPackageName = packageNameResolver.resolveEntity(request);
