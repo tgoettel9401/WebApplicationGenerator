@@ -11,7 +11,7 @@ import java.util.Set;
 
 @Getter
 public enum Cardinality {
-    NULL ("0"), ONE ("1"), MANY("n", "N", "m", "M");
+    ONE ("0", "1"), MANY("n", "N", "m", "M");
 
     private Set<String> keys;
 
@@ -28,7 +28,7 @@ public enum Cardinality {
                 }
             }
         }
-        throw new WagException("Specified Key " + key + " cannot be found as DataType");
+        throw new WagException("Specified Key " + key + " cannot be found as Cardinality");
     }
 
 }

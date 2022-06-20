@@ -7,6 +7,7 @@ import org.dhbw.webapplicationgenerator.generator.util.PackageNameResolver;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.webclient.request.EntityAttribute;
 import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
+import org.dhbw.webapplicationgenerator.webclient.request.EntityRelation;
 import org.dhbw.webapplicationgenerator.webclient.request.RequestEntity;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -62,12 +64,18 @@ public class EntityGenerator extends FileFolderGenerator {
             addImports(printWriter, entity);
             printWriter.println();
 
-            printWriter.println("@Table(name = \"" + plural(entity.getTitle().toLowerCase()) + "\")");
+            String tableName = entity.getTableName() != null ? entity.getTableName() : plural(entity.getName().toLowerCase());
+            printWriter.println("@Table(name = \"" + tableName + "\")");
             printWriter.println("@Entity");
             printWriter.println("public class " + entity.getTitle() + " implements Serializable {");
             printWriter.println();
 
             addIdAttribute(printWriter);
+
+            for (EntityRelation relation : entity.getRelations()) {
+                addRelationAttribute(entity, relation, printWriter);
+            }
+
 
             for (EntityAttribute attribute : entity.getAttributes()) {
                 addCustomAttribute(attribute, printWriter);
@@ -79,6 +87,11 @@ public class EntityGenerator extends FileFolderGenerator {
             idAttribute.setDataType("Long");
             addGetter(idAttribute, printWriter);
             addSetter(idAttribute, printWriter);
+
+            for (EntityRelation relation : entity.getRelations()) {
+                addRelationGetter(relation, printWriter);
+                addRelationSetter(relation, printWriter);
+            }
 
             // Getter and Setter for other attributes
             for (EntityAttribute attribute : entity.getAttributes()) {
@@ -102,6 +115,12 @@ public class EntityGenerator extends FileFolderGenerator {
                 .filter(packageToImport -> !packageToImport.isEmpty())
                 .distinct()
                 .forEach(packageToImport -> writer.println("import " + packageToImport + ";"));
+
+        // If there is any relation with _TO_MANY, then we have to import a List.
+        if (entity.getRelations().stream().map(EntityRelation::getRelationType).anyMatch(type -> type.equals(RelationType.MANY_TO_MANY) || type.equals(RelationType.ONE_TO_MANY))) {
+            writer.println("import java.util.List;");
+            writer.println("import java.util.ArrayList;");
+        }
     }
 
     private void addIdAttribute(PrintWriter writer) {
@@ -109,6 +128,7 @@ public class EntityGenerator extends FileFolderGenerator {
         writer.println("@GeneratedValue");
         writer.println("@Column(name = \"id\", nullable = false)");
         writer.println("private Long id;");
+        writer.println("");
     }
 
     private void addCustomAttribute(EntityAttribute attribute, PrintWriter writer) {
@@ -120,13 +140,15 @@ public class EntityGenerator extends FileFolderGenerator {
             writer.println("@DateTimeFormat(pattern = \"yyyy-MM-dd\")");
         }
 
-        writer.println("private " + attribute.getDataType() + " " + columnName.toLowerCase(Locale.ROOT) + ";");
+        writer.println("private " + attribute.getDataType() + " " + attribute.getName().toLowerCase(Locale.ROOT) + ";");
+        writer.println("");
     }
 
     private void addGetter(EntityAttribute attribute, PrintWriter writer) {
         writer.println("public " + attribute.getDataType() + " get" + capitalize(attribute.getName()) + "() {");
         writer.println("    return " + attribute.getName().toLowerCase(Locale.ROOT) + ";");
         writer.println("}");
+        writer.println("");
     }
 
     private void addSetter(EntityAttribute attribute, PrintWriter writer) {
@@ -134,6 +156,72 @@ public class EntityGenerator extends FileFolderGenerator {
                 attribute.getDataType() + " " + attribute.getName() + ") {");
         writer.println("this." + attribute.getName().toLowerCase(Locale.ROOT) + " = " + attribute.getName().toLowerCase(Locale.ROOT) + ";");
         writer.println("}");
+        writer.println("");
+    }
+
+    private void addRelationAttribute(RequestEntity entity, EntityRelation relation, PrintWriter writer) {
+        RelationType relationType = relation.getRelationType();
+
+        if (relationType.equals(RelationType.ONE_TO_ONE)) {
+            // TODO: TBD
+        }
+
+        if (relationType.equals(RelationType.ONE_TO_MANY)) {
+            writer.println("@OneToMany(mappedBy = \"" + entity.getName() + "\")");
+            writer.println("private List<" + capitalize(relation.getEntity()) + "> " + plural(relation.getEntity()) + " = new ArrayList<>();");
+        }
+
+        if (relationType.equals(RelationType.MANY_TO_ONE)) {
+            writer.println("@ManyToOne"); // TODO: Add/Need JoinColumn?
+            writer.println("private " + capitalize(relation.getEntity()) + " " + relation.getEntity() + ";");
+        }
+
+        if (relationType.equals(RelationType.MANY_TO_MANY)) {
+            writer.println("@ManyToMany"); // TODO: Add/Need JoinTable with joinColumns and inverseJoinColumns?
+            writer.println("private List<" + capitalize(relation.getEntity()) + "> " + plural(relation.getEntity()) + " = new ArrayList<>();");
+        }
+
+        writer.println("");
+
+    }
+
+    private void addRelationGetter(EntityRelation relation, PrintWriter writer) {
+
+        RelationType relationType = relation.getRelationType();
+
+        if (relationType.equals(RelationType.ONE_TO_ONE) || relationType.equals(RelationType.MANY_TO_ONE)) {
+            writer.println("public " + capitalize(relation.getEntity()) + " get" + capitalize(relation.getEntity()) + "() {");
+            writer.println("    return " + relation.getEntity() + ";");
+        }
+
+        if (relationType.equals(RelationType.ONE_TO_MANY) || relationType.equals(RelationType.MANY_TO_MANY)) {
+            writer.println("public List<" + capitalize(relation.getEntity()) + "> get" + capitalize(plural(relation.getEntity())) + "() {");
+            writer.println("    return " + plural(relation.getEntity()) + ";");
+        }
+
+        writer.println("}");
+        writer.println("");
+        writer.println("");
+
+    }
+
+    private void addRelationSetter(EntityRelation relation, PrintWriter writer) {
+
+        RelationType relationType = relation.getRelationType();
+
+        if (relationType.equals(RelationType.ONE_TO_ONE) || relationType.equals(RelationType.MANY_TO_ONE)) {
+            writer.println("public void set" + capitalize(relation.getEntity()) + "(" + capitalize(relation.getEntity()) + " " + relation.getEntity() + ") {");
+            writer.println("this." + relation.getEntity() + " = " + relation.getEntity() + ";");
+        }
+
+        if (relationType.equals(RelationType.ONE_TO_MANY) || relationType.equals(RelationType.MANY_TO_MANY)) {
+            writer.println("public void set" + capitalize(plural(relation.getEntity())) + "(List<" + capitalize(relation.getEntity()) + "> " + plural(relation.getEntity()) + ") {");
+            writer.println("this." + plural(relation.getEntity()) + " = " + plural(relation.getEntity()) + ";");
+        }
+
+        writer.println("}");
+        writer.println("");
+
     }
 
 }

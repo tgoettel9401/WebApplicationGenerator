@@ -1,6 +1,8 @@
 package org.dhbw.webapplicationgenerator.webclient.request;
 
 import lombok.Data;
+import org.dhbw.webapplicationgenerator.generator.entity.RelationType;
+import org.dhbw.webapplicationgenerator.webclient.exception.WagException;
 
 @Data
 public class EntityRelation {
@@ -8,4 +10,21 @@ public class EntityRelation {
     private Cardinality cardinalityMin;
     private Cardinality cardinalityMax;
     private String entity;
+
+    public RelationType getRelationType() {
+        if (cardinalityMin.equals(Cardinality.ONE) && cardinalityMax.equals(Cardinality.ONE)) {
+            return RelationType.ONE_TO_ONE;
+        }
+        if (cardinalityMin.equals(Cardinality.ONE) && cardinalityMax.equals(Cardinality.MANY)) {
+            return RelationType.ONE_TO_MANY;
+        }
+        if (cardinalityMin.equals(Cardinality.MANY) && cardinalityMax.equals(Cardinality.ONE)) {
+            return RelationType.MANY_TO_ONE;
+        }
+        if (cardinalityMin.equals(Cardinality.MANY) && cardinalityMax.equals(Cardinality.MANY)) {
+            return RelationType.MANY_TO_MANY;
+        }
+        throw new WagException("The combination of cardinalityMin and cardinalityMax is not known: " + cardinalityMin + ":" + cardinalityMax);
+    }
+
 }
