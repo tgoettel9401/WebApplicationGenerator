@@ -7,9 +7,6 @@ import java.util.Set;
 
 @Data
 public class CreationRequest {
-
     private CreationRequestProject project;
-
     private Set<RequestEntity> entities = new HashSet<>();
-
 }

@@ -89,7 +89,7 @@ public class FrontendGenerator extends FileFolderGenerator {
     }
 
     private File createOverviewFile(RequestEntity entity) throws IOException {
-        String fileName = plural(entity.getEntityName().toLowerCase(Locale.ROOT)) + HTML_FILE_ENDING;
+        String fileName = plural(entity.getName().toLowerCase(Locale.ROOT)) + HTML_FILE_ENDING;
         File file = new File(String.valueOf(Files.createFile(Path.of(TMP_PATH + fileName))));
         FileWriter fileWriter = new FileWriter(file);
         try (PrintWriter printWriter = new PrintWriter(fileWriter)) {
@@ -98,7 +98,7 @@ public class FrontendGenerator extends FileFolderGenerator {
             printWriter.println("<div th:insert=\"main.html\"></div>");
             printWriter.println("<body>");
             printWriter.println("<div class=\"container-fluid\" style=\"margin-top: 10px\">");
-            printWriter.println("<h1>" + plural(entity.getEntityName()) + "</h1> <br>");
+            printWriter.println("<h1>" + plural(entity.getName()) + "</h1> <br>");
             printWriter.println("<a th:href=\"@{/" + plural(entity.getTitle().toLowerCase(Locale.ROOT)) +
                     "/create}\"><input type=\"button\" class=\"btn btn-primary\" value=\"New\"\n" +
                     " style=\"margin-bottom: 10px\"></a>");
@@ -112,11 +112,11 @@ public class FrontendGenerator extends FileFolderGenerator {
             printWriter.println("</tr>");
 
 
-            printWriter.println("<tr th:each=\"" + entity.getEntityName().toLowerCase(Locale.ROOT)
-                    + " : ${" + plural(entity.getEntityName().toLowerCase(Locale.ROOT)) + "}\">");
+            printWriter.println("<tr th:each=\"" + entity.getName().toLowerCase(Locale.ROOT)
+                    + " : ${" + plural(entity.getName().toLowerCase(Locale.ROOT)) + "}\">");
 
             for (EntityAttribute attribute : entity.getAttributes()) {
-                printWriter.println("<td th:text=\"${" + entity.getEntityName().toLowerCase(Locale.ROOT) + ".get"
+                printWriter.println("<td th:text=\"${" + entity.getName().toLowerCase(Locale.ROOT) + ".get"
                         + capitalize(attribute.getTitle()) + "()}\"></td>");
                 // TODO: Add Link for marked attribute.
                 /*printWriter.println("<td><a th:href=\"@{'/teachers/edit/' + ${course.getTeacher().getId()}}\"\n" +
@@ -128,12 +128,12 @@ public class FrontendGenerator extends FileFolderGenerator {
 
             printWriter.println("<!-- Buttons -->");
             printWriter.println("<td>");
-            printWriter.println("<a th:href=\"@{'/" + plural(entity.getEntityName().toLowerCase(Locale.ROOT))
-                    + "/edit/' + ${" + entity.getEntityName().toLowerCase(Locale.ROOT) + ".getId()}}\">");
+            printWriter.println("<a th:href=\"@{'/" + plural(entity.getName().toLowerCase(Locale.ROOT))
+                    + "/edit/' + ${" + entity.getName().toLowerCase(Locale.ROOT) + ".getId()}}\">");
             printWriter.println("<input type=\"button\" class=\"btn btn-light\" value=\"Edit\">");
             printWriter.println(" </a>");
-            printWriter.println("<a th:href=\"@{'/" + plural(entity.getEntityName().toLowerCase(Locale.ROOT))
-                    + "/delete/' + ${" + entity.getEntityName().toLowerCase(Locale.ROOT) + ".getId()}}\">");
+            printWriter.println("<a th:href=\"@{'/" + plural(entity.getName().toLowerCase(Locale.ROOT))
+                    + "/delete/' + ${" + entity.getName().toLowerCase(Locale.ROOT) + ".getId()}}\">");
             printWriter.println("<input type=\"button\" class=\"btn btn-danger\" value=\"Delete\">");
             printWriter.println("</a>");
             printWriter.println("</td>");
@@ -149,7 +149,7 @@ public class FrontendGenerator extends FileFolderGenerator {
     }
 
     private File createDetailsFile(RequestEntity entity) throws IOException {
-        String fileName = entity.getEntityName().toLowerCase(Locale.ROOT) + "Details" + HTML_FILE_ENDING;
+        String fileName = entity.getName().toLowerCase(Locale.ROOT) + "Details" + HTML_FILE_ENDING;
         File file = new File(String.valueOf(Files.createFile(Path.of(TMP_PATH + fileName))));
         FileWriter fileWriter = new FileWriter(file);
         try (PrintWriter printWriter = new PrintWriter(fileWriter)) {

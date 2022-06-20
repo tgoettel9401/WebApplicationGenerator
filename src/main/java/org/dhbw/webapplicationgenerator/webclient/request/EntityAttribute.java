@@ -4,6 +4,8 @@ import lombok.Data;
 
 @Data
 public class EntityAttribute {
-    private String title;
+    private String name; // Name of the attribute
+    private String title; // Title that is shown in the Frontend
     private String dataType;
+    private String column;
 }

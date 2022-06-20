@@ -65,9 +65,9 @@ public class WebMvcConfigGenerator extends FileFolderGenerator {
 
             for (RequestEntity entity : entities) {
                 printWriter.println("registry.addViewController(\"/" +
-                        plural(entity.getEntityName().toLowerCase(Locale.ROOT)) +
+                        plural(entity.getName().toLowerCase(Locale.ROOT)) +
                         "\").setViewName(\"" +
-                        plural(entity.getEntityName().toLowerCase(Locale.ROOT)) +
+                        plural(entity.getName().toLowerCase(Locale.ROOT)) +
                         "\");");
             }
 

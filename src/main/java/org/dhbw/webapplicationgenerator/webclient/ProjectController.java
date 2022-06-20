@@ -1,6 +1,8 @@
 package org.dhbw.webapplicationgenerator.webclient;
 
 import lombok.AllArgsConstructor;
+import org.dhbw.webapplicationgenerator.webclient.exception.ValidationException;
+import org.dhbw.webapplicationgenerator.webclient.request.CreationRequestValidator;
 import org.dhbw.webapplicationgenerator.webclient.request.EntityAttribute;
 import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.dhbw.webapplicationgenerator.webclient.request.RequestEntity;
@@ -23,6 +25,7 @@ public class ProjectController {
     private final Logger logger = LoggerFactory.getLogger(ProjectController.class);
 
     private final ProjectService projectService;
+    private final CreationRequestValidator creationRequestValidator;
 
     @GetMapping(value = "generate", produces = "application/zip")
     public byte[] generateBaseProject() throws IOException {
@@ -37,8 +40,11 @@ public class ProjectController {
     }
 
     @PostMapping("generate")
-    public byte[] generateByRequest(@RequestBody() CreationRequest request) throws IOException {
+    public byte[] generateByRequest(@RequestBody() CreationRequest request) throws IOException, ValidationException {
         logger.info("Received generation request for project with title {}", request.getProject().getTitle());
+        logger.info("Validating the request");
+        creationRequestValidator.validate(request);
+        logger.info("Validation passed");
         ByteArrayOutputStream stream = projectService.generate(request);
         return stream.toByteArray();
     }
