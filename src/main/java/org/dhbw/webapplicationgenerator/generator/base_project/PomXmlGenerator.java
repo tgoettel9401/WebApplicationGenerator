@@ -15,6 +15,8 @@ import java.util.Objects;
 @AllArgsConstructor
 public class PomXmlGenerator extends FileFolderGenerator {
 
+    private final String springdocVersion = "1.6.9";
+
     private final ResourceFileHelper resourceFileHelper;
 
     public ProjectFile create(CreationRequest request, ProjectDirectory parent) {
@@ -67,14 +69,18 @@ public class PomXmlGenerator extends FileFolderGenerator {
     }
 
     private void replaceAdditionalDependencies(StringBuilder builder, CreationRequest request) {
-        if (request.isHavingWeb()) {
-            addDependency("org.springframework.boot", "spring-boot-starter-web", builder);
-            addDependency("org.springframework.boot", "spring-boot-starter-thymeleaf", builder);
-        }
-        if (request.isHavingJpa()) {
-            addDependency("org.springframework.boot", "spring-boot-starter-data-jpa", builder);
-            addDependency("com.h2database", "h2", "runtime", builder);
-        }
+
+        // Web and Thymeleaf
+        addDependency("org.springframework.boot", "spring-boot-starter-web", builder);
+        addDependency("org.springframework.boot", "spring-boot-starter-thymeleaf", builder);
+
+        // Data, H2, Data Rest and Springdoc
+        addDependency("org.springframework.boot", "spring-boot-starter-data-jpa", builder);
+        addDependency("org.springframework.boot", "spring-boot-starter-data-rest", builder);
+        addDependency("org.springdoc", "springdoc-openapi-ui", builder);
+        addDependency("org.springdoc", "springdoc-openapi-data-rest", builder);
+        addDependency("com.h2database", "h2", "runtime", builder);
+
         builder.append("\n");
     }
 

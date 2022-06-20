@@ -32,8 +32,6 @@ public class ProjectController {
         request.getProject().setGroup("org.example");
         request.getProject().setDescription("This was generated automatically");
         request.getProject().setArtifact("demo");
-        request.setHavingWeb(true);
-        request.setHavingJpa(true);
         request.setEntities(initializeEntities());
         return projectService.generate(request).toByteArray();
     }

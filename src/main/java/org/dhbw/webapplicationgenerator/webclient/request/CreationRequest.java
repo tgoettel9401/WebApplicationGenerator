@@ -12,7 +12,4 @@ public class CreationRequest {
 
     private Set<RequestEntity> entities = new HashSet<>();
 
-    private boolean havingWeb;
-    private boolean havingJpa;
-
 }
