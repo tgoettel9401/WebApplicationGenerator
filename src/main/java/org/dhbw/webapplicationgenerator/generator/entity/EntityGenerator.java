@@ -3,10 +3,10 @@ package org.dhbw.webapplicationgenerator.generator.entity;
 import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.Project;
 import org.dhbw.webapplicationgenerator.generator.base_project.FileFolderGenerator;
-import org.dhbw.webapplicationgenerator.generator.util.PackageNameResolver;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
-import org.dhbw.webapplicationgenerator.webclient.request.EntityAttribute;
+import org.dhbw.webapplicationgenerator.generator.util.PackageNameResolver;
 import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
+import org.dhbw.webapplicationgenerator.webclient.request.EntityAttribute;
 import org.dhbw.webapplicationgenerator.webclient.request.EntityRelation;
 import org.dhbw.webapplicationgenerator.webclient.request.RequestEntity;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -44,18 +43,24 @@ public class EntityGenerator extends FileFolderGenerator {
 
     private void create(CreationRequest request, ProjectDirectory parent) throws IOException {
 
+        // Create the domain directory with entities first.
         ProjectDirectory domainDir = addDirectory("domain", Optional.of(parent));
+        String entityPackageName = packageNameResolver.resolveEntity(request);
 
-        String packageName = packageNameResolver.resolveEntity(request);
+        // Second we also create the transferObjects directory with transferObjects.
+        ProjectDirectory dtoDir = addDirectory("transferObjects", Optional.of(parent));
+        String transferObjectPackageName = packageNameResolver.resolveTransferObjects(request);
 
+        // Finally we add entities and transferobjects to each of the directories.
         for (RequestEntity entity : request.getEntities()) {
-            addFile(createEntity(entity, packageName), domainDir);
+            addFile(createEntity(entity, entityPackageName), domainDir);
+            addFile(createTransferObject(entity, transferObjectPackageName), dtoDir);
         }
 
     }
 
     private File createEntity(RequestEntity entity, String packageName) throws IOException {
-        File file = new File(String.valueOf(Files.createFile(Path.of(TMP_PATH + entity.getTitle() + JAVA_CLASS_ENDING))));
+        File file = new File(String.valueOf(Files.createFile(Path.of(TMP_PATH + capitalize(entity.getName()) + JAVA_CLASS_ENDING))));
         FileWriter fileWriter = new FileWriter(file);
         try (PrintWriter printWriter = new PrintWriter(fileWriter)) {
             printWriter.println("package " + packageName + ";");
@@ -97,6 +102,77 @@ public class EntityGenerator extends FileFolderGenerator {
             for (EntityAttribute attribute : entity.getAttributes()) {
                 addGetter(attribute, printWriter);
                 addSetter(attribute, printWriter);
+            }
+
+            printWriter.println("}");
+        }
+        return file;
+    }
+
+    private File createTransferObject(RequestEntity entity, String packageName) throws IOException {
+        File file = new File(String.valueOf(Files.createFile(Path.of(TMP_PATH + capitalize(entity.getName()) + "Request" + JAVA_CLASS_ENDING))));
+        FileWriter fileWriter = new FileWriter(file);
+        try (PrintWriter printWriter = new PrintWriter(fileWriter)) {
+            printWriter.println("package " + packageName + ";");
+            printWriter.println();
+
+            printWriter.println("import java.io.Serializable;");
+            if (entity.getRelations().stream().anyMatch(relation -> relation.getRelationType().isToMany())) {
+                printWriter.println("import java.util.List;");
+                printWriter.println("import java.util.ArrayList;");
+            }
+            entity.getAttributes().stream()
+                    .map(EntityAttribute::getDataType)
+                    .map(DataType::fromName)
+                    .map(DataType::getPackageToImport)
+                    .flatMap(List::stream)
+                    .filter(packageToImport -> !packageToImport.isEmpty())
+                    .distinct()
+                    .forEach(packageToImport -> printWriter.println("import " + packageToImport + ";"));
+            printWriter.println();
+
+            printWriter.println("public class " + entity.getTitle() + "Request" + " implements Serializable {");
+            printWriter.println();
+
+            printWriter.println("private Long id;");
+            for (EntityAttribute attribute : entity.getAttributes()) {
+                // Add DateTimeFormat if the attribute is a LocalDate
+                if (attribute.getDataType().equals("LocalDate")) {
+                    printWriter.println("@DateTimeFormat(pattern = \"yyyy-MM-dd\")");
+                }
+                printWriter.println("private " + attribute.getDataType() + " " + attribute.getName() + ";");
+            }
+            printWriter.println("");
+
+            for (EntityRelation relation : entity.getRelations()) {
+                if (relation.getRelationType().isToMany()) {
+                    printWriter.println("private List<Long> " + relation.getEntity() + "Ids = new ArrayList<>();");
+                } else {
+                    printWriter.println("private Long " + relation.getEntity() + "Id;");
+                }
+
+            }
+            printWriter.println("");
+
+            // Add Getter and Setter for Id-Attribute
+            printWriter.println("public Long getId() {");
+            printWriter.println("return this.id;");
+            printWriter.println("}");
+            printWriter.println("");
+            printWriter.println("public void setId(Long id) {");
+            printWriter.println("this.id = id;");
+            printWriter.println("}");
+            printWriter.println("");
+
+            // Getter and Setter for normal attributes
+            for (EntityAttribute attribute : entity.getAttributes()) {
+                addGetter(attribute, printWriter);
+                addSetter(attribute, printWriter);
+            }
+
+            for (EntityRelation relation : entity.getRelations()) {
+                addRelationIdGetter(relation, printWriter);
+                addRelationIdSetter(relation, printWriter);
             }
 
             printWriter.println("}");
@@ -163,7 +239,8 @@ public class EntityGenerator extends FileFolderGenerator {
         RelationType relationType = relation.getRelationType();
 
         if (relationType.equals(RelationType.ONE_TO_ONE)) {
-            // TODO: TBD
+            writer.println("@OneToOne");
+            writer.println("private " + capitalize(relation.getEntity()) + " " + relation.getEntity() + ";");
         }
 
         if (relationType.equals(RelationType.ONE_TO_MANY)) {
@@ -177,7 +254,12 @@ public class EntityGenerator extends FileFolderGenerator {
         }
 
         if (relationType.equals(RelationType.MANY_TO_MANY)) {
-            writer.println("@ManyToMany"); // TODO: Add/Need JoinTable with joinColumns and inverseJoinColumns?
+            writer.println("@ManyToMany");
+            writer.println("@JoinTable(");
+            writer.println("name = \"" + relation.getJoinTable() + "\",");
+            writer.println("joinColumns = @JoinColumn(name = \"" + entity.getName() + "_id\"),");
+            writer.println("inverseJoinColumns = @JoinColumn(name = \"" + relation.getEntity() + "_id\")");
+            writer.println(")");
             writer.println("private List<" + capitalize(relation.getEntity()) + "> " + plural(relation.getEntity()) + " = new ArrayList<>();");
         }
 
@@ -221,6 +303,36 @@ public class EntityGenerator extends FileFolderGenerator {
 
         writer.println("}");
         writer.println("");
+
+    }
+
+    private void addRelationIdGetter(EntityRelation relation, PrintWriter writer) {
+        if (relation.getRelationType().isToMany()) {
+            writer.println("public List<Long> get" + capitalize(relation.getEntity()) + "Ids() {");
+            writer.println("    return " + relation.getEntity() + "Ids;");
+            writer.println("}");
+            writer.println("");
+        } else {
+            writer.println("public Long get" + capitalize(relation.getEntity()) + "Id() {");
+            writer.println("    return " + relation.getEntity() + "Id;");
+            writer.println("}");
+            writer.println("");
+        }
+
+    }
+
+    private void addRelationIdSetter(EntityRelation relation, PrintWriter writer) {
+        if (relation.getRelationType().isToMany()) {
+            writer.println("public void set" + capitalize(relation.getEntity()) + "Ids(List<Long> " + relation.getEntity() + "Ids) {");
+            writer.println("this." + relation.getEntity() + "Ids = " + relation.getEntity() + "Ids;");
+            writer.println("}");
+            writer.println("");
+        } else {
+            writer.println("public void set" + capitalize(relation.getEntity()) + "Id(Long " + relation.getEntity() + "Id) {");
+            writer.println("this." + relation.getEntity() + "Id = " + relation.getEntity() + "Id;");
+            writer.println("}");
+            writer.println("");
+        }
 
     }
 

@@ -7,6 +7,8 @@ import org.dhbw.webapplicationgenerator.generator.util.PackageNameResolver;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.util.ResourceFileHelper;
 import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
+import org.dhbw.webapplicationgenerator.webclient.request.EntityAttribute;
+import org.dhbw.webapplicationgenerator.webclient.request.EntityRelation;
 import org.dhbw.webapplicationgenerator.webclient.request.RequestEntity;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +18,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -54,21 +58,34 @@ public class FrontendControllerGenerator extends FileFolderGenerator {
     }
 
     private File createFrontendController(RequestEntity entity, CreationRequest request, String packageName) throws IOException {
-        String controllerName = entity.getTitle() + "Controller";
-        String repositoryName = entity.getTitle() + "Repository";
+        String controllerName = capitalize(entity.getName()) + "Controller";
+        String repositoryName = capitalize(entity.getName()) + "Repository";
+        List<EntityRelation> toManyRelations = entity.getRelations().stream().filter(relation -> relation.getRelationType().isToMany()).collect(Collectors.toList());
+        List<EntityRelation> toOneRelations = entity.getRelations().stream().filter(relation -> !relation.getRelationType().isToMany()).collect(Collectors.toList());
         File file = new File(String.valueOf(Files.createFile(Path.of(TMP_PATH + controllerName + JAVA_CLASS_ENDING))));
         FileWriter fileWriter = new FileWriter(file);
         try (PrintWriter printWriter = new PrintWriter(fileWriter)) {
             printWriter.println("package " + packageName + ";");
             printWriter.println();
 
-            printWriter.println("import " + packageNameResolver.resolveEntity(request) + "." + entity.getTitle() + ";");
-            printWriter.println("import " + packageNameResolver.resolveRepository(request) + "." + repositoryName + ";");
-            printWriter.println("import " + packageNameResolver.resolveException(request) + ".NotFoundException;");
+            // Basic Imports
             printWriter.println("import org.springframework.stereotype.Controller;");
             printWriter.println("import org.springframework.ui.Model;");
             printWriter.println("import org.springframework.web.bind.annotation.*;");
             printWriter.println("import org.springframework.web.servlet.view.RedirectView;");
+
+            // Application Imports
+            printWriter.println("import " + packageNameResolver.resolveEntity(request) + "." + capitalize(entity.getName()) + ";");
+            printWriter.println("import " + packageNameResolver.resolveRepository(request) + "." + repositoryName + ";");
+            printWriter.println("import " + packageNameResolver.resolveException(request) + ".NotFoundException;");
+            printWriter.println("import " + packageNameResolver.resolveTransferObjects(request) + "." + capitalize(entity.getName()) + "Request;");
+
+            // Also we need the RelationRepositories if there is a any relation (toOne or toMany).
+            for (EntityRelation relation : entity.getRelations()) {
+                printWriter.println("import " + packageNameResolver.resolveRepository(request) + "." + capitalize(relation.getEntity()) + "Repository;");
+            }
+
+            printWriter.println("");
 
             // Annotations
             printWriter.println("@Controller");
@@ -77,14 +94,28 @@ public class FrontendControllerGenerator extends FileFolderGenerator {
             // Class Header & Attributes
             printWriter.println("public class " + controllerName + " {");
             printWriter.println("");
-            printWriter.println("private final " + entity.getTitle() + "Repository " +
-                    entity.getTitle().toLowerCase(Locale.ROOT) + "Repository;");
+
+            // Add Repositories. We need the entity's repository as well as all Relation-Repositories (toOne or toMany)
+            printWriter.println("private final " + capitalize(entity.getName()) + "Repository " +
+                    entity.getName() + "Repository;");
+            for (EntityRelation relation : entity.getRelations()) {
+                printWriter.println("private final " + capitalize(relation.getEntity()) + "Repository " +
+                        relation.getEntity() + "Repository;");
+            }
             printWriter.println("");
 
             // Constructor
             String repositoryVariableName = entity.getTitle().toLowerCase(Locale.ROOT) + "Repository";
-            printWriter.println("public " + controllerName + "(" + repositoryName + " " + repositoryVariableName + ") {");
+            printWriter.print("public " + controllerName + "(" + repositoryName + " " + repositoryVariableName);
+            for (EntityRelation relation : entity.getRelations()) {
+                printWriter.println(",");
+                printWriter.print(capitalize(relation.getEntity()) + "Repository " + relation.getEntity() + "Repository");
+            }
+            printWriter.println(") {");
             printWriter.println("this." + repositoryVariableName + " = " + repositoryVariableName + ";");
+            for (EntityRelation relation : entity.getRelations()) {
+                printWriter.println("this." + relation.getEntity() + "Repository" + " = " + relation.getEntity() + "Repository" + ";");
+            }
             printWriter.println("}");
 
             // Show all entities
@@ -103,6 +134,12 @@ public class FrontendControllerGenerator extends FileFolderGenerator {
                     entity.getTitle() + "();");
             printWriter.println("model.addAttribute(\"" + entity.getTitle().toLowerCase(Locale.ROOT) + "\", " +
                     entity.getTitle().toLowerCase(Locale.ROOT) + ");");
+
+            // For every relation (toOne and toMany), we have to add the whole relation data as well.
+            for (EntityRelation relation : entity.getRelations()) {
+                printWriter.println("model.addAttribute(\"" + plural(relation.getEntity()) + "\", " + relation.getEntity() + "Repository.findAll());");
+            }
+
             printWriter.println("return \"" + entity.getTitle().toLowerCase(Locale.ROOT) + "Details\";");
             printWriter.println("}");
             printWriter.println("");
@@ -117,16 +154,42 @@ public class FrontendControllerGenerator extends FileFolderGenerator {
                     "\", " + entity.getTitle().toLowerCase(Locale.ROOT) + "Id));");
             printWriter.println("model.addAttribute(\"" + entity.getTitle().toLowerCase(Locale.ROOT) + "\", " +
                     entity.getTitle().toLowerCase(Locale.ROOT) + ");");
+
+            // For every relation (toOne and toMany), we have to add the whole relation data as well.
+            for (EntityRelation relation : entity.getRelations()) {
+                printWriter.println("model.addAttribute(\"" + plural(relation.getEntity()) + "\", " + relation.getEntity() + "Repository.findAll());");
+            }
             printWriter.println("return \"" + entity.getTitle().toLowerCase(Locale.ROOT) + "Details\";");
             printWriter.println("}");
             printWriter.println("");
 
             // Saving an entity
             printWriter.println("@PostMapping(\"save\")");
-            printWriter.println("public RedirectView save(@ModelAttribute " + entity.getTitle() + " " +
-                    entity.getTitle().toLowerCase(Locale.ROOT) + ") {");
-            printWriter.println(repositoryVariableName + ".save(" + entity.getTitle().toLowerCase(Locale.ROOT) + ");");
-            printWriter.println("return new RedirectView(\"/" + plural(entity.getTitle().toLowerCase(Locale.ROOT))  + "\");");
+            printWriter.println("public RedirectView save(@ModelAttribute " + entity.getTitle() + "Request " +
+                    entity.getName() + "Request) {");
+            printWriter.println(capitalize(entity.getName()) + " " + entity.getName() + " = new " + capitalize(entity.getName()) + "();");
+            printWriter.println(entity.getName() + ".setId(" + entity.getName() + "Request.getId());");
+            for (EntityAttribute attribute : entity.getAttributes()) {
+                printWriter.println(entity.getName() + ".set" + capitalize(attribute.getName()) + "(" + entity.getName() + "Request.get" + capitalize(attribute.getName()) + "());");
+            }
+
+            // For all toOne relations we potentially add a single relation object to the entity.
+            for (EntityRelation relation : entity.getRelations().stream().filter(relation -> !relation.getRelationType().isToMany()).collect(Collectors.toList())) {
+                printWriter.println("if(" + entity.getName() + "Request.get" + capitalize(relation.getEntity()) + "Id() != null) {");
+                printWriter.println(entity.getName() + ".set" + capitalize(relation.getEntity()) + "(" + relation.getEntity() + "Repository.findById(" + entity.getName() + "Request.get" + capitalize(relation.getEntity()) + "Id()).orElse(null));");
+                printWriter.println("}");
+            }
+
+            // For all toMany relations we potentially add multiple relation objects to the entity. However, because a List may contain the same element multiple times, we have to clear the list first.
+            for (EntityRelation relation : entity.getRelations().stream().filter(relation -> relation.getRelationType().isToMany()).collect(Collectors.toList())) {
+                printWriter.println(entity.getName() + ".get" + capitalize(plural(relation.getEntity())) + "().clear();");
+                printWriter.println("for (Long " + relation.getEntity() + "Id : " + entity.getName() + "Request.get" + capitalize(relation.getEntity()) + "Ids()) {");
+                printWriter.println(entity.getName() + ".get" + capitalize(plural(relation.getEntity())) + "().add(" + relation.getEntity() + "Repository.findById(" + relation.getEntity() + "Id).orElse(null));");
+                printWriter.println("}");
+            }
+
+            printWriter.println(repositoryVariableName + ".save(" + entity.getName() + ");");
+            printWriter.println("return new RedirectView(\"/" + plural(entity.getName())  + "\");");
             printWriter.println("}");
             printWriter.println("");
 

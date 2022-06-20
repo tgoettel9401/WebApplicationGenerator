@@ -10,6 +10,10 @@ public class PackageNameResolver {
         return basePackage(request) + ".domain";
     }
 
+    public String resolveTransferObjects(CreationRequest request) {
+        return basePackage(request) + ".transferObjects";
+    }
+
     public String resolveRepository(CreationRequest request) {
         return basePackage(request) + ".repository";
     }

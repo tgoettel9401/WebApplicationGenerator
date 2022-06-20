@@ -8,4 +8,6 @@ public class EntityAttribute {
     private String title; // Title that is shown in the Frontend
     private String dataType;
     private String columnName;
+    private boolean referenceAttribute = false;
+    private boolean tableAttribute = false;
 }

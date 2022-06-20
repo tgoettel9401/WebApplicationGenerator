@@ -10,6 +10,8 @@ public class EntityRelation {
     private Cardinality cardinalityMin;
     private Cardinality cardinalityMax;
     private String entity;
+    private String joinTable;
+    private RequestEntity entityObject;
 
     public RelationType getRelationType() {
         if (cardinalityMin.equals(Cardinality.ONE) && cardinalityMax.equals(Cardinality.ONE)) {

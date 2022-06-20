@@ -1,11 +1,14 @@
 package org.dhbw.webapplicationgenerator.webclient.request;
 
 import org.dhbw.webapplicationgenerator.generator.entity.DataType;
+import org.dhbw.webapplicationgenerator.generator.entity.RelationType;
 import org.dhbw.webapplicationgenerator.webclient.exception.ValidationException;
+import org.dhbw.webapplicationgenerator.webclient.exception.WagException;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class CreationRequestValidator {
@@ -19,7 +22,39 @@ public class CreationRequestValidator {
     public void validate(CreationRequest request) throws ValidationException {
         validateRequiredFields(request);
         validateDataTypes(request);
+        validateReferenceAndTableAttributes(request);
+        validateUniquenessOfEntities(request);
         validateRelationNames(request);
+    }
+
+    /**
+     * Validates that all ManyToMany relations have JoinTables set (which are identical on both sides of the relation)
+     *
+     * @param request CreationRequest
+     * @throws ValidationException Exception providing the validation error
+     */
+    public void validateManyToManyRelations(CreationRequest request) throws ValidationException {
+        for (RequestEntity entity : request.getEntities()) {
+            for (EntityRelation relation : entity.getRelations()) {
+                if (relation.getRelationType().equals(RelationType.MANY_TO_MANY)) {
+                    if (relation.getJoinTable() == null) {
+                        throw new ValidationException("JoinTable of relation " + relation.getName() + " in entity " + entity.getName() + " is not set even though it is a ManyToMany Relation");
+                    }
+                    String joinTable = relation.getJoinTable();
+                    EntityRelation relationOnTheOtherSide = request.getEntities().stream()
+                            // We filter for the entity on the other side of the relation
+                            .filter(e -> e.getName().equals(relation.getEntity()))
+                            .findFirst().orElseThrow(() -> new WagException("Entity with name " + relation.getEntity() + " not found"))
+                            .getRelations().stream()
+                            // We filter for the relation that points to the current entity
+                            .filter(r -> r.getEntity().equals(entity.getName()))
+                            .findFirst().orElseThrow(() -> new WagException("Relation with name " + relation.getName() + " not found"));
+                    if (!relation.getJoinTable().equals(relationOnTheOtherSide.getJoinTable())) {
+                        throw new ValidationException("JoinTable of relation " + relation.getName() + " is different in the associated entities");
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -95,6 +130,22 @@ public class CreationRequestValidator {
     }
 
     /**
+     * Validates that all entities are unique.
+     * @param request CreationRequest
+     * @throws ValidationException Exception providing the validation error
+     */
+    private void validateUniquenessOfEntities(CreationRequest request) throws ValidationException {
+        Set<String> entityNames = new HashSet<>();
+        for (RequestEntity entity : request.getEntities()) {
+            if (entityNames.contains(entity.getName())) {
+                throw new ValidationException("Entity with name " + entity.getName() + " is not unique");
+            } else {
+                entityNames.add(entity.getName());
+            }
+        }
+    }
+
+    /**
      * Validates only allowed DataTypes are present in the request.
      *
      * @param request CreationRequest
@@ -107,6 +158,22 @@ public class CreationRequestValidator {
                 } catch (Exception ex) {
                     throw new ValidationException("Converting " + attribute.getDataType() + " to DataType failed with Exception '" + ex.getMessage() + "'");
                 }
+            }
+        }
+    }
+
+    /**
+     * Validates all entities have exactly one ReferenceAttribute and at least one TableAttribute
+     *
+     * @param request CreationRequest
+     */
+    private void validateReferenceAndTableAttributes(CreationRequest request) throws ValidationException {
+        for(RequestEntity entity: request.getEntities()) {
+            if (entity.getAttributes().stream().filter(EntityAttribute::isReferenceAttribute).count() != 1) {
+                throw new ValidationException("For entity " + entity.getName() + " there must be exactly one ReferenceAttribute");
+            }
+            if (entity.getAttributes().stream().noneMatch(EntityAttribute::isTableAttribute)) {
+                throw new ValidationException("For entity " + entity.getName() + " no TableAttribute has been specified");
             }
         }
     }

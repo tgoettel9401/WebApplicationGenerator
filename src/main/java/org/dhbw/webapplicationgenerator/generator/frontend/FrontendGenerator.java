@@ -6,8 +6,9 @@ import org.dhbw.webapplicationgenerator.generator.base_project.FileFolderGenerat
 import org.dhbw.webapplicationgenerator.generator.entity.DataType;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.util.ResourceFileHelper;
-import org.dhbw.webapplicationgenerator.webclient.request.EntityAttribute;
 import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
+import org.dhbw.webapplicationgenerator.webclient.request.EntityAttribute;
+import org.dhbw.webapplicationgenerator.webclient.request.EntityRelation;
 import org.dhbw.webapplicationgenerator.webclient.request.RequestEntity;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,7 @@ import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -74,8 +76,8 @@ public class FrontendGenerator extends FileFolderGenerator {
 
             for (RequestEntity entity : entities) {
                 printWriter.println("<li class=\"nav-item\">");
-                printWriter.println("<a class=\"nav-link\" th:href=\"@{/" + plural(entity.getTitle().toLowerCase(Locale.ROOT)) +
-                    "}\">" + plural(entity.getTitle()) + "</a>");
+                printWriter.println("<a class=\"nav-link\" th:href=\"@{/" + plural(entity.getName().toLowerCase(Locale.ROOT)) +
+                        "}\">" + plural(entity.getTitle()) + "</a>");
                 printWriter.println("</li>");
             }
             printWriter.println("</ul>");
@@ -99,7 +101,7 @@ public class FrontendGenerator extends FileFolderGenerator {
             printWriter.println("<body>");
             printWriter.println("<div class=\"container-fluid\" style=\"margin-top: 10px\">");
             printWriter.println("<h1>" + plural(entity.getName()) + "</h1> <br>");
-            printWriter.println("<a th:href=\"@{/" + plural(entity.getTitle().toLowerCase(Locale.ROOT)) +
+            printWriter.println("<a th:href=\"@{/" + plural(entity.getName().toLowerCase(Locale.ROOT)) +
                     "/create}\"><input type=\"button\" class=\"btn btn-primary\" value=\"New\"\n" +
                     " style=\"margin-bottom: 10px\"></a>");
 
@@ -117,13 +119,7 @@ public class FrontendGenerator extends FileFolderGenerator {
 
             for (EntityAttribute attribute : entity.getAttributes()) {
                 printWriter.println("<td th:text=\"${" + entity.getName().toLowerCase(Locale.ROOT) + ".get"
-                        + capitalize(attribute.getTitle()) + "()}\"></td>");
-                // TODO: Add Link for marked attribute.
-                /*printWriter.println("<td><a th:href=\"@{'/teachers/edit/' + ${course.getTeacher().getId()}}\"\n" +
-                        " th:text=\"${course.getTeacher().getName()}\"></a></td>");*/
-
-                // TODO: Add size for related entities.
-                //printWriter.println("<td th:text=\"${course.getStudents().size()}\"></td>");
+                        + capitalize(attribute.getName()) + "()}\"></td>");
             }
 
             printWriter.println("<!-- Buttons -->");
@@ -161,28 +157,68 @@ public class FrontendGenerator extends FileFolderGenerator {
             printWriter.println("<div class=\"container-fluid\" style=\"margin-top: 10px\">");
 
             // Update or Create
-            printWriter.println("<h1 th:if=\"${" + entity.getTitle().toLowerCase(Locale.ROOT) +
+            printWriter.println("<h1 th:if=\"${" + entity.getName().toLowerCase(Locale.ROOT) +
                     ".getId() != null}\">Update an existing " + entity.getTitle() + "</h1>");
-            printWriter.println("<h1 th:if=\"${" + entity.getTitle().toLowerCase(Locale.ROOT) +
+            printWriter.println("<h1 th:if=\"${" + entity.getName().toLowerCase(Locale.ROOT) +
                     ".getId() == null}\">Create a new " + entity.getTitle() + "</h1>");
 
-            printWriter.println("<form th:action=\"@{'/" + plural(entity.getTitle().toLowerCase(Locale.ROOT)) +
-                    "/save'}\" th:object=\"${" + entity.getTitle().toLowerCase(Locale.ROOT) + "}\" method=\"post\">");
+            printWriter.println("<form th:action=\"@{'/" + plural(entity.getName().toLowerCase(Locale.ROOT)) +
+                    "/save'}\" th:object=\"${" + entity.getName().toLowerCase(Locale.ROOT) + "}\" method=\"post\">");
             printWriter.println("<input type=\"hidden\" name=\"id\" th:value=\"${" +
-                    entity.getTitle().toLowerCase(Locale.ROOT) + ".getId()}\">");
+                    entity.getName().toLowerCase(Locale.ROOT) + ".getId()}\">");
 
             for (EntityAttribute attribute : entity.getAttributes()) {
-                printWriter.println("<label for=\"" + attribute.getTitle().toLowerCase(Locale.ROOT) + "\">" +
-                        capitalize(attribute.getTitle().toLowerCase(Locale.ROOT)) + "</label>");
+                printWriter.println("<label for=\"" + attribute.getName() + "\">" +
+                        capitalize(attribute.getName()) + "</label>");
                 DataType dataType = DataType.fromName(attribute.getDataType());
-                printWriter.println("<input type=\"" + dataType.getInputType() + "\" id=\"" + attribute.getTitle().toLowerCase(Locale.ROOT) + "\" name=\"" +
-                        attribute.getTitle().toLowerCase(Locale.ROOT) + "\" class=\"input-group\" th:value=\"${" +
-                        entity.getTitle().toLowerCase(Locale.ROOT) + ".get" +
-                        capitalize(attribute.getTitle().toLowerCase(Locale.ROOT)) + "()}\">");
+                printWriter.println("<input type=\"" + dataType.getInputType() + "\" id=\"" + attribute.getName().toLowerCase(Locale.ROOT) + "\" name=\"" +
+                        attribute.getName().toLowerCase(Locale.ROOT) + "\" class=\"input-group\" th:value=\"${" +
+                        entity.getName().toLowerCase(Locale.ROOT) + ".get" +
+                        capitalize(attribute.getName().toLowerCase(Locale.ROOT)) + "()}\">");
                 printWriter.println("<br>");
+                printWriter.println("");
             }
 
-            printWriter.println("<a th:href=\"@{/" + plural(entity.getTitle().toLowerCase(Locale.ROOT)) +
+            // For all toOne relation (hence not toMany) we add a simple select to choose the correct option.
+            for (EntityRelation relation : entity.getRelations().stream().filter(relation -> !relation.getRelationType().isToMany()).collect(Collectors.toList())) {
+                printWriter.println("<label for=\"" + relation.getEntity() + "\">" + capitalize(relation.getEntity()) + "</label>");
+                printWriter.println("<select id=\"" + relation.getEntity() + "\" name=\"" + relation.getEntity() +
+                        "Id" + "\" class=\"form-control\" th:value=\"${" + entity.getName() + ".get" +
+                        capitalize(relation.getEntity()) + "()}\">");
+                printWriter.println("<option th:value=\"null\">none</option>");
+                printWriter.println("<option " +
+                        "th:each=\"" + relation.getEntity() + " : ${" + plural(relation.getEntity()) + "}\" " +
+                        "th:text=\"${" + relation.getEntity() + ".get" + capitalize(relation.getEntityObject().getReferenceAttribute().getName()) + "()}\" " +
+                        "th:value=\"${" + relation.getEntity() + ".getId()}\" " +
+                        "th:selected=\"${" + relation.getEntity() + ".equals(" + entity.getName() + ".get" + capitalize(relation.getEntity()) + "())}\")>" +
+                        "</option>");
+                printWriter.println("</select>");
+
+                printWriter.println("<br>");
+                printWriter.println("");
+            }
+
+            // For all toMany relation we add a multiple select to choose multiple options.
+            for (EntityRelation relation : entity.getRelations().stream().filter(relation -> relation.getRelationType().isToMany()).collect(Collectors.toList())) {
+                printWriter.println("<label for=\"" + plural(relation.getEntity()) + "\">" + capitalize(plural(relation.getEntity())) + "</label>");
+                printWriter.println("<select multiple id=\"" + plural(relation.getEntity()) + "\" name=\"" + relation.getEntity() +
+                        "Ids" + "\" class=\"form-control\" th:value=\"${" + entity.getName() + ".get" +
+                        capitalize(plural(relation.getEntity())) + "()}\">");
+                printWriter.println("<option th:value=\"null\">none</option>");
+                printWriter.println("<option " +
+                        "th:each=\"" + relation.getEntity() + " : ${" + plural(relation.getEntity()) + "}\" " +
+                        "th:text=\"${" + relation.getEntity() + ".get" + capitalize(relation.getEntityObject().getReferenceAttribute().getName()) + "()}\" " +
+                        "th:value=\"${" + relation.getEntity() + ".getId()}\" " +
+                        "th:selected=\"${" + entity.getName() + ".get" + capitalize(plural(relation.getEntity())) + ".contains(" + relation.getEntity() + ")}\")>" +
+                        "</option>");
+                printWriter.println("</select>");
+
+                printWriter.println("<br>");
+                printWriter.println("");
+
+            }
+
+            printWriter.println("<a th:href=\"@{/" + plural(entity.getName().toLowerCase(Locale.ROOT)) +
                     "}\"><input type=\"button\" class=\"btn btn-warning\" value=\"Cancel\"></a>");
 
             printWriter.println("<input type=\"submit\" class=\"btn btn-primary\" value=\"Save\"> <br>");
