@@ -75,7 +75,7 @@ public class EntityGenerator extends FileFolderGenerator {
 
             // Getter and Setter for ID
             EntityAttribute idAttribute = new EntityAttribute();
-            idAttribute.setTitle("id");
+            idAttribute.setName("id");
             idAttribute.setDataType("Long");
             addGetter(idAttribute, printWriter);
             addSetter(idAttribute, printWriter);
@@ -112,26 +112,27 @@ public class EntityGenerator extends FileFolderGenerator {
     }
 
     private void addCustomAttribute(EntityAttribute attribute, PrintWriter writer) {
-        writer.println("@Column(name = \"" + attribute.getTitle().toLowerCase(Locale.ROOT) + "\")");
+        String columnName = attribute.getColumnName() != null ? attribute.getColumnName() : attribute.getName();
+        writer.println("@Column(name = \"" + columnName.toLowerCase(Locale.ROOT) + "\")");
 
         // Add DateTimeFormat if the attribute is a LocalDate
         if (attribute.getDataType().equals("LocalDate")) {
             writer.println("@DateTimeFormat(pattern = \"yyyy-MM-dd\")");
         }
 
-        writer.println("private " + attribute.getDataType() + " " + attribute.getTitle().toLowerCase(Locale.ROOT) + ";");
+        writer.println("private " + attribute.getDataType() + " " + columnName.toLowerCase(Locale.ROOT) + ";");
     }
 
     private void addGetter(EntityAttribute attribute, PrintWriter writer) {
-        writer.println("public " + attribute.getDataType() + " get" + capitalize(attribute.getTitle()) + "() {");
-        writer.println("    return " + attribute.getTitle().toLowerCase(Locale.ROOT) + ";");
+        writer.println("public " + attribute.getDataType() + " get" + capitalize(attribute.getName()) + "() {");
+        writer.println("    return " + attribute.getName().toLowerCase(Locale.ROOT) + ";");
         writer.println("}");
     }
 
     private void addSetter(EntityAttribute attribute, PrintWriter writer) {
-        writer.println("public void set" + capitalize(attribute.getTitle()) + "(" +
-                attribute.getDataType() + " " + attribute.getTitle() + ") {");
-        writer.println("this." + attribute.getTitle().toLowerCase(Locale.ROOT) + " = " + attribute.getTitle().toLowerCase(Locale.ROOT) + ";");
+        writer.println("public void set" + capitalize(attribute.getName()) + "(" +
+                attribute.getDataType() + " " + attribute.getName() + ") {");
+        writer.println("this." + attribute.getName().toLowerCase(Locale.ROOT) + " = " + attribute.getName().toLowerCase(Locale.ROOT) + ";");
         writer.println("}");
     }
 

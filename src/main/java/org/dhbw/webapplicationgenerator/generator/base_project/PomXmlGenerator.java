@@ -77,9 +77,9 @@ public class PomXmlGenerator extends FileFolderGenerator {
         // Data, H2, Data Rest and Springdoc
         addDependency("org.springframework.boot", "spring-boot-starter-data-jpa", builder);
         addDependency("org.springframework.boot", "spring-boot-starter-data-rest", builder);
-        addDependency("org.springdoc", "springdoc-openapi-ui", builder);
-        addDependency("org.springdoc", "springdoc-openapi-data-rest", builder);
-        addDependency("com.h2database", "h2", "runtime", builder);
+        addDependency("org.springdoc", "springdoc-openapi-ui", springdocVersion, builder);
+        addDependency("org.springdoc", "springdoc-openapi-data-rest", springdocVersion, builder);
+        addDependency("com.h2database", "h2", "runtime", "", builder);
 
         builder.append("\n");
     }
@@ -104,7 +104,7 @@ public class PomXmlGenerator extends FileFolderGenerator {
         builder.append("\n");
     }
 
-    private void addDependency(String groupId, String artifactId, String scope, StringBuilder builder) {
+    private void addDependency(String groupId, String artifactId, String scope, String version, StringBuilder builder) {
         builder.append("\n");
         builder.append("\t\t<dependency>");
         builder.append("\n");
@@ -112,6 +112,10 @@ public class PomXmlGenerator extends FileFolderGenerator {
         builder.append("\n");
         builder.append("\t\t\t<artifactId>").append(artifactId).append("</artifactId>");
         builder.append("\n");
+        if (!version.isEmpty()) {
+            builder.append("\t\t\t<version>").append(version).append("</version>");
+            builder.append("\n");
+        }
         if (!scope.isEmpty()) {
             builder.append("\t\t\t<scope>").append(scope).append("</scope>");
             builder.append("\n");
@@ -120,8 +124,12 @@ public class PomXmlGenerator extends FileFolderGenerator {
         builder.append("\n");
     }
 
+    private void addDependency(String groupId, String artifactId, String version, StringBuilder builder) {
+        addDependency(groupId, artifactId, "", version, builder);
+    }
+
     private void addDependency(String groupId, String artifactId, StringBuilder builder) {
-        addDependency(groupId, artifactId, "", builder);
+        addDependency(groupId, artifactId, "", "", builder);
     }
 
     private File getBasePomXml() {
