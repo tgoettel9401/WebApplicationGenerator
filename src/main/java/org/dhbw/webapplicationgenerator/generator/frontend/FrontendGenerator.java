@@ -52,7 +52,7 @@ public class FrontendGenerator extends FileFolderGenerator {
         addFile(resourceFileHelper.getFile("footer.html"), templatesDir);
         addFile(createNavbarFile(request.getEntities()), templatesDir);
 
-        // TODO: Add dashboard first.
+        addFile(createDashboardFile(request), templatesDir);
 
         for (RequestEntity entity : request.getEntities()) {
             addFile(createOverviewFile(entity), templatesDir);
@@ -90,6 +90,33 @@ public class FrontendGenerator extends FileFolderGenerator {
         return file;
     }
 
+    private File createDashboardFile(CreationRequest request) throws IOException {
+        String fileName = "dashboard.html";
+        File file = new File(String.valueOf(Files.createFile(Path.of(TMP_PATH + fileName))));
+        FileWriter fileWriter = new FileWriter(file);
+        try (PrintWriter printWriter = new PrintWriter(fileWriter)) {
+            printWriter.println("<html lang=\"en\" xmlns:th=\"http://www.thymeleaf.org\">");
+
+            printWriter.println("<div th:insert=\"main.html\"></div>");
+            printWriter.println("<body>");
+            printWriter.println("<div class=\"container-fluid\" style=\"margin-top: 10px\">");
+            printWriter.println("<h1>Dashboard</h1> <br>");
+            printWriter.println("<ul>");
+            for (RequestEntity entity : request.getEntities()) {
+                printWriter.println("<li>");
+                printWriter.println("<a th:href=\"@{" + plural(entity.getName()) + "}\">" + capitalize(plural(entity.getName())) + "</a>");
+                printWriter.println("</li>");
+            }
+            printWriter.println("</ul>");
+
+            printWriter.println("<div th:insert=\"footer.html\">");
+            printWriter.println("</div>");
+            printWriter.println("</div>");
+            printWriter.println("</body>");
+        }
+        return file;
+    }
+
     private File createOverviewFile(RequestEntity entity) throws IOException {
         String fileName = plural(entity.getName().toLowerCase(Locale.ROOT)) + HTML_FILE_ENDING;
         File file = new File(String.valueOf(Files.createFile(Path.of(TMP_PATH + fileName))));
@@ -100,7 +127,7 @@ public class FrontendGenerator extends FileFolderGenerator {
             printWriter.println("<div th:insert=\"main.html\"></div>");
             printWriter.println("<body>");
             printWriter.println("<div class=\"container-fluid\" style=\"margin-top: 10px\">");
-            printWriter.println("<h1>" + plural(entity.getName()) + "</h1> <br>");
+            printWriter.println("<h1>" + capitalize(plural(entity.getName())) + "</h1> <br>");
             printWriter.println("<a th:href=\"@{/" + plural(entity.getName().toLowerCase(Locale.ROOT)) +
                     "/create}\"><input type=\"button\" class=\"btn btn-primary\" value=\"New\"\n" +
                     " style=\"margin-bottom: 10px\"></a>");
@@ -157,10 +184,10 @@ public class FrontendGenerator extends FileFolderGenerator {
             printWriter.println("<div class=\"container-fluid\" style=\"margin-top: 10px\">");
 
             // Update or Create
-            printWriter.println("<h1 th:if=\"${" + entity.getName().toLowerCase(Locale.ROOT) +
-                    ".getId() != null}\">Update an existing " + entity.getTitle() + "</h1>");
-            printWriter.println("<h1 th:if=\"${" + entity.getName().toLowerCase(Locale.ROOT) +
-                    ".getId() == null}\">Create a new " + entity.getTitle() + "</h1>");
+            printWriter.println("<h1 th:if=\"${" + entity.getName() +
+                    ".getId() != null}\">Update an existing " + plural(entity.getTitle()) + "</h1>");
+            printWriter.println("<h1 th:if=\"${" + entity.getName() +
+                    ".getId() == null}\">Create a new " + plural(entity.getTitle()) + "</h1>");
 
             printWriter.println("<form th:action=\"@{'/" + plural(entity.getName().toLowerCase(Locale.ROOT)) +
                     "/save'}\" th:object=\"${" + entity.getName().toLowerCase(Locale.ROOT) + "}\" method=\"post\">");

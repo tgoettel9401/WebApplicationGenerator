@@ -123,6 +123,7 @@ public class FrontendControllerGenerator extends FileFolderGenerator {
             printWriter.println("public String index(Model model) {");
             printWriter.println("model.addAttribute(\"" + plural(entity.getTitle().toLowerCase(Locale.ROOT)) +
                     "\", " + repositoryVariableName + ".findAll());");
+            printWriter.println("model.addAttribute(\"title\", \"" + plural(entity.getTitle()) + " - Index\");");
             printWriter.println("return \"" + plural(entity.getTitle().toLowerCase(Locale.ROOT)) + "\";");
             printWriter.println("}");
             printWriter.println("");
@@ -139,6 +140,7 @@ public class FrontendControllerGenerator extends FileFolderGenerator {
             for (EntityRelation relation : entity.getRelations()) {
                 printWriter.println("model.addAttribute(\"" + plural(relation.getEntity()) + "\", " + relation.getEntity() + "Repository.findAll());");
             }
+            printWriter.println("model.addAttribute(\"title\", \"" + plural(entity.getTitle()) + " - Create\");");
 
             printWriter.println("return \"" + entity.getTitle().toLowerCase(Locale.ROOT) + "Details\";");
             printWriter.println("}");
@@ -159,6 +161,7 @@ public class FrontendControllerGenerator extends FileFolderGenerator {
             for (EntityRelation relation : entity.getRelations()) {
                 printWriter.println("model.addAttribute(\"" + plural(relation.getEntity()) + "\", " + relation.getEntity() + "Repository.findAll());");
             }
+            printWriter.println("model.addAttribute(\"title\", \"" + plural(entity.getTitle()) + " - Update\");");
             printWriter.println("return \"" + entity.getTitle().toLowerCase(Locale.ROOT) + "Details\";");
             printWriter.println("}");
             printWriter.println("");
