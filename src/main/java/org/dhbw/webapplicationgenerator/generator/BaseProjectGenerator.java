@@ -28,6 +28,8 @@ public class BaseProjectGenerator extends FileFolderGenerator {
         Project baseProject = new Project();
 
         ProjectDirectory mainDirectory = addDirectory(request.getProject().getTitleWithoutSpaces(), Optional.empty());
+        this.createTmpFolderIfNotExists();
+        this.createTmp2FolderIfNotExists();
         this.mavenFolderGenerator.create(mainDirectory);
         this.rootFilesGenerator.create(request, mainDirectory);
         this.sourceFolderGenerator.create(request, mainDirectory);

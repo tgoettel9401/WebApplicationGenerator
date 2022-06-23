@@ -2,8 +2,9 @@ package org.dhbw.webapplicationgenerator.util;
 
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 
 @Service
@@ -18,10 +19,17 @@ public class ResourceFileHelper {
     public File getFile(String fileName) throws FileNotFoundException {
         ClassLoader classLoader = getClass().getClassLoader();
         String fileNameWithPath = "files/" + fileName;
-        if (classLoader.getResource(fileNameWithPath) == null) {
+        if (classLoader.getResourceAsStream(fileNameWithPath) == null) {
             throw new FileNotFoundException(fileNameWithPath);
         } else {
-            return new File(Objects.requireNonNull(classLoader.getResource(fileNameWithPath)).getFile());
+            InputStream inputStream = Objects.requireNonNull(classLoader.getResourceAsStream(fileNameWithPath));
+            File file = new File(".tmp2/" + fileName);
+            try {
+                Files.copy(inputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            return file;
         }
     }
 

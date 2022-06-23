@@ -114,6 +114,19 @@ public class FileFolderGenerator {
         }
     }
 
+    /**
+     * Creates the .tmp2 folder if it does not exist yet.
+     */
+    public void createTmp2FolderIfNotExists() {
+        if (!Files.exists(Path.of(".tmp2"))) {
+            try {
+                Files.createDirectory(Path.of(".tmp2"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     protected String capitalize(String value) {
         value = value.toLowerCase(Locale.ROOT);
         return value.substring(0,1).toUpperCase() + value.substring(1).toLowerCase();
