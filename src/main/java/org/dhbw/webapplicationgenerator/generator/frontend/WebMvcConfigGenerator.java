@@ -64,6 +64,9 @@ public class WebMvcConfigGenerator extends FileFolderGenerator {
             printWriter.println("public void addViewControllers(ViewControllerRegistry registry) {");
 
             printWriter.println("registry.addViewController(\"/\").setViewName(\"dashboard\");");
+            printWriter.println("registry.addViewController(\"/login\").setViewName(\"login\");");
+            printWriter.println("registry.addViewController(\"/register\").setViewName(\"register\");");
+            printWriter.println("registry.addViewController(\"/users\").setViewName(\"users\");");
             for (RequestEntity entity : entities) {
                 printWriter.println("registry.addViewController(\"/" +
                         plural(entity.getName().toLowerCase(Locale.ROOT)) +

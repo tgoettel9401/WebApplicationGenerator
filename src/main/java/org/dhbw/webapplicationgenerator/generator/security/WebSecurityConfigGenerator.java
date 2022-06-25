@@ -1,4 +1,4 @@
-package org.dhbw.webapplicationgenerator.generator.frontend;
+package org.dhbw.webapplicationgenerator.generator.security;
 
 import org.dhbw.webapplicationgenerator.generator.Project;
 import org.dhbw.webapplicationgenerator.generator.base_project.FileFolderGenerator;
@@ -67,7 +67,7 @@ public class WebSecurityConfigGenerator extends FileFolderGenerator {
             printWriter.println("@Override");
             printWriter.println("protected void configure(HttpSecurity http) throws Exception {");
             printWriter.println("http.authorizeRequests()");
-            printWriter.println(".antMatchers(\"/\", \"/home\", \"/users/register\").permitAll()");
+            printWriter.println(".antMatchers(\"/users/register\").permitAll()");
             printWriter.println(".anyRequest().authenticated()");
             printWriter.println(".and()");
             printWriter.println(".formLogin()");

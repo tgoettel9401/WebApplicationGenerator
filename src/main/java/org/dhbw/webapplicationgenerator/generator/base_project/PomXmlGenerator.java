@@ -77,9 +77,11 @@ public class PomXmlGenerator extends FileFolderGenerator {
         // Data, H2, Data Rest and Springdoc
         addDependency("org.springframework.boot", "spring-boot-starter-data-jpa", builder);
         addDependency("org.springframework.boot", "spring-boot-starter-data-rest", builder);
+        addDependency("org.springframework.boot", "spring-boot-starter-security", builder);
         addDependency("org.springdoc", "springdoc-openapi-ui", springdocVersion, builder);
         addDependency("org.springdoc", "springdoc-openapi-data-rest", springdocVersion, builder);
         addDependency("com.h2database", "h2", "runtime", "", builder);
+        addDependency("org.thymeleaf.extras", "thymeleaf-extras-springsecurity5", builder);
 
         builder.append("\n");
     }

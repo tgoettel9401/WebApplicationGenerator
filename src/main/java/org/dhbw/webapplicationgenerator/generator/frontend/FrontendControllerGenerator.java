@@ -3,9 +3,8 @@ package org.dhbw.webapplicationgenerator.generator.frontend;
 import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.Project;
 import org.dhbw.webapplicationgenerator.generator.base_project.FileFolderGenerator;
-import org.dhbw.webapplicationgenerator.generator.util.PackageNameResolver;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
-import org.dhbw.webapplicationgenerator.util.ResourceFileHelper;
+import org.dhbw.webapplicationgenerator.generator.util.PackageNameResolver;
 import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.dhbw.webapplicationgenerator.webclient.request.EntityAttribute;
 import org.dhbw.webapplicationgenerator.webclient.request.EntityRelation;
@@ -18,7 +17,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,7 +28,6 @@ public class FrontendControllerGenerator extends FileFolderGenerator {
     private static final String TMP_PATH = ".tmp/";
     private static final String JAVA_CLASS_ENDING = ".java";
 
-    private final ResourceFileHelper resourceFileHelper;
     private final PackageNameResolver packageNameResolver;
 
     public Project create(Project project, CreationRequest request) {
@@ -60,8 +57,6 @@ public class FrontendControllerGenerator extends FileFolderGenerator {
     private File createFrontendController(RequestEntity entity, CreationRequest request, String packageName) throws IOException {
         String controllerName = capitalize(entity.getName()) + "Controller";
         String repositoryName = capitalize(entity.getName()) + "Repository";
-        List<EntityRelation> toManyRelations = entity.getRelations().stream().filter(relation -> relation.getRelationType().isToMany()).collect(Collectors.toList());
-        List<EntityRelation> toOneRelations = entity.getRelations().stream().filter(relation -> !relation.getRelationType().isToMany()).collect(Collectors.toList());
         File file = new File(String.valueOf(Files.createFile(Path.of(TMP_PATH + controllerName + JAVA_CLASS_ENDING))));
         FileWriter fileWriter = new FileWriter(file);
         try (PrintWriter printWriter = new PrintWriter(fileWriter)) {

@@ -1,4 +1,4 @@
-package org.dhbw.webapplicationgenerator.generator.entity;
+package org.dhbw.webapplicationgenerator.generator.security;
 
 import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.Project;
@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -38,28 +37,37 @@ public class SecurityEntitiesGenerator extends FileFolderGenerator {
 
     private void create(CreationRequest request, ProjectDirectory parent) throws IOException {
 
-        ProjectDirectory domainDir = (ProjectDirectory) parent.getChildren().stream().filter(dir -> dir.getTitle().equals("domain")).collect(Collectors.toList());
+        ProjectDirectory domainDir = (ProjectDirectory) parent.getChildren().stream()
+                .filter(dir -> dir.getTitle().equals("domain"))
+                .findFirst().orElseThrow(() -> new RuntimeException("Creating entity failed due to missing domain folder"));
+
+        ProjectDirectory repositoryDir = (ProjectDirectory) parent.getChildren().stream()
+                .filter(dir -> dir.getTitle().equals("repository"))
+                .findFirst().orElseThrow(() -> new RuntimeException("Creating repository failed due to missing repository folder"));
 
         String packageName = packageNameResolver.resolveEntity(request);
 
         addFile(addUserEntity(packageName), domainDir);
         addFile(addRoleEntity(packageName), domainDir);
+        addFile(addUserRepository(request), repositoryDir);
+        addFile(addRoleRepository(request), repositoryDir);
 
     }
 
     private File addUserEntity(String packageName) throws IOException {
-        File file = new File(String.valueOf(Files.createFile(Path.of(TMP_PATH + "User" + JAVA_CLASS_ENDING))));
+        File file = new File(String.valueOf(Files.createFile(Path.of(TMP_PATH + "AppUser" + JAVA_CLASS_ENDING))));
         FileWriter fileWriter = new FileWriter(file);
         try (PrintWriter printWriter = new PrintWriter(fileWriter)) {
             printWriter.println("package " + packageName + ";");
             printWriter.println();
 
-            printWriter.println("import javax.persistency.*;");
+            printWriter.println("import javax.persistence.*;");
             printWriter.println("import java.util.List;");
             printWriter.println();
 
             printWriter.println("@Entity");
-            printWriter.println("public class User {");
+            printWriter.println("@Table(name = \"app_users\")");
+            printWriter.println("public class AppUser {");
             printWriter.println();
 
             printWriter.println("@Id");
@@ -83,7 +91,7 @@ public class SecurityEntitiesGenerator extends FileFolderGenerator {
             printWriter.println("joinColumns = @JoinColumn(");
             printWriter.println("name = \"user_id\", referencedColumnName = \"id\"),");
             printWriter.println("inverseJoinColumns = @JoinColumn(");
-            printWriter.println("name = \"role_id\", referencedColumName = \"id\"))");
+            printWriter.println("name = \"role_id\", referencedColumnName = \"id\"))");
             printWriter.println("private List<Role> roles;");
             printWriter.println();
 
@@ -147,7 +155,7 @@ public class SecurityEntitiesGenerator extends FileFolderGenerator {
             printWriter.println("}");
             printWriter.println();
 
-            printWriter.println("public List<Rol> getRoles() {");
+            printWriter.println("public List<Role> getRoles() {");
             printWriter.println("return roles;");
             printWriter.println("}");
             printWriter.println();
@@ -156,6 +164,9 @@ public class SecurityEntitiesGenerator extends FileFolderGenerator {
             printWriter.println("this.roles = roles;");
             printWriter.println("}");
             printWriter.println();
+
+            // Close the final curly bracket.
+            printWriter.println("}");
 
         }
         return file;
@@ -172,12 +183,12 @@ public class SecurityEntitiesGenerator extends FileFolderGenerator {
             printWriter.println("import org.springframework.security.core.authority.SimpleGrantedAuthority;");
 
 
-            printWriter.println("import javax.persistency.*;");
+            printWriter.println("import javax.persistence.*;");
             printWriter.println("import java.util.Collection;");
             printWriter.println();
 
             printWriter.println("@Entity");
-            printWriter.println("public class User {");
+            printWriter.println("public class Role {");
             printWriter.println();
 
             printWriter.println("@Id");
@@ -191,7 +202,7 @@ public class SecurityEntitiesGenerator extends FileFolderGenerator {
             printWriter.println();
 
             printWriter.println("@ManyToMany(mappedBy = \"roles\")");
-            printWriter.println("private Collection<User> users;");
+            printWriter.println("private Collection<AppUser> users;");
             printWriter.println();
 
             printWriter.println("public GrantedAuthority getAuthority() {");
@@ -209,7 +220,7 @@ public class SecurityEntitiesGenerator extends FileFolderGenerator {
             printWriter.println();
 
             printWriter.println("public String getName() {");
-            printWriter.println("return id;");
+            printWriter.println("return name;");
             printWriter.println("}");
             printWriter.println();
 
@@ -218,12 +229,12 @@ public class SecurityEntitiesGenerator extends FileFolderGenerator {
             printWriter.println("}");
             printWriter.println();
 
-            printWriter.println("public Collection<User> getUsers() {");
+            printWriter.println("public Collection<AppUser> getUsers() {");
             printWriter.println("return users;");
             printWriter.println("}");
             printWriter.println();
 
-            printWriter.println("public void setUsers(Collection<User> users) {");
+            printWriter.println("public void setUsers(Collection<AppUser> users) {");
             printWriter.println("this.users = users;");
             printWriter.println("}");
             printWriter.println();
@@ -238,6 +249,43 @@ public class SecurityEntitiesGenerator extends FileFolderGenerator {
             printWriter.println("}");
             printWriter.println();
 
+            // Close the final curly bracket.
+            printWriter.println("}");
+
+        }
+        return file;
+    }
+
+    private File addUserRepository(CreationRequest request) throws IOException {
+        File file = new File(String.valueOf(Files.createFile(Path.of(TMP_PATH + "AppUserRepository" + JAVA_CLASS_ENDING))));
+        FileWriter fileWriter = new FileWriter(file);
+        try (PrintWriter printWriter = new PrintWriter(fileWriter)) {
+            printWriter.println("package " + packageNameResolver.resolveRepository(request) + ";");
+            printWriter.println();
+            printWriter.println("import " + packageNameResolver.resolveEntity(request) + ".AppUser;");
+            printWriter.println("import org.springframework.data.jpa.repository.JpaRepository;");
+            printWriter.println("import java.util.Optional;");
+            printWriter.println();
+            printWriter.println("public interface " + "AppUserRepository extends JpaRepository<AppUser, Long> {");
+            printWriter.println("Optional<AppUser> findByUsername(String username);");
+            printWriter.println("}");
+            printWriter.println();
+        }
+        return file;
+    }
+
+    private File addRoleRepository(CreationRequest request) throws IOException {
+        File file = new File(String.valueOf(Files.createFile(Path.of(TMP_PATH + "RoleRepository" + JAVA_CLASS_ENDING))));
+        FileWriter fileWriter = new FileWriter(file);
+        try (PrintWriter printWriter = new PrintWriter(fileWriter)) {
+            printWriter.println("package " + packageNameResolver.resolveRepository(request) + ";");
+            printWriter.println();
+            printWriter.println("import " + packageNameResolver.resolveEntity(request) + ".Role;");
+            printWriter.println("import org.springframework.data.jpa.repository.JpaRepository;");
+            printWriter.println();
+            printWriter.println("public interface " + "RoleRepository extends JpaRepository<Role, Long> {");
+            printWriter.println("}");
+            printWriter.println();
         }
         return file;
     }

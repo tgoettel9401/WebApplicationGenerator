@@ -55,6 +55,39 @@ public class FileFolderGenerator {
     }
 
     /**
+     * Returns the templates directory, usually in path /src/main/resources/templates
+     * @param project current Project object
+     * @return ProjectDirectory for templates
+     */
+    public ProjectDirectory getTemplatesDirectory(Project project) {
+        ProjectDirectory resourcesDir = getResourcesDirectory(project);
+        return (ProjectDirectory) resourcesDir.getChildren().stream().filter(child -> child.getTitle().equals("templates"))
+                .findFirst().orElseThrow(() -> new RuntimeException("Creating template failed due to missing templates folder"));
+    }
+
+    /**
+     * Returns the controller directory, usually in path {mainDir}/controller
+     * @param project current Project object
+     * @return ProjectDirectory for resources
+     */
+    public ProjectDirectory getControllerDirectory(Project project, CreationRequest request) {
+        ProjectDirectory artifactDir = getMainProjectDirectory(project, request);
+        return (ProjectDirectory) artifactDir.getChildren().stream().filter(child -> child.getTitle().equals("controller"))
+                .findFirst().orElseThrow(() -> new RuntimeException("Creating controller failed due to missing controller folder"));
+    }
+
+    /**
+     * Returns the transferObject directory, usually in path {mainDir}/transferObject
+     * @param project current Project object
+     * @return ProjectDirectory for resources
+     */
+    public ProjectDirectory getTransferObjectDirectory(Project project, CreationRequest request) {
+        ProjectDirectory artifactDir = getMainProjectDirectory(project, request);
+        return (ProjectDirectory) artifactDir.getChildren().stream().filter(child -> child.getTitle().equals("transferObject"))
+                .findFirst().orElseThrow(() -> new RuntimeException("Creating transferObject failed due to missing transferObject folder"));
+    }
+
+    /**
      * Adds a directory to the specified parent folder
      * @param title String
      * @param parent Optional parent directory the folder should be added to. If the Optional is empty, it will be

@@ -11,7 +11,7 @@ public class PackageNameResolver {
     }
 
     public String resolveTransferObjects(CreationRequest request) {
-        return basePackage(request) + ".transferObjects";
+        return basePackage(request) + ".transferObject";
     }
 
     public String resolveRepository(CreationRequest request) {
@@ -20,6 +20,10 @@ public class PackageNameResolver {
 
     public String resolveController(CreationRequest request) {
         return basePackage(request) + ".controller";
+    }
+
+    public String resolveService(CreationRequest request) {
+        return basePackage(request) + ".service";
     }
 
     public String resolveConfig(CreationRequest request) {

@@ -48,7 +48,7 @@ public class EntityGenerator extends FileFolderGenerator {
         String entityPackageName = packageNameResolver.resolveEntity(request);
 
         // Second we also create the transferObjects directory with transferObjects.
-        ProjectDirectory dtoDir = addDirectory("transferObjects", Optional.of(parent));
+        ProjectDirectory dtoDir = addDirectory("transferObject", Optional.of(parent));
         String transferObjectPackageName = packageNameResolver.resolveTransferObjects(request);
 
         // Finally we add entities and transferobjects to each of the directories.

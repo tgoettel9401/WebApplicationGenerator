@@ -80,6 +80,12 @@ public class FrontendGenerator extends FileFolderGenerator {
                         "}\">" + plural(entity.getTitle()) + "</a>");
                 printWriter.println("</li>");
             }
+
+            // Add users
+            printWriter.println("<li class=\"nav-item\">");
+            printWriter.println("<a class=\"nav-link\" th:href=\"@{/users}\">Users</a>");
+            printWriter.println("</li>");
+
             printWriter.println("</ul>");
             printWriter.println("</div>");
             printWriter.println("</div>");

@@ -7,6 +7,8 @@ import org.dhbw.webapplicationgenerator.generator.frontend.FrontendControllerGen
 import org.dhbw.webapplicationgenerator.generator.frontend.FrontendGenerator;
 import org.dhbw.webapplicationgenerator.generator.frontend.WebMvcConfigGenerator;
 import org.dhbw.webapplicationgenerator.generator.repository.RepositoryGenerator;
+import org.dhbw.webapplicationgenerator.generator.security.SecurityGenerator;
+import org.dhbw.webapplicationgenerator.util.FileCleaner;
 import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +27,8 @@ public class ProjectGenerator {
     private final ExceptionGenerator exceptionGenerator;
     private final FrontendControllerGenerator frontendControllerGenerator;
     private final FrontendGenerator frontendGenerator;
+    private final SecurityGenerator securityGenerator;
+    private final FileCleaner fileCleaner;
 
     /**
      * Generates the Project based on the provided request
@@ -33,13 +37,15 @@ public class ProjectGenerator {
      */
     public Project generate(CreationRequest request) {
         logger.info("Generating new project with title {}", request.getProject().getTitle());
+        fileCleaner.performCleanup(); // In case of previous errors, we perform a cleanup to be safe.
         Project baseProject = this.baseProjectGenerator.create(request);
         Project projectWithEntites = this.entityGenerator.create(baseProject, request);
         Project projectWithRepositories =  this.repositoryGenerator.create(projectWithEntites, request);
         Project projectWithMvcConfig = this.mvcConfigGenerator.create(projectWithRepositories, request);
         Project projectWithExceptions = this.exceptionGenerator.create(projectWithMvcConfig, request);
         Project projectWithFrontendController = this.frontendControllerGenerator.create(projectWithExceptions, request);
-        return this.frontendGenerator.create(projectWithFrontendController, request);
+        Project projectWithFrontend = this.frontendGenerator.create(projectWithFrontendController, request);
+        return this.securityGenerator.create(projectWithFrontend, request);
     }
 
 }

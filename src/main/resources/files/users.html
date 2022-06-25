@@ -1,0 +1,23 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<div th:insert="main.html"></div>
+<body>
+<div class="container-fluid" style="margin-top: 10px">
+    <h1>Users</h1> <br>
+    <table class="table table-bordered">
+        <tr>
+            <th>Username</th>
+            <th>E-Mail</th>
+            <th>Firstname</th>
+            <th>Lastname</th>
+        </tr>
+        <tr th:each="user : ${users}">
+            <td th:text="${user.getUsername()}"></td>
+            <td th:text="${user.getEmail()}"></td>
+            <td th:text="${user.getFirstName()}"></td>
+            <td th:text="${user.getLastName()}"></td>
+        </tr>
+    </table>
+    <div th:insert="footer.html">
+    </div>
+</div>
+</body>
