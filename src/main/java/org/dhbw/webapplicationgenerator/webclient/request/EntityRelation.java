@@ -12,6 +12,7 @@ public class EntityRelation {
     private Cardinality cardinalityMax;
     private String entity;
     private String joinTable;
+    private boolean owning = false;
 
     @ToString.Exclude
     private RequestEntity entityObject;
@@ -30,6 +31,10 @@ public class EntityRelation {
             return RelationType.MANY_TO_MANY;
         }
         throw new WagException("The combination of cardinalityMin and cardinalityMax is not known: " + cardinalityMin + ":" + cardinalityMax);
+    }
+
+    public boolean isOwning() {
+        return owning || !getRelationType().equals(RelationType.ONE_TO_ONE);
     }
 
 }

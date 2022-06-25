@@ -40,7 +40,6 @@ public class CreationRequestValidator {
                     if (relation.getJoinTable() == null) {
                         throw new ValidationException("JoinTable of relation " + relation.getName() + " in entity " + entity.getName() + " is not set even though it is a ManyToMany Relation");
                     }
-                    String joinTable = relation.getJoinTable();
                     EntityRelation relationOnTheOtherSide = request.getEntities().stream()
                             // We filter for the entity on the other side of the relation
                             .filter(e -> e.getName().equals(relation.getEntity()))
@@ -51,6 +50,19 @@ public class CreationRequestValidator {
                             .findFirst().orElseThrow(() -> new WagException("Relation with name " + relation.getName() + " not found"));
                     if (!relation.getJoinTable().equals(relationOnTheOtherSide.getJoinTable())) {
                         throw new ValidationException("JoinTable of relation " + relation.getName() + " is different in the associated entities");
+                    }
+                }
+                if (relation.getRelationType().equals(RelationType.ONE_TO_ONE)) {
+                    EntityRelation relationOnTheOtherSide = request.getEntities().stream()
+                            // We filter for the entity on the other side of the relation
+                            .filter(e -> e.getName().equals(relation.getEntity()))
+                            .findFirst().orElseThrow(() -> new WagException("Entity with name " + relation.getEntity() + " not found"))
+                            .getRelations().stream()
+                            // We filter for the relation that points to the current entity
+                            .filter(r -> r.getEntity().equals(entity.getName()))
+                            .findFirst().orElseThrow(() -> new WagException("Relation with name " + relation.getName() + " not found"));
+                    if (relation.isOwning() && relationOnTheOtherSide.isOwning() || !relation.isOwning() && !relationOnTheOtherSide.isOwning()) {
+                        throw new ValidationException("OneToOne-Relation " + relation.getName() + " does not have exactly one owning side");
                     }
                 }
             }

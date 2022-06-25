@@ -239,7 +239,14 @@ public class EntityGenerator extends FileFolderGenerator {
         RelationType relationType = relation.getRelationType();
 
         if (relationType.equals(RelationType.ONE_TO_ONE)) {
-            writer.println("@OneToOne");
+            if (relation.isOwning()) {
+                writer.println("@OneToOne");
+                writer.println("@JoinColumn(");
+                writer.println("name = \"" + relation.getEntity() + "_id\",");
+                writer.println("referencedColumnName = \"id\")");
+            } else {
+                writer.println("@OneToOne(mappedBy=\"" + entity.getName() + "\")");
+            }
             writer.println("private " + capitalize(relation.getEntity()) + " " + relation.getEntity() + ";");
         }
 
