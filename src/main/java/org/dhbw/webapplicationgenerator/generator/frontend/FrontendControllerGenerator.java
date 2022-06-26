@@ -69,6 +69,7 @@ public class FrontendControllerGenerator extends FileFolderGenerator {
             printWriter.println("import org.springframework.ui.Model;");
             printWriter.println("import org.springframework.web.bind.annotation.*;");
             printWriter.println("import org.springframework.web.servlet.view.RedirectView;");
+            printWriter.println("import javax.transaction.Transactional;");
 
             // Application Imports
             printWriter.println("import " + packageNameResolver.resolveEntity(request) + "." + capitalize(entity.getName()) + ";");
@@ -211,8 +212,21 @@ public class FrontendControllerGenerator extends FileFolderGenerator {
             for (EntityRelation relation : entity.getRelations().stream().filter(relation -> relation.getRelationType().isToMany()).collect(Collectors.toList())) {
                 printWriter.println(entity.getName() + ".get" + capitalize(plural(relation.getEntity())) + "().clear();");
                 printWriter.println("for (Long " + relation.getEntity() + "Id : " + entity.getName() + "Request.get" + capitalize(relation.getEntity()) + "Ids()) {");
-                printWriter.println(entity.getName() + ".get" + capitalize(plural(relation.getEntity())) + "().add(" + relation.getEntity() + "Repository.findById(" + relation.getEntity() + "Id).orElse(null));");
+                printWriter.println(capitalize(relation.getEntity()) + " " + relation.getEntity() + " = " + relation.getEntity() + "Repository.findById(" + relation.getEntity() + "Id).orElseThrow(() -> new NotFoundException(\"" + relation.getEntity() + "\", " + relation.getEntity() + "Id));");
+                if (relation.getRelationType().equals(RelationType.ONE_TO_MANY)) {
+                    printWriter.println(relation.getEntity() + ".set" + capitalize(entity.getName()) + "(" + entity.getName() + ");");
+                    printWriter.println(relation.getEntity() +"Repository.save(" + relation.getEntity() + ");");
+                    printWriter.println(entity.getName() + ".get" + capitalize(plural(relation.getEntity())) + "().add(" + relation.getEntity() + "Repository.findById(" + relation.getEntity() + "Id).orElse(null));");
+                }
                 printWriter.println("}");
+                if (relation.getRelationType().equals(RelationType.ONE_TO_MANY)) {
+                    printWriter.println("if (" + entity.getName() + "Request.get" + capitalize(relation.getEntity()) + "Ids().isEmpty() && isUpdate) {");
+                    printWriter.println("for (" + capitalize(relation.getEntity()) + " " + relation.getEntity() + " : " + relation.getEntity() + "Repository.findBy" + capitalize(entity.getName()) + "Id(" + entity.getName() + "Request.getId())) {");
+                    printWriter.println(relation.getEntity() + ".set" + capitalize(entity.getName() + "(null);"));
+                    printWriter.println(relation.getEntity() + "Repository.save(" + relation.getEntity() + ");");
+                    printWriter.println("}");
+                    printWriter.println("}");
+                }
             }
 
             printWriter.println(repositoryVariableName + ".save(" + entity.getName() + ");");

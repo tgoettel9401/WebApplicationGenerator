@@ -104,6 +104,26 @@ public class EntityGenerator extends FileFolderGenerator {
                 addSetter(attribute, printWriter);
             }
 
+            printWriter.println("@PreRemove");
+            printWriter.println("public void removeRelations() {");
+            for (EntityRelation relation : entity.getRelations()) {
+                if (relation.getRelationType().equals(RelationType.ONE_TO_MANY)) {
+                    printWriter.println("for (" + capitalize(relation.getEntity()) + " " + relation.getEntity() + " : this.get" + plural(capitalize(relation.getEntity())) + "()) {");
+                    printWriter.println(relation.getEntity() + ".set" + capitalize(entity.getName()) + "(null);");
+                    printWriter.println("}");
+                } else if (relation.getRelationType().equals(RelationType.MANY_TO_MANY)) {
+                    printWriter.println("for (" + capitalize(relation.getEntity()) + " " + relation.getEntity() + " : this.get" + plural(capitalize(relation.getEntity())) + "()) {");
+                    printWriter.println(relation.getEntity() + ".get" + capitalize(plural(entity.getName())) + "().remove(this);");
+                    printWriter.println("}");
+                } else if (relation.getRelationType().equals(RelationType.MANY_TO_ONE)) {
+                    printWriter.println(relation.getEntity() + ".get" + capitalize(plural(entity.getName())) + "().remove(this);");
+                }
+                else { // ONE_TO_ONE
+                    printWriter.println(relation.getEntity() + ".set" + capitalize(entity.getName()) + "(null);");
+                }
+            }
+            printWriter.println("}");
+
             printWriter.println("}");
         }
         return file;
