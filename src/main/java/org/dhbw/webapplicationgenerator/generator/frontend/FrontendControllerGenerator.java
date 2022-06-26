@@ -218,6 +218,9 @@ public class FrontendControllerGenerator extends FileFolderGenerator {
                     printWriter.println(relation.getEntity() +"Repository.save(" + relation.getEntity() + ");");
                     printWriter.println(entity.getName() + ".get" + capitalize(plural(relation.getEntity())) + "().add(" + relation.getEntity() + "Repository.findById(" + relation.getEntity() + "Id).orElse(null));");
                 }
+                if (relation.getRelationType().equals(RelationType.MANY_TO_MANY)) {
+                    printWriter.println(entity.getName() + ".get" + capitalize(plural(relation.getEntity())) + "().add(" + relation.getEntity() + ");");
+                }
                 printWriter.println("}");
                 if (relation.getRelationType().equals(RelationType.ONE_TO_MANY)) {
                     printWriter.println("if (" + entity.getName() + "Request.get" + capitalize(relation.getEntity()) + "Ids().isEmpty() && isUpdate) {");

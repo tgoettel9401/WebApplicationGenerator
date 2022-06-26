@@ -116,10 +116,14 @@ public class EntityGenerator extends FileFolderGenerator {
                     printWriter.println(relation.getEntity() + ".get" + capitalize(plural(entity.getName())) + "().remove(this);");
                     printWriter.println("}");
                 } else if (relation.getRelationType().equals(RelationType.MANY_TO_ONE)) {
+                    printWriter.println("if (" + relation.getEntity() + " != null) {");
                     printWriter.println(relation.getEntity() + ".get" + capitalize(plural(entity.getName())) + "().remove(this);");
+                    printWriter.println("}");
                 }
                 else { // ONE_TO_ONE
+                    printWriter.println("if (" + relation.getEntity() + " != null) {");
                     printWriter.println(relation.getEntity() + ".set" + capitalize(entity.getName()) + "(null);");
+                    printWriter.println("}");
                 }
             }
             printWriter.println("}");
