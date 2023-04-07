@@ -63,7 +63,7 @@ public class RepositoryGenerator extends FileFolderGenerator {
             printWriter.println();
             printWriter.println("public interface " + entity.getTitle() + "Repository extends JpaRepository<" + entity.getTitle() + ", Long> {");
             for (EntityRelation relation : entity.getRelations().stream().filter(rel -> !rel.getRelationType().isToMany()).collect(Collectors.toList())) {
-                printWriter.println("List<" + capitalize(entity.getName()) + "> findBy" + capitalize(relation.getEntity()) + "Id(Long " + relation.getEntity() + "Id);");
+                printWriter.println("List<" + capitalize(entity.getName()) + "> findBy" + capitalize(relation.getEntityName()) + "Id(Long " + relation.getEntityName() + "Id);");
             }
             printWriter.println("}");
             printWriter.println();

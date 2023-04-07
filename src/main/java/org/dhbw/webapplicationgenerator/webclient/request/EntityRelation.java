@@ -3,6 +3,7 @@ package org.dhbw.webapplicationgenerator.webclient.request;
 import lombok.Data;
 import lombok.ToString;
 import org.dhbw.webapplicationgenerator.generator.entity.RelationType;
+import org.dhbw.webapplicationgenerator.generator.util.Utils;
 import org.dhbw.webapplicationgenerator.webclient.exception.WagException;
 
 @Data
@@ -10,7 +11,7 @@ public class EntityRelation {
     private String name;
     private Cardinality cardinalityMin;
     private Cardinality cardinalityMax;
-    private String entity;
+    private String entityName;
     private String joinTable;
     private boolean owning = false;
 
@@ -35,6 +36,18 @@ public class EntityRelation {
 
     public boolean isOwning() {
         return owning || !getRelationType().equals(RelationType.ONE_TO_ONE);
+    }
+
+    public String getEntityClassName() {
+        return Utils.capitalize(entityName);
+    }
+
+    public String getEntityNamePlural() {
+        return Utils.plural(entityName);
+    }
+
+    public String getEntityClassNamePlural() {
+        return Utils.capitalize(Utils.plural(entityName));
     }
 
 }

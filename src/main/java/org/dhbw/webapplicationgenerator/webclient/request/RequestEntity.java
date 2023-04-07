@@ -4,9 +4,7 @@ import lombok.Data;
 import org.dhbw.webapplicationgenerator.webclient.exception.WagException;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Data
 public class RequestEntity {
@@ -20,11 +18,6 @@ public class RequestEntity {
         return attributes.stream().filter(EntityAttribute::isReferenceAttribute)
                 .findFirst()
                 .orElseThrow(() -> new WagException("No Reference-Attribute was found for entity " + getClass().getName()));
-    }
-
-    public List<EntityAttribute> getTableAttributes() {
-        return attributes.stream().filter(EntityAttribute::isTableAttribute)
-                .collect(Collectors.toList());
     }
 
 }

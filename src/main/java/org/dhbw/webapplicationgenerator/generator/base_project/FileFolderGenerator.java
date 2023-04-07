@@ -3,6 +3,7 @@ package org.dhbw.webapplicationgenerator.generator.base_project;
 import org.dhbw.webapplicationgenerator.generator.Project;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectFile;
+import org.dhbw.webapplicationgenerator.generator.util.Utils;
 import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.springframework.stereotype.Service;
 
@@ -10,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -161,8 +161,7 @@ public class FileFolderGenerator {
     }
 
     protected String capitalize(String value) {
-        value = value.toLowerCase(Locale.ROOT);
-        return value.substring(0,1).toUpperCase() + value.substring(1).toLowerCase();
+        return Utils.capitalize(value);
     }
 
     protected String plural(String value) {

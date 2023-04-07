@@ -214,16 +214,16 @@ public class FrontendGenerator extends FileFolderGenerator {
 
             // For all toOne relation (hence not toMany) we add a simple select to choose the correct option.
             for (EntityRelation relation : entity.getRelations().stream().filter(relation -> !relation.getRelationType().isToMany()).collect(Collectors.toList())) {
-                printWriter.println("<label for=\"" + relation.getEntity() + "\">" + capitalize(relation.getEntity()) + "</label>");
-                printWriter.println("<select id=\"" + relation.getEntity() + "\" name=\"" + relation.getEntity() +
+                printWriter.println("<label for=\"" + relation.getEntityName() + "\">" + capitalize(relation.getEntityName()) + "</label>");
+                printWriter.println("<select id=\"" + relation.getEntityName() + "\" name=\"" + relation.getEntityName() +
                         "Id" + "\" class=\"form-control\" th:value=\"${" + entity.getName() + ".get" +
-                        capitalize(relation.getEntity()) + "()}\">");
+                        capitalize(relation.getEntityName()) + "()}\">");
                 printWriter.println("<option th:value=\"null\">none</option>");
                 printWriter.println("<option " +
-                        "th:each=\"" + relation.getEntity() + " : ${" + plural(relation.getEntity()) + "}\" " +
-                        "th:text=\"${" + relation.getEntity() + ".get" + capitalize(relation.getEntityObject().getReferenceAttribute().getName()) + "()}\" " +
-                        "th:value=\"${" + relation.getEntity() + ".getId()}\" " +
-                        "th:selected=\"${" + relation.getEntity() + ".equals(" + entity.getName() + ".get" + capitalize(relation.getEntity()) + "())}\")>" +
+                        "th:each=\"" + relation.getEntityName() + " : ${" + plural(relation.getEntityName()) + "}\" " +
+                        "th:text=\"${" + relation.getEntityName() + ".get" + capitalize(relation.getEntityObject().getReferenceAttribute().getName()) + "()}\" " +
+                        "th:value=\"${" + relation.getEntityName() + ".getId()}\" " +
+                        "th:selected=\"${" + relation.getEntityName() + ".equals(" + entity.getName() + ".get" + capitalize(relation.getEntityName()) + "())}\")>" +
                         "</option>");
                 printWriter.println("</select>");
 
@@ -233,16 +233,16 @@ public class FrontendGenerator extends FileFolderGenerator {
 
             // For all toMany relation we add a multiple select to choose multiple options.
             for (EntityRelation relation : entity.getRelations().stream().filter(relation -> relation.getRelationType().isToMany()).collect(Collectors.toList())) {
-                printWriter.println("<label for=\"" + plural(relation.getEntity()) + "\">" + capitalize(plural(relation.getEntity())) + "</label>");
-                printWriter.println("<select multiple id=\"" + plural(relation.getEntity()) + "\" name=\"" + relation.getEntity() +
+                printWriter.println("<label for=\"" + plural(relation.getEntityName()) + "\">" + capitalize(plural(relation.getEntityName())) + "</label>");
+                printWriter.println("<select multiple id=\"" + plural(relation.getEntityName()) + "\" name=\"" + relation.getEntityName() +
                         "Ids" + "\" class=\"form-control\" th:value=\"${" + entity.getName() + ".get" +
-                        capitalize(plural(relation.getEntity())) + "()}\">");
+                        capitalize(plural(relation.getEntityName())) + "()}\">");
                 printWriter.println("<option th:value=\"null\">none</option>");
                 printWriter.println("<option " +
-                        "th:each=\"" + relation.getEntity() + " : ${" + plural(relation.getEntity()) + "}\" " +
-                        "th:text=\"${" + relation.getEntity() + ".get" + capitalize(relation.getEntityObject().getReferenceAttribute().getName()) + "()}\" " +
-                        "th:value=\"${" + relation.getEntity() + ".getId()}\" " +
-                        "th:selected=\"${" + entity.getName() + ".get" + capitalize(plural(relation.getEntity())) + ".contains(" + relation.getEntity() + ")}\")>" +
+                        "th:each=\"" + relation.getEntityName() + " : ${" + plural(relation.getEntityName()) + "}\" " +
+                        "th:text=\"${" + relation.getEntityName() + ".get" + capitalize(relation.getEntityObject().getReferenceAttribute().getName()) + "()}\" " +
+                        "th:value=\"${" + relation.getEntityName() + ".getId()}\" " +
+                        "th:selected=\"${" + entity.getName() + ".get" + capitalize(plural(relation.getEntityName())) + ".contains(" + relation.getEntityName() + ")}\")>" +
                         "</option>");
                 printWriter.println("</select>");
 

@@ -42,9 +42,9 @@ public class ProjectController {
             for (EntityRelation relation : entity.getRelations()) {
                 relation.setEntityObject(
                         entities.stream()
-                                .filter(e -> e.getName().equals(relation.getEntity()))
+                                .filter(e -> e.getName().equals(relation.getEntityName()))
                                 .findFirst()
-                                .orElseThrow(() -> new WagException("Relation-Entity " + relation.getEntity() + " is not found")
+                                .orElseThrow(() -> new WagException("Relation-Entity " + relation.getEntityName() + " is not found")
                                 ));
             }
         }

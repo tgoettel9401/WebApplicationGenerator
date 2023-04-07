@@ -1,15 +1,20 @@
 package org.dhbw.webapplicationgenerator.generator.entity;
 
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.Project;
 import org.dhbw.webapplicationgenerator.generator.base_project.FileFolderGenerator;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.generator.util.PackageNameResolver;
+import org.dhbw.webapplicationgenerator.generator.util.Utils;
+import org.dhbw.webapplicationgenerator.webclient.exception.WagException;
 import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.dhbw.webapplicationgenerator.webclient.request.EntityAttribute;
 import org.dhbw.webapplicationgenerator.webclient.request.EntityRelation;
 import org.dhbw.webapplicationgenerator.webclient.request.RequestEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -17,9 +22,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -29,6 +32,7 @@ public class EntityGenerator extends FileFolderGenerator {
     private static final String JAVA_CLASS_ENDING = ".java";
 
     private final PackageNameResolver packageNameResolver;
+    private final FreeMarkerConfigurer freemarkerConfigurer;
 
     public Project create(Project project, CreationRequest request) {
 
@@ -53,86 +57,42 @@ public class EntityGenerator extends FileFolderGenerator {
 
         // Finally we add entities and transferobjects to each of the directories.
         for (RequestEntity entity : request.getEntities()) {
-            addFile(createEntity(entity, entityPackageName), domainDir);
+            addFile(createEntityFreemarker(entity, entityPackageName), domainDir);
             addFile(createTransferObject(entity, transferObjectPackageName), dtoDir);
         }
 
     }
 
-    private File createEntity(RequestEntity entity, String packageName) throws IOException {
-        File file = new File(String.valueOf(Files.createFile(Path.of(TMP_PATH + capitalize(entity.getName()) + JAVA_CLASS_ENDING))));
-        FileWriter fileWriter = new FileWriter(file);
-        try (PrintWriter printWriter = new PrintWriter(fileWriter)) {
-            printWriter.println("package " + packageName + ";");
-            printWriter.println();
+    private File createEntityFreemarker(RequestEntity entity, String packageName) {
 
-            addImports(printWriter, entity);
-            printWriter.println();
+        try {
+            // Load template and process with Data Model to create the file.
+            Template template = freemarkerConfigurer.getConfiguration().getTemplate("Entity.ftl");
+            File file = new File(String.valueOf(Files.createFile(Path.of(TMP_PATH + capitalize(entity.getName()) + JAVA_CLASS_ENDING))));
+            FileWriter teacherFileWriter = new FileWriter(file);
 
-            String tableName = entity.getTableName() != null ? entity.getTableName() : plural(entity.getName().toLowerCase());
-            printWriter.println("@Table(name = \"" + tableName + "\")");
-            printWriter.println("@Entity");
-            printWriter.println("public class " + entity.getTitle() + " implements Serializable {");
-            printWriter.println();
+            // Initialize Data Model for Freemarker
+            Map<String, Object> dataModel = new HashMap<>();
+            dataModel.put("tableName", entity.getTableName() != null ? entity.getTableName() : plural(entity.getName().toLowerCase()));
+            dataModel.put("className", Utils.capitalize(entity.getName()));
+            dataModel.put("classNamePlural", Utils.capitalize(plural(entity.getName())));
+            dataModel.put("packageName", packageName);
+            dataModel.put("imports", getImports(entity));
+            dataModel.put("entityName", entity.getName());
+            dataModel.put("attributes", entity.getAttributes());
+            dataModel.put("relations", entity.getRelations());
 
-            addIdAttribute(printWriter);
-
-            for (EntityRelation relation : entity.getRelations()) {
-                addRelationAttribute(entity, relation, printWriter);
-            }
-
-
-            for (EntityAttribute attribute : entity.getAttributes()) {
-                addCustomAttribute(attribute, printWriter);
-            }
-
-            // Getter and Setter for ID
-            EntityAttribute idAttribute = new EntityAttribute();
-            idAttribute.setName("id");
-            idAttribute.setDataType("Long");
-            addGetter(idAttribute, printWriter);
-            addSetter(idAttribute, printWriter);
-
-            for (EntityRelation relation : entity.getRelations()) {
-                addRelationGetter(relation, printWriter);
-                addRelationSetter(relation, printWriter);
-            }
-
-            // Getter and Setter for other attributes
-            for (EntityAttribute attribute : entity.getAttributes()) {
-                addGetter(attribute, printWriter);
-                addSetter(attribute, printWriter);
-            }
-
-            printWriter.println("@PreRemove");
-            printWriter.println("public void removeRelations() {");
-            for (EntityRelation relation : entity.getRelations()) {
-                if (relation.getRelationType().equals(RelationType.ONE_TO_MANY)) {
-                    printWriter.println("for (" + capitalize(relation.getEntity()) + " " + relation.getEntity() + " : this.get" + plural(capitalize(relation.getEntity())) + "()) {");
-                    printWriter.println(relation.getEntity() + ".set" + capitalize(entity.getName()) + "(null);");
-                    printWriter.println("}");
-                } else if (relation.getRelationType().equals(RelationType.MANY_TO_MANY)) {
-                    printWriter.println("for (" + capitalize(relation.getEntity()) + " " + relation.getEntity() + " : this.get" + plural(capitalize(relation.getEntity())) + "()) {");
-                    printWriter.println(relation.getEntity() + ".get" + capitalize(plural(entity.getName())) + "().remove(this);");
-                    printWriter.println("}");
-                } else if (relation.getRelationType().equals(RelationType.MANY_TO_ONE)) {
-                    printWriter.println("if (" + relation.getEntity() + " != null) {");
-                    printWriter.println(relation.getEntity() + ".get" + capitalize(plural(entity.getName())) + "().remove(this);");
-                    printWriter.println("}");
-                }
-                else { // ONE_TO_ONE
-                    printWriter.println("if (" + relation.getEntity() + " != null) {");
-                    printWriter.println(relation.getEntity() + ".set" + capitalize(entity.getName()) + "(null);");
-                    printWriter.println("}");
-                }
-            }
-            printWriter.println("}");
-
-            printWriter.println("}");
+            // Process template and create file.
+            template.process(dataModel, teacherFileWriter);
+            return file;
+        } catch (IOException | TemplateException ex) {
+            ex.printStackTrace();
+            throw new WagException("Processing template failed with exception " + ex.getCause());
         }
-        return file;
+
     }
 
+    // TODO: Replace by Freemarker template
     private File createTransferObject(RequestEntity entity, String packageName) throws IOException {
         File file = new File(String.valueOf(Files.createFile(Path.of(TMP_PATH + capitalize(entity.getName()) + "Request" + JAVA_CLASS_ENDING))));
         FileWriter fileWriter = new FileWriter(file);
@@ -170,9 +130,9 @@ public class EntityGenerator extends FileFolderGenerator {
 
             for (EntityRelation relation : entity.getRelations()) {
                 if (relation.getRelationType().isToMany()) {
-                    printWriter.println("private List<Long> " + relation.getEntity() + "Ids = new ArrayList<>();");
+                    printWriter.println("private List<Long> " + relation.getEntityName() + "Ids = new ArrayList<>();");
                 } else {
-                    printWriter.println("private Long " + relation.getEntity() + "Id;");
+                    printWriter.println("private Long " + relation.getEntityName() + "Id;");
                 }
 
             }
@@ -204,9 +164,10 @@ public class EntityGenerator extends FileFolderGenerator {
         return file;
     }
 
-    private void addImports(PrintWriter writer, RequestEntity entity) {
-        writer.println("import javax.persistence.*;");
-        writer.println("import java.io.Serializable;");
+    private List<String> getImports(RequestEntity entity) {
+        List<String> imports = new ArrayList<>();
+        imports.add("javax.persistence.*");
+        imports.add("java.io.Serializable");
         entity.getAttributes().stream()
                 .map(EntityAttribute::getDataType)
                 .map(DataType::fromName)
@@ -214,34 +175,14 @@ public class EntityGenerator extends FileFolderGenerator {
                 .flatMap(List::stream)
                 .filter(packageToImport -> !packageToImport.isEmpty())
                 .distinct()
-                .forEach(packageToImport -> writer.println("import " + packageToImport + ";"));
+                .forEach(imports::add);
 
         // If there is any relation with _TO_MANY, then we have to import a List.
         if (entity.getRelations().stream().map(EntityRelation::getRelationType).anyMatch(type -> type.equals(RelationType.MANY_TO_MANY) || type.equals(RelationType.ONE_TO_MANY))) {
-            writer.println("import java.util.List;");
-            writer.println("import java.util.ArrayList;");
+            imports.add("java.util.List");
+            imports.add("java.util.ArrayList");
         }
-    }
-
-    private void addIdAttribute(PrintWriter writer) {
-        writer.println("@Id");
-        writer.println("@GeneratedValue");
-        writer.println("@Column(name = \"id\", nullable = false)");
-        writer.println("private Long id;");
-        writer.println("");
-    }
-
-    private void addCustomAttribute(EntityAttribute attribute, PrintWriter writer) {
-        String columnName = attribute.getColumnName() != null ? attribute.getColumnName() : attribute.getName();
-        writer.println("@Column(name = \"" + columnName.toLowerCase(Locale.ROOT) + "\")");
-
-        // Add DateTimeFormat if the attribute is a LocalDate
-        if (attribute.getDataType().equals("LocalDate")) {
-            writer.println("@DateTimeFormat(pattern = \"yyyy-MM-dd\")");
-        }
-
-        writer.println("private " + attribute.getDataType() + " " + attribute.getName().toLowerCase(Locale.ROOT) + ";");
-        writer.println("");
+        return imports;
     }
 
     private void addGetter(EntityAttribute attribute, PrintWriter writer) {
@@ -259,93 +200,15 @@ public class EntityGenerator extends FileFolderGenerator {
         writer.println("");
     }
 
-    private void addRelationAttribute(RequestEntity entity, EntityRelation relation, PrintWriter writer) {
-        RelationType relationType = relation.getRelationType();
-
-        if (relationType.equals(RelationType.ONE_TO_ONE)) {
-            if (relation.isOwning()) {
-                writer.println("@OneToOne");
-                writer.println("@JoinColumn(");
-                writer.println("name = \"" + relation.getEntity() + "_id\",");
-                writer.println("referencedColumnName = \"id\")");
-            } else {
-                writer.println("@OneToOne(mappedBy=\"" + entity.getName() + "\")");
-            }
-            writer.println("private " + capitalize(relation.getEntity()) + " " + relation.getEntity() + ";");
-        }
-
-        if (relationType.equals(RelationType.ONE_TO_MANY)) {
-            writer.println("@OneToMany(mappedBy = \"" + entity.getName() + "\")");
-            writer.println("private List<" + capitalize(relation.getEntity()) + "> " + plural(relation.getEntity()) + " = new ArrayList<>();");
-        }
-
-        if (relationType.equals(RelationType.MANY_TO_ONE)) {
-            writer.println("@ManyToOne"); // TODO: Add/Need JoinColumn?
-            writer.println("private " + capitalize(relation.getEntity()) + " " + relation.getEntity() + ";");
-        }
-
-        if (relationType.equals(RelationType.MANY_TO_MANY)) {
-            writer.println("@ManyToMany");
-            writer.println("@JoinTable(");
-            writer.println("name = \"" + relation.getJoinTable() + "\",");
-            writer.println("joinColumns = @JoinColumn(name = \"" + entity.getName() + "_id\"),");
-            writer.println("inverseJoinColumns = @JoinColumn(name = \"" + relation.getEntity() + "_id\")");
-            writer.println(")");
-            writer.println("private List<" + capitalize(relation.getEntity()) + "> " + plural(relation.getEntity()) + " = new ArrayList<>();");
-        }
-
-        writer.println("");
-
-    }
-
-    private void addRelationGetter(EntityRelation relation, PrintWriter writer) {
-
-        RelationType relationType = relation.getRelationType();
-
-        if (relationType.equals(RelationType.ONE_TO_ONE) || relationType.equals(RelationType.MANY_TO_ONE)) {
-            writer.println("public " + capitalize(relation.getEntity()) + " get" + capitalize(relation.getEntity()) + "() {");
-            writer.println("    return " + relation.getEntity() + ";");
-        }
-
-        if (relationType.equals(RelationType.ONE_TO_MANY) || relationType.equals(RelationType.MANY_TO_MANY)) {
-            writer.println("public List<" + capitalize(relation.getEntity()) + "> get" + capitalize(plural(relation.getEntity())) + "() {");
-            writer.println("    return " + plural(relation.getEntity()) + ";");
-        }
-
-        writer.println("}");
-        writer.println("");
-        writer.println("");
-
-    }
-
-    private void addRelationSetter(EntityRelation relation, PrintWriter writer) {
-
-        RelationType relationType = relation.getRelationType();
-
-        if (relationType.equals(RelationType.ONE_TO_ONE) || relationType.equals(RelationType.MANY_TO_ONE)) {
-            writer.println("public void set" + capitalize(relation.getEntity()) + "(" + capitalize(relation.getEntity()) + " " + relation.getEntity() + ") {");
-            writer.println("this." + relation.getEntity() + " = " + relation.getEntity() + ";");
-        }
-
-        if (relationType.equals(RelationType.ONE_TO_MANY) || relationType.equals(RelationType.MANY_TO_MANY)) {
-            writer.println("public void set" + capitalize(plural(relation.getEntity())) + "(List<" + capitalize(relation.getEntity()) + "> " + plural(relation.getEntity()) + ") {");
-            writer.println("this." + plural(relation.getEntity()) + " = " + plural(relation.getEntity()) + ";");
-        }
-
-        writer.println("}");
-        writer.println("");
-
-    }
-
     private void addRelationIdGetter(EntityRelation relation, PrintWriter writer) {
         if (relation.getRelationType().isToMany()) {
-            writer.println("public List<Long> get" + capitalize(relation.getEntity()) + "Ids() {");
-            writer.println("    return " + relation.getEntity() + "Ids;");
+            writer.println("public List<Long> get" + capitalize(relation.getEntityName()) + "Ids() {");
+            writer.println("    return " + relation.getEntityName() + "Ids;");
             writer.println("}");
             writer.println("");
         } else {
-            writer.println("public Long get" + capitalize(relation.getEntity()) + "Id() {");
-            writer.println("    return " + relation.getEntity() + "Id;");
+            writer.println("public Long get" + capitalize(relation.getEntityName()) + "Id() {");
+            writer.println("    return " + relation.getEntityName() + "Id;");
             writer.println("}");
             writer.println("");
         }
@@ -354,13 +217,13 @@ public class EntityGenerator extends FileFolderGenerator {
 
     private void addRelationIdSetter(EntityRelation relation, PrintWriter writer) {
         if (relation.getRelationType().isToMany()) {
-            writer.println("public void set" + capitalize(relation.getEntity()) + "Ids(List<Long> " + relation.getEntity() + "Ids) {");
-            writer.println("this." + relation.getEntity() + "Ids = " + relation.getEntity() + "Ids;");
+            writer.println("public void set" + capitalize(relation.getEntityName()) + "Ids(List<Long> " + relation.getEntityName() + "Ids) {");
+            writer.println("this." + relation.getEntityName() + "Ids = " + relation.getEntityName() + "Ids;");
             writer.println("}");
             writer.println("");
         } else {
-            writer.println("public void set" + capitalize(relation.getEntity()) + "Id(Long " + relation.getEntity() + "Id) {");
-            writer.println("this." + relation.getEntity() + "Id = " + relation.getEntity() + "Id;");
+            writer.println("public void set" + capitalize(relation.getEntityName()) + "Id(Long " + relation.getEntityName() + "Id) {");
+            writer.println("this." + relation.getEntityName() + "Id = " + relation.getEntityName() + "Id;");
             writer.println("}");
             writer.println("");
         }

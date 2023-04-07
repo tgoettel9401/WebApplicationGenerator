@@ -79,8 +79,8 @@ public class FrontendControllerGenerator extends FileFolderGenerator {
 
             // Also we need the RelationEntities and RelationRepositories if there is a any relation (toOne or toMany).
             for (EntityRelation relation : entity.getRelations()) {
-                printWriter.println("import " + packageNameResolver.resolveRepository(request) + "." + capitalize(relation.getEntity()) + "Repository;");
-                printWriter.println("import " + packageNameResolver.resolveEntity(request) + "." + capitalize(relation.getEntity()) + ";");
+                printWriter.println("import " + packageNameResolver.resolveRepository(request) + "." + capitalize(relation.getEntityName()) + "Repository;");
+                printWriter.println("import " + packageNameResolver.resolveEntity(request) + "." + capitalize(relation.getEntityName()) + ";");
             }
 
             printWriter.println("");
@@ -97,8 +97,8 @@ public class FrontendControllerGenerator extends FileFolderGenerator {
             printWriter.println("private final " + capitalize(entity.getName()) + "Repository " +
                     entity.getName() + "Repository;");
             for (EntityRelation relation : entity.getRelations()) {
-                printWriter.println("private final " + capitalize(relation.getEntity()) + "Repository " +
-                        relation.getEntity() + "Repository;");
+                printWriter.println("private final " + capitalize(relation.getEntityName()) + "Repository " +
+                        relation.getEntityName() + "Repository;");
             }
             printWriter.println("");
 
@@ -107,12 +107,12 @@ public class FrontendControllerGenerator extends FileFolderGenerator {
             printWriter.print("public " + controllerName + "(" + repositoryName + " " + repositoryVariableName);
             for (EntityRelation relation : entity.getRelations()) {
                 printWriter.println(",");
-                printWriter.print(capitalize(relation.getEntity()) + "Repository " + relation.getEntity() + "Repository");
+                printWriter.print(capitalize(relation.getEntityName()) + "Repository " + relation.getEntityName() + "Repository");
             }
             printWriter.println(") {");
             printWriter.println("this." + repositoryVariableName + " = " + repositoryVariableName + ";");
             for (EntityRelation relation : entity.getRelations()) {
-                printWriter.println("this." + relation.getEntity() + "Repository" + " = " + relation.getEntity() + "Repository" + ";");
+                printWriter.println("this." + relation.getEntityName() + "Repository" + " = " + relation.getEntityName() + "Repository" + ";");
             }
             printWriter.println("}");
 
@@ -136,7 +136,7 @@ public class FrontendControllerGenerator extends FileFolderGenerator {
 
             // For every relation (toOne and toMany), we have to add the whole relation data as well.
             for (EntityRelation relation : entity.getRelations()) {
-                printWriter.println("model.addAttribute(\"" + plural(relation.getEntity()) + "\", " + relation.getEntity() + "Repository.findAll());");
+                printWriter.println("model.addAttribute(\"" + plural(relation.getEntityName()) + "\", " + relation.getEntityName() + "Repository.findAll());");
             }
             printWriter.println("model.addAttribute(\"title\", \"" + plural(entity.getTitle()) + " - Create\");");
 
@@ -157,7 +157,7 @@ public class FrontendControllerGenerator extends FileFolderGenerator {
 
             // For every relation (toOne and toMany), we have to add the whole relation data as well.
             for (EntityRelation relation : entity.getRelations()) {
-                printWriter.println("model.addAttribute(\"" + plural(relation.getEntity()) + "\", " + relation.getEntity() + "Repository.findAll());");
+                printWriter.println("model.addAttribute(\"" + plural(relation.getEntityName()) + "\", " + relation.getEntityName() + "Repository.findAll());");
             }
             printWriter.println("model.addAttribute(\"title\", \"" + plural(entity.getTitle()) + " - Update\");");
             printWriter.println("return \"" + entity.getTitle().toLowerCase(Locale.ROOT) + "Details\";");
@@ -180,28 +180,28 @@ public class FrontendControllerGenerator extends FileFolderGenerator {
             for (EntityRelation relation : entity.getRelations().stream().filter(relation -> !relation.getRelationType().isToMany()).collect(Collectors.toList())) {
 
                 // First we deal with the case that the relation has been set.
-                printWriter.println("if(" + entity.getName() + "Request.get" + capitalize(relation.getEntity()) + "Id() != null) {");
+                printWriter.println("if(" + entity.getName() + "Request.get" + capitalize(relation.getEntityName()) + "Id() != null) {");
 
                 if (relation.isOwning()) {
                     // If we are on the owing side, we only have to add the relation and can save that later on.
-                    printWriter.println(entity.getName() + ".set" + capitalize(relation.getEntity()) + "(" + relation.getEntity() + "Repository.findById(" + entity.getName() + "Request.get" + capitalize(relation.getEntity()) + "Id()).orElse(null));");
+                    printWriter.println(entity.getName() + ".set" + capitalize(relation.getEntityName()) + "(" + relation.getEntityName() + "Repository.findById(" + entity.getName() + "Request.get" + capitalize(relation.getEntityName()) + "Id()).orElse(null));");
                 } else {
                     // If we are on the non-owning side, we have to get the owning entity and update it respectively.
-                    printWriter.println(capitalize(relation.getEntity()) + " " + relation.getEntity() + " = " + relation.getEntity() + "Repository.findById(" + entity.getName() + "Request.get" + capitalize(relation.getEntity()) + "Id()).orElseThrow(() -> new NotFoundException(\"" + capitalize(relation.getEntity()) + "\", " + entity.getName() + "Request.get" + capitalize(relation.getName()) + "Id()));");
-                    printWriter.println(relation.getEntity() + ".set" + capitalize(entity.getName()) + "(" + entity.getName() + ");");
-                    printWriter.println(relation.getEntity() + "Repository.save(" + relation.getEntity() + ");");
-                    printWriter.println(entity.getName() + ".set" + capitalize(relation.getEntity()) + "(" + relation.getEntity() + ");");
+                    printWriter.println(capitalize(relation.getEntityName()) + " " + relation.getEntityName() + " = " + relation.getEntityName() + "Repository.findById(" + entity.getName() + "Request.get" + capitalize(relation.getEntityName()) + "Id()).orElseThrow(() -> new NotFoundException(\"" + capitalize(relation.getEntityName()) + "\", " + entity.getName() + "Request.get" + capitalize(relation.getName()) + "Id()));");
+                    printWriter.println(relation.getEntityName() + ".set" + capitalize(entity.getName()) + "(" + entity.getName() + ");");
+                    printWriter.println(relation.getEntityName() + "Repository.save(" + relation.getEntityName() + ");");
+                    printWriter.println(entity.getName() + ".set" + capitalize(relation.getEntityName()) + "(" + relation.getEntityName() + ");");
                 }
                 printWriter.println("}");
 
                 // Next we deal with the case that we have an update process and the relation's id is set to null.
                 if (relation.getRelationType().equals(RelationType.ONE_TO_ONE)) {
                     printWriter.println("else if(isUpdate) {");
-                    printWriter.println(capitalize(entity.getName()) + " previous" + capitalize(entity.getName()) + " = " + entity.getName() + "Repository.findById(" + entity.getName() + "Request.getId()).orElseThrow(() -> new NotFoundException(\"" + capitalize(relation.getEntity()) + "\", " + entity.getName() + "Request.get" + capitalize(relation.getName()) + "Id()));");
-                    printWriter.println(capitalize(relation.getEntity()) + " previous" + capitalize(relation.getEntity()) + " = previous" + capitalize(entity.getName()) + ".get" + capitalize(relation.getEntity()) + "();");
-                    printWriter.println("if (previous" + capitalize(relation.getEntity()) + " != null) {");
-                    printWriter.println("previous" + capitalize(relation.getEntity()) + ".set" + capitalize(entity.getName()) + "(null);");
-                    printWriter.println(relation.getEntity() + "Repository.save(previous" + capitalize(relation.getEntity()) + ");");
+                    printWriter.println(capitalize(entity.getName()) + " previous" + capitalize(entity.getName()) + " = " + entity.getName() + "Repository.findById(" + entity.getName() + "Request.getId()).orElseThrow(() -> new NotFoundException(\"" + capitalize(relation.getEntityName()) + "\", " + entity.getName() + "Request.get" + capitalize(relation.getName()) + "Id()));");
+                    printWriter.println(capitalize(relation.getEntityName()) + " previous" + capitalize(relation.getEntityName()) + " = previous" + capitalize(entity.getName()) + ".get" + capitalize(relation.getEntityName()) + "();");
+                    printWriter.println("if (previous" + capitalize(relation.getEntityName()) + " != null) {");
+                    printWriter.println("previous" + capitalize(relation.getEntityName()) + ".set" + capitalize(entity.getName()) + "(null);");
+                    printWriter.println(relation.getEntityName() + "Repository.save(previous" + capitalize(relation.getEntityName()) + ");");
                     printWriter.println("}");
                     printWriter.println("}");
                 }
@@ -210,23 +210,23 @@ public class FrontendControllerGenerator extends FileFolderGenerator {
 
             // For all toMany relations we potentially add multiple relation objects to the entity. However, because a List may contain the same element multiple times, we have to clear the list first.
             for (EntityRelation relation : entity.getRelations().stream().filter(relation -> relation.getRelationType().isToMany()).collect(Collectors.toList())) {
-                printWriter.println(entity.getName() + ".get" + capitalize(plural(relation.getEntity())) + "().clear();");
-                printWriter.println("for (Long " + relation.getEntity() + "Id : " + entity.getName() + "Request.get" + capitalize(relation.getEntity()) + "Ids()) {");
-                printWriter.println(capitalize(relation.getEntity()) + " " + relation.getEntity() + " = " + relation.getEntity() + "Repository.findById(" + relation.getEntity() + "Id).orElseThrow(() -> new NotFoundException(\"" + relation.getEntity() + "\", " + relation.getEntity() + "Id));");
+                printWriter.println(entity.getName() + ".get" + capitalize(plural(relation.getEntityName())) + "().clear();");
+                printWriter.println("for (Long " + relation.getEntityName() + "Id : " + entity.getName() + "Request.get" + capitalize(relation.getEntityName()) + "Ids()) {");
+                printWriter.println(capitalize(relation.getEntityName()) + " " + relation.getEntityName() + " = " + relation.getEntityName() + "Repository.findById(" + relation.getEntityName() + "Id).orElseThrow(() -> new NotFoundException(\"" + relation.getEntityName() + "\", " + relation.getEntityName() + "Id));");
                 if (relation.getRelationType().equals(RelationType.ONE_TO_MANY)) {
-                    printWriter.println(relation.getEntity() + ".set" + capitalize(entity.getName()) + "(" + entity.getName() + ");");
-                    printWriter.println(relation.getEntity() +"Repository.save(" + relation.getEntity() + ");");
-                    printWriter.println(entity.getName() + ".get" + capitalize(plural(relation.getEntity())) + "().add(" + relation.getEntity() + "Repository.findById(" + relation.getEntity() + "Id).orElse(null));");
+                    printWriter.println(relation.getEntityName() + ".set" + capitalize(entity.getName()) + "(" + entity.getName() + ");");
+                    printWriter.println(relation.getEntityName() +"Repository.save(" + relation.getEntityName() + ");");
+                    printWriter.println(entity.getName() + ".get" + capitalize(plural(relation.getEntityName())) + "().add(" + relation.getEntityName() + "Repository.findById(" + relation.getEntityName() + "Id).orElse(null));");
                 }
                 if (relation.getRelationType().equals(RelationType.MANY_TO_MANY)) {
-                    printWriter.println(entity.getName() + ".get" + capitalize(plural(relation.getEntity())) + "().add(" + relation.getEntity() + ");");
+                    printWriter.println(entity.getName() + ".get" + capitalize(plural(relation.getEntityName())) + "().add(" + relation.getEntityName() + ");");
                 }
                 printWriter.println("}");
                 if (relation.getRelationType().equals(RelationType.ONE_TO_MANY)) {
-                    printWriter.println("if (" + entity.getName() + "Request.get" + capitalize(relation.getEntity()) + "Ids().isEmpty() && isUpdate) {");
-                    printWriter.println("for (" + capitalize(relation.getEntity()) + " " + relation.getEntity() + " : " + relation.getEntity() + "Repository.findBy" + capitalize(entity.getName()) + "Id(" + entity.getName() + "Request.getId())) {");
-                    printWriter.println(relation.getEntity() + ".set" + capitalize(entity.getName() + "(null);"));
-                    printWriter.println(relation.getEntity() + "Repository.save(" + relation.getEntity() + ");");
+                    printWriter.println("if (" + entity.getName() + "Request.get" + capitalize(relation.getEntityName()) + "Ids().isEmpty() && isUpdate) {");
+                    printWriter.println("for (" + capitalize(relation.getEntityName()) + " " + relation.getEntityName() + " : " + relation.getEntityName() + "Repository.findBy" + capitalize(entity.getName()) + "Id(" + entity.getName() + "Request.getId())) {");
+                    printWriter.println(relation.getEntityName() + ".set" + capitalize(entity.getName() + "(null);"));
+                    printWriter.println(relation.getEntityName() + "Repository.save(" + relation.getEntityName() + ");");
                     printWriter.println("}");
                     printWriter.println("}");
                 }
