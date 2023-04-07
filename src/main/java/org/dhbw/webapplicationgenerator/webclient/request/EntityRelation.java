@@ -1,5 +1,6 @@
 package org.dhbw.webapplicationgenerator.webclient.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.ToString;
 import org.dhbw.webapplicationgenerator.generator.entity.RelationType;
@@ -11,7 +12,7 @@ public class EntityRelation {
     private String name;
     private Cardinality cardinalityMin;
     private Cardinality cardinalityMax;
-    private String entityName;
+    @JsonProperty("entity") private String entityName;
     private String joinTable;
     private boolean owning = false;
 
