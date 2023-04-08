@@ -19,18 +19,14 @@ public class MainTestFileGenerator extends FileFolderGenerator {
     private final FreemarkerTemplateProcessor freemarkerTemplateProcessor;
 
     public ProjectFile create(CreationRequest request, ProjectDirectory parent) {
-        createTmpFolderIfNotExists();
-        // Initialize variables
-        String packageName = request.getProject().getGroup() + "." + request.getProject().getArtifact();
-        String className = getClassName(request);
 
         // Initialize Data Model for Freemarker
         Map<String, Object> dataModel = new HashMap<>();
-        dataModel.put("packageName", packageName);
-        dataModel.put("className", className);
+        dataModel.put("packageName", request.getProject().getGroup() + "." + request.getProject().getArtifact());
+        dataModel.put("className", getClassName(request));
 
         // Process the template and return the file
-        String filename = className + JAVA_CLASS_ENDING;
+        String filename = getClassName(request) + JAVA_CLASS_ENDING;
         return addFile(freemarkerTemplateProcessor.process(
                 "MainApplicationTest.ftl", dataModel, filename),
                 parent

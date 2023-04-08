@@ -40,8 +40,9 @@ public class FreemarkerTemplateProcessor {
             return file;
 
         } catch (Exception e) {
+            e.printStackTrace();
             throw new WagException("Processing template " + templateFilename + " with new name " + newFilename +
-                    " failed with exception " + e.getMessage());
+                    " failed with an exception (message: " + e.getMessage());
         }
     }
 

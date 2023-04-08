@@ -18,7 +18,7 @@ import java.util.Optional;
 public class FileFolderGenerator {
 
     private final Path tmpPath = Path.of(".tmp");
-    private final Path tmp2Path = Path.of(".tmp");
+    private final Path tmp2Path = Path.of(".tmp2");
 
     /**
      * Returns the main project directory, usually in path /src/main/group/artifact
@@ -117,7 +117,6 @@ public class FileFolderGenerator {
      * @return newly created file that resides in the parent directory
      */
     public ProjectFile addFile(File file, ProjectDirectory parent) {
-        createTmpFolderIfNotExists();
         Objects.requireNonNull(parent);
         return addFile(file.getName(), file, parent);
     }
@@ -129,7 +128,6 @@ public class FileFolderGenerator {
      * @return newly created file that resides in the parent directory
      */
     public ProjectFile addFile(String title, File file, ProjectDirectory parent) {
-        createTmpFolderIfNotExists();
         Objects.requireNonNull(parent);
         ProjectFile projectFile = new ProjectFile();
         projectFile.setTitle(title);

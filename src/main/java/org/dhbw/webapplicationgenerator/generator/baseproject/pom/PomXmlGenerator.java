@@ -22,7 +22,6 @@ public class PomXmlGenerator extends FileFolderGenerator {
     private final FreemarkerTemplateProcessor freemarkerTemplateProcessor;
 
     public ProjectFile create(CreationRequest request, ProjectDirectory parent) {
-        createTmpFolderIfNotExists();
         return addFile(createPomXmlWithFreemarker(request), parent);
     }
 

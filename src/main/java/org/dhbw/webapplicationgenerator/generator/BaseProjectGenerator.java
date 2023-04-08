@@ -25,6 +25,8 @@ public class BaseProjectGenerator extends FileFolderGenerator {
      * @return BaseProject
      */
     public Project create(CreationRequest request) {
+        createTmpFolderIfNotExists();
+        createTmp2FolderIfNotExists();
         Project baseProject = new Project();
 
         ProjectDirectory mainDirectory = addDirectory(request.getProject().getTitleWithoutSpaces(), Optional.empty());
