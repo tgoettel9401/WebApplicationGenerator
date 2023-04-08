@@ -1,4 +1,4 @@
-package org.dhbw.webapplicationgenerator.generator.base_project;
+package org.dhbw.webapplicationgenerator.generator.baseproject;
 
 import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
@@ -30,5 +30,4 @@ public class MavenFolderGenerator extends FileFolderGenerator {
         }
         return mavenFolder;
     }
-
 }

@@ -2,7 +2,7 @@ package org.dhbw.webapplicationgenerator.generator.security;
 
 import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.Project;
-import org.dhbw.webapplicationgenerator.generator.base_project.FileFolderGenerator;
+import org.dhbw.webapplicationgenerator.generator.baseproject.FileFolderGenerator;
 import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.springframework.stereotype.Service;
 

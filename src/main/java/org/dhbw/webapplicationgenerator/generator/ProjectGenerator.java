@@ -1,7 +1,7 @@
 package org.dhbw.webapplicationgenerator.generator;
 
 import lombok.AllArgsConstructor;
-import org.dhbw.webapplicationgenerator.generator.base_project.ExceptionGenerator;
+import org.dhbw.webapplicationgenerator.generator.baseproject.ExceptionGenerator;
 import org.dhbw.webapplicationgenerator.generator.entity.EntityGenerator;
 import org.dhbw.webapplicationgenerator.generator.frontend.FrontendControllerGenerator;
 import org.dhbw.webapplicationgenerator.generator.frontend.FrontendGenerator;

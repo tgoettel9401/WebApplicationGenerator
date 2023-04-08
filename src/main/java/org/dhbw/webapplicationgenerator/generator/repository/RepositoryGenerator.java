@@ -2,7 +2,7 @@ package org.dhbw.webapplicationgenerator.generator.repository;
 
 import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.Project;
-import org.dhbw.webapplicationgenerator.generator.base_project.FileFolderGenerator;
+import org.dhbw.webapplicationgenerator.generator.baseproject.FileFolderGenerator;
 import org.dhbw.webapplicationgenerator.generator.util.PackageNameResolver;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;

@@ -1,4 +1,4 @@
-package org.dhbw.webapplicationgenerator.generator.base_project;
+package org.dhbw.webapplicationgenerator.generator.baseproject;
 
 import org.dhbw.webapplicationgenerator.generator.Project;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
@@ -16,6 +16,9 @@ import java.util.Optional;
 
 @Service
 public class FileFolderGenerator {
+
+    private final Path tmpPath = Path.of(".tmp");
+    private final Path tmp2Path = Path.of(".tmp");
 
     /**
      * Returns the main project directory, usually in path /src/main/group/artifact
@@ -114,6 +117,7 @@ public class FileFolderGenerator {
      * @return newly created file that resides in the parent directory
      */
     public ProjectFile addFile(File file, ProjectDirectory parent) {
+        createTmpFolderIfNotExists();
         Objects.requireNonNull(parent);
         return addFile(file.getName(), file, parent);
     }
@@ -125,6 +129,7 @@ public class FileFolderGenerator {
      * @return newly created file that resides in the parent directory
      */
     public ProjectFile addFile(String title, File file, ProjectDirectory parent) {
+        createTmpFolderIfNotExists();
         Objects.requireNonNull(parent);
         ProjectFile projectFile = new ProjectFile();
         projectFile.setTitle(title);
@@ -138,9 +143,9 @@ public class FileFolderGenerator {
      * Creates the .tmp folder if it does not exist yet.
      */
     public void createTmpFolderIfNotExists() {
-        if (!Files.exists(Path.of(".tmp"))) {
+        if (!Files.exists(tmpPath)) {
             try {
-                Files.createDirectory(Path.of(".tmp"));
+                Files.createDirectory(tmpPath);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -151,9 +156,9 @@ public class FileFolderGenerator {
      * Creates the .tmp2 folder if it does not exist yet.
      */
     public void createTmp2FolderIfNotExists() {
-        if (!Files.exists(Path.of(".tmp2"))) {
+        if (!Files.exists(tmp2Path)) {
             try {
-                Files.createDirectory(Path.of(".tmp2"));
+                Files.createDirectory(tmp2Path);
             } catch (IOException e) {
                 e.printStackTrace();
             }
