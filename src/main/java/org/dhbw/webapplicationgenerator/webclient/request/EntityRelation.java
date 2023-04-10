@@ -7,6 +7,8 @@ import org.dhbw.webapplicationgenerator.generator.entity.RelationType;
 import org.dhbw.webapplicationgenerator.generator.util.Utils;
 import org.dhbw.webapplicationgenerator.webclient.exception.WagException;
 
+import java.util.Locale;
+
 @Data
 public class EntityRelation {
     private String name;
@@ -39,8 +41,34 @@ public class EntityRelation {
         return owning || !getRelationType().equals(RelationType.ONE_TO_ONE);
     }
 
+    /**
+     * Always returns the entity's name with all letters lowercase.
+     * @return entityName
+     */
+    public String getEntityName() {
+        return entityName.toLowerCase(Locale.ROOT);
+    }
+
     public String getEntityClassName() {
         return Utils.capitalize(entityName);
+    }
+
+    /**
+     * Calculates the ClassName of the repository associated with the related entity. This is always the entity's
+     * classname appended by the String "Repository".
+     * @return ClassName of entity's Repository
+     */
+    public String getRepositoryClassName() {
+        return Utils.capitalize(entityName) + "Repository";
+    }
+
+    /**
+     * Calculates the VariableName of the repository associated with the related entity. This is always the entity's
+     * name appended by the String "Repository".
+     * @return ClassName of entity's Repository
+     */
+    public String getRepositoryVariableName() {
+        return getEntityName() + "Repository";
     }
 
     public String getEntityNamePlural() {
