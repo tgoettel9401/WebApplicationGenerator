@@ -38,12 +38,12 @@ public class FrontendControllerGenerator extends FileFolderGenerator {
         String packageName = packageNameResolver.resolveController(request);
 
         for (RequestEntity entity : request.getEntities()) {
-            addFile(createFrontendControllerWithFreemarker(entity, request, packageName), controllerDir);
+            addFile(createFrontendController(entity, request, packageName), controllerDir);
         }
 
     }
 
-    private File createFrontendControllerWithFreemarker(RequestEntity entity, CreationRequest request, String packageName) {
+    private File createFrontendController(RequestEntity entity, CreationRequest request, String packageName) {
         // Initialize Data Model for Freemarker
         Map<String, Object> dataModel = new HashMap<>();
         dataModel.put("packageName", packageName);
