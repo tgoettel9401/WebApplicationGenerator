@@ -40,6 +40,30 @@ public class RequestEntity {
         return Utils.capitalize(name);
     }
 
+    /**
+     * Gets the variable name of the entity's repository (first letter uppercase)
+     * @return class name of Repository
+     */
+    public String getRepositoryClassName() {
+        return this.getTitle() + "Repository";
+    }
+
+    /**
+     * Gets the variable name of the entity's repository (first letter lowercase)
+     * @return variable name of Repository
+     */
+    public String getRepositoryVariableName() {
+        return this.getName() + "Repository";
+    }
+
+    /**
+     * Gets the variable name of the entity's repository (first letter uppercase)
+     * @return class name of Repository
+     */
+    public String getControllerClassName() {
+        return this.getTitle() + "Controller";
+    }
+
     public EntityAttribute getReferenceAttribute() {
         return attributes.stream().filter(EntityAttribute::isReferenceAttribute)
                 .findFirst()
