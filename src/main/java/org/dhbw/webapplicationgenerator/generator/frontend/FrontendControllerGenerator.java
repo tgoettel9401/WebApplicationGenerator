@@ -49,9 +49,9 @@ public class FrontendControllerGenerator extends FileFolderGenerator {
         dataModel.put("packageName", packageName);
         dataModel.put("imports", getImports(entity, request));
         dataModel.put("requestPath", Utils.plural(entity.getName()));
-        dataModel.put("controllerClassName", entity.getTitle() + "Controller");
-        dataModel.put("repositoryClassName", entity.getTitle() + "Repository");
-        dataModel.put("repositoryVariableName", entity.getName() + "Repository");
+        dataModel.put("controllerClassName", entity.getControllerClassName());
+        dataModel.put("repositoryClassName", entity.getRepositoryClassName());
+        dataModel.put("repositoryVariableName", entity.getRepositoryVariableName());
         dataModel.put("entityVariableName", entity.getName());
         dataModel.put("entityVariableNamePlural", Utils.plural(entity.getName()));
         dataModel.put("entityClassName", entity.getTitle());
@@ -95,6 +95,5 @@ public class FrontendControllerGenerator extends FileFolderGenerator {
         }
 
         return imports;
-
     }
 }
