@@ -105,7 +105,7 @@ public class FrontendGenerator extends FileFolderGenerator {
                 .filter(relation -> relation.getRelationType().isToMany()).collect(Collectors.toList()));
 
         // Process the template and return the file
-        String filename = entity.getName() + "Details" + "2" + HTML_FILE_ENDING;
+        String filename = entity.getName() + "Details" + HTML_FILE_ENDING;
         return freemarkerTemplateProcessor.process("Details.ftl", dataModel, filename);
     }
 

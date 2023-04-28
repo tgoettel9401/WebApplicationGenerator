@@ -3,7 +3,7 @@
 <#-- @ftlvariable name="className" type="java.lang.String" -->
 <#-- @ftlvariable name="classNamePlural" type="java.lang.String" -->
 <#-- @ftlvariable name="packageName" type="java.lang.String" -->
-<#-- @ftlvariable name="imports" type="java.util.List" -->
+<#-- @ftlvariable name="imports" type="java.util.List<java.lang.String>" -->
 <#-- @ftlvariable name="entityName" type="java.lang.String" -->
 <#-- @ftlvariable name="attributes" type="java.util.Set<org.dhbw.webapplicationgenerator.webclient.request.EntityAttribute>" -->
 <#-- @ftlvariable name="relations" type="java.util.Set<org.dhbw.webapplicationgenerator.webclient.request.EntityRelation>" -->
