@@ -1,6 +1,7 @@
 package org.dhbw.webapplicationgenerator.webclient.request;
 
 import lombok.Data;
+import org.dhbw.webapplicationgenerator.generator.entity.DataType;
 import org.dhbw.webapplicationgenerator.generator.util.Utils;
 
 import java.util.Locale;
@@ -15,7 +16,7 @@ public class EntityAttribute {
     private boolean tableAttribute = false;
 
     /**
-     * Returns the name of the entity with all letters lowercase.
+     * Returns the name of the attribute with all letters lowercase.
      * @return Name of the attribute
      */
     public String getName() {
@@ -23,10 +24,19 @@ public class EntityAttribute {
     }
 
     /**
-     * Returns the name of the entity with the first letter uppercase.
+     * Returns the name of the attribute with the first letter uppercase.
      * @return Title of the attribute
      */
     public String getTitle() {
         return Utils.capitalize(name);
     }
+
+    /**
+     * Returns the DataType (as object) of the attribute.
+     * @return DataType as object
+     */
+    public DataType getDataTypeObject() {
+        return DataType.fromName(dataType);
+    }
+
 }

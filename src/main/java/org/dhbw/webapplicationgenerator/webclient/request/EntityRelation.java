@@ -37,6 +37,30 @@ public class EntityRelation {
         throw new WagException("The combination of cardinalityMin and cardinalityMax is not known: " + cardinalityMin + ":" + cardinalityMax);
     }
 
+    /**
+     * Returns the name of the relation with all letters lowercase.
+     * @return Name of the relation
+     */
+    public String getName() {
+        return name.toLowerCase(Locale.ROOT);
+    }
+
+    /**
+     * Returns the name of the relation with all letters lowercase in plural.
+     * @return Name of the relation in plural
+     */
+    public String getNamePlural() {
+        return name.toLowerCase(Locale.ROOT);
+    }
+
+    /**
+     * Returns the name of the relation with the first letter uppercase.
+     * @return Title of the attribute
+     */
+    public String getTitle() {
+        return Utils.capitalize(name);
+    }
+
     public boolean isOwning() {
         return owning || !getRelationType().equals(RelationType.ONE_TO_ONE);
     }

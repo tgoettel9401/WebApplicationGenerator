@@ -25,11 +25,27 @@ public class RequestEntity {
     }
 
     /**
+     * Always returns the name of the entity in plural with all letters lowercase
+     * @return name of the entity in plural
+     */
+    public String getNamePlural() {
+        return Utils.plural(getName());
+    }
+
+    /**
      * Either returns the title specified in the request or alternatively returns the name with the first letter uppercase
      * @return title of the entity
      */
     public String getTitle() {
         return title != null && !title.isEmpty() ? title : Utils.capitalize(name);
+    }
+
+    /**
+     * Always returns the title of the entity in plural with the first letter uppercase.
+     * @return title of the entity in plural
+     */
+    public String getTitlePlural() {
+        return Utils.plural(getTitle());
     }
 
     /**
