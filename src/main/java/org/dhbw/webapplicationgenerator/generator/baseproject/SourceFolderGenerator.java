@@ -1,4 +1,4 @@
-package org.dhbw.webapplicationgenerator.generator.base_project;
+package org.dhbw.webapplicationgenerator.generator.baseproject;
 
 import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
@@ -7,7 +7,6 @@ import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Optional;
 
 @Service
@@ -15,6 +14,7 @@ import java.util.Optional;
 public class SourceFolderGenerator extends FileFolderGenerator {
 
     private final MainFileGenerator mainFileGenerator;
+    private final MainTestFileGenerator mainTestFileGenerator;
     private final ResourceFileHelper resourceFileHelper;
 
     /**
@@ -33,11 +33,7 @@ public class SourceFolderGenerator extends FileFolderGenerator {
         ProjectDirectory testDir = addDirectory("test", Optional.of(srcDir));
         ProjectDirectory javaPackageDir = addDirectory("java", Optional.of(testDir));
         ProjectDirectory groupPackageDir = addGroupPackage(request, javaPackageDir);
-        try {
-            mainFileGenerator.createTestFile(request, groupPackageDir);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        mainTestFileGenerator.create(request, groupPackageDir);
         return testDir;
     }
 
@@ -51,11 +47,7 @@ public class SourceFolderGenerator extends FileFolderGenerator {
         }
         ProjectDirectory javaPackageDir = addDirectory("java", Optional.of(mainDir));
         ProjectDirectory groupPackageDir = addGroupPackage(request, javaPackageDir);
-        try {
-            mainFileGenerator.create(request, groupPackageDir);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        mainFileGenerator.create(request, groupPackageDir);
         return mainDir;
     }
 

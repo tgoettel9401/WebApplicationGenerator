@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class CreationRequestValidator {
@@ -42,11 +41,11 @@ public class CreationRequestValidator {
                     }
                     EntityRelation relationOnTheOtherSide = request.getEntities().stream()
                             // We filter for the entity on the other side of the relation
-                            .filter(e -> e.getName().equals(relation.getEntity()))
-                            .findFirst().orElseThrow(() -> new WagException("Entity with name " + relation.getEntity() + " not found"))
+                            .filter(e -> e.getName().equals(relation.getEntityName()))
+                            .findFirst().orElseThrow(() -> new WagException("Entity with name " + relation.getEntityName() + " not found"))
                             .getRelations().stream()
                             // We filter for the relation that points to the current entity
-                            .filter(r -> r.getEntity().equals(entity.getName()))
+                            .filter(r -> r.getEntityName().equals(entity.getName()))
                             .findFirst().orElseThrow(() -> new WagException("Relation with name " + relation.getName() + " not found"));
                     if (!relation.getJoinTable().equals(relationOnTheOtherSide.getJoinTable())) {
                         throw new ValidationException("JoinTable of relation " + relation.getName() + " is different in the associated entities");
@@ -55,11 +54,11 @@ public class CreationRequestValidator {
                 if (relation.getRelationType().equals(RelationType.ONE_TO_ONE)) {
                     EntityRelation relationOnTheOtherSide = request.getEntities().stream()
                             // We filter for the entity on the other side of the relation
-                            .filter(e -> e.getName().equals(relation.getEntity()))
-                            .findFirst().orElseThrow(() -> new WagException("Entity with name " + relation.getEntity() + " not found"))
+                            .filter(e -> e.getName().equals(relation.getEntityName()))
+                            .findFirst().orElseThrow(() -> new WagException("Entity with name " + relation.getEntityName() + " not found"))
                             .getRelations().stream()
                             // We filter for the relation that points to the current entity
-                            .filter(r -> r.getEntity().equals(entity.getName()))
+                            .filter(r -> r.getEntityName().equals(entity.getName()))
                             .findFirst().orElseThrow(() -> new WagException("Relation with name " + relation.getName() + " not found"));
                     if (relation.isOwning() && relationOnTheOtherSide.isOwning() || !relation.isOwning() && !relationOnTheOtherSide.isOwning()) {
                         throw new ValidationException("OneToOne-Relation " + relation.getName() + " does not have exactly one owning side");
@@ -132,7 +131,7 @@ public class CreationRequestValidator {
                     throw new ValidationException("Value of CardinalityMax of Relation " + relation + " of entity " + entity + " is not set");
                 }
 
-                if (relation.getEntity() == null) {
+                if (relation.getEntityName() == null) {
                     throw new ValidationException("Entity of Relation " + relation + " of entity " + entity + " is not set");
                 }
             }
@@ -204,8 +203,8 @@ public class CreationRequestValidator {
 
         for (RequestEntity entity : request.getEntities()) {
             for (EntityRelation relation : entity.getRelations()) {
-                if (!entityNames.contains(relation.getEntity())) {
-                    throw new ValidationException("The relation " + relation.getName() + " contains the referenced entity " + relation.getEntity() + ", however this is not set as an entity in the request.");
+                if (!entityNames.contains(relation.getEntityName())) {
+                    throw new ValidationException("The relation " + relation.getName() + " contains the referenced entity " + relation.getEntityName() + ", however this is not set as an entity in the request.");
                 }
             }
         }

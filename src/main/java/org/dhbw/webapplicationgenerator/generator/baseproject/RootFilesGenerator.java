@@ -1,6 +1,7 @@
-package org.dhbw.webapplicationgenerator.generator.base_project;
+package org.dhbw.webapplicationgenerator.generator.baseproject;
 
 import lombok.AllArgsConstructor;
+import org.dhbw.webapplicationgenerator.generator.baseproject.pom.PomXmlGenerator;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectFile;
 import org.dhbw.webapplicationgenerator.util.ResourceFileHelper;

@@ -1,8 +1,9 @@
-package org.dhbw.webapplicationgenerator.generator.base_project;
+package org.dhbw.webapplicationgenerator.generator.baseproject;
 
 import org.dhbw.webapplicationgenerator.generator.Project;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectFile;
+import org.dhbw.webapplicationgenerator.generator.util.Utils;
 import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.springframework.stereotype.Service;
 
@@ -10,12 +11,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
 @Service
 public class FileFolderGenerator {
+
+    private final Path tmpPath = Path.of(".tmp");
+    private final Path tmp2Path = Path.of(".tmp2");
 
     /**
      * Returns the main project directory, usually in path /src/main/group/artifact
@@ -138,9 +141,9 @@ public class FileFolderGenerator {
      * Creates the .tmp folder if it does not exist yet.
      */
     public void createTmpFolderIfNotExists() {
-        if (!Files.exists(Path.of(".tmp"))) {
+        if (!Files.exists(tmpPath)) {
             try {
-                Files.createDirectory(Path.of(".tmp"));
+                Files.createDirectory(tmpPath);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -151,9 +154,9 @@ public class FileFolderGenerator {
      * Creates the .tmp2 folder if it does not exist yet.
      */
     public void createTmp2FolderIfNotExists() {
-        if (!Files.exists(Path.of(".tmp2"))) {
+        if (!Files.exists(tmp2Path)) {
             try {
-                Files.createDirectory(Path.of(".tmp2"));
+                Files.createDirectory(tmp2Path);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -161,8 +164,7 @@ public class FileFolderGenerator {
     }
 
     protected String capitalize(String value) {
-        value = value.toLowerCase(Locale.ROOT);
-        return value.substring(0,1).toUpperCase() + value.substring(1).toLowerCase();
+        return Utils.capitalize(value);
     }
 
     protected String plural(String value) {

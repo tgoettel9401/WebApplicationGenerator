@@ -17,7 +17,7 @@ import java.util.*;
 
 @Service
 @AllArgsConstructor
-public class EntityGenerator extends FileFolderGenerator {
+public class TransferObjectGenerator extends FileFolderGenerator {
 
     private static final String JAVA_CLASS_ENDING = ".java";
 
@@ -32,39 +32,41 @@ public class EntityGenerator extends FileFolderGenerator {
 
     private void create(CreationRequest request, ProjectDirectory parent) {
 
-        // Create the domain directory with entities.
-        ProjectDirectory domainDir = addDirectory("domain", Optional.of(parent));
-        String entityPackageName = packageNameResolver.resolveEntity(request);
+        // Create the transferObjects directory with transferObjects.
+        ProjectDirectory dtoDir = addDirectory("transferObject", Optional.of(parent));
+        String transferObjectPackageName = packageNameResolver.resolveTransferObjects(request);
 
-        // Finally we add entities to each of the directories.
+        // Finally we add transferobjects to each of the directories.
         for (RequestEntity entity : request.getEntities()) {
-            addFile(createEntity(entity, entityPackageName), domainDir);
+            addFile(createTransferObjectWithFreemarker(entity, transferObjectPackageName), dtoDir);
         }
 
     }
 
-    private File createEntity(RequestEntity entity, String packageName) {
+    private File createTransferObjectWithFreemarker(RequestEntity entity, String packageName) {
 
         // Initialize Data Model for Freemarker
         Map<String, Object> dataModel = new HashMap<>();
-        dataModel.put("tableName", entity.getTableName() != null ? entity.getTableName() : plural(entity.getName().toLowerCase()));
-        dataModel.put("className", Utils.capitalize(entity.getName()));
-        dataModel.put("classNamePlural", Utils.capitalize(plural(entity.getName())));
         dataModel.put("packageName", packageName);
-        dataModel.put("imports", getEntityImports(entity));
-        dataModel.put("entityName", entity.getName());
+        dataModel.put("imports", getImports(entity));
+        dataModel.put("className", Utils.capitalize(entity.getName()));
         dataModel.put("attributes", entity.getAttributes());
         dataModel.put("relations", entity.getRelations());
 
         // Process the template and return the file
-        String filename = capitalize(entity.getName()) + JAVA_CLASS_ENDING;
-        return freemarkerTemplateProcessor.process("Entity.ftl", dataModel, filename);
+        String filename = capitalize(entity.getName()) + "Request" + JAVA_CLASS_ENDING;
+        return freemarkerTemplateProcessor.process("TransferObject.ftl", dataModel, filename);
     }
 
-    private List<String> getEntityImports(RequestEntity entity) {
+    private List<String> getImports(RequestEntity entity) {
         List<String> imports = new ArrayList<>();
-        imports.add("javax.persistence.*");
         imports.add("java.io.Serializable");
+
+        if (entity.getRelations().stream().anyMatch(relation -> relation.getRelationType().isToMany())) {
+            imports.add("java.util.List");
+            imports.add("java.util.ArrayList");
+        }
+
         entity.getAttributes().stream()
                 .map(EntityAttribute::getDataType)
                 .map(DataType::fromName)
@@ -73,12 +75,6 @@ public class EntityGenerator extends FileFolderGenerator {
                 .filter(packageToImport -> !packageToImport.isEmpty())
                 .distinct()
                 .forEach(imports::add);
-
-        // If there is any relation with _TO_MANY, then we have to import a List.
-        if (entity.getRelations().stream().anyMatch(relation -> relation.getRelationType().isToMany())) {
-            imports.add("java.util.List");
-            imports.add("java.util.ArrayList");
-        }
         return imports;
     }
 }

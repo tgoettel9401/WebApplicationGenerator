@@ -1,10 +1,10 @@
 package org.dhbw.webapplicationgenerator.generator;
 
 import lombok.AllArgsConstructor;
-import org.dhbw.webapplicationgenerator.generator.base_project.FileFolderGenerator;
-import org.dhbw.webapplicationgenerator.generator.base_project.MavenFolderGenerator;
-import org.dhbw.webapplicationgenerator.generator.base_project.RootFilesGenerator;
-import org.dhbw.webapplicationgenerator.generator.base_project.SourceFolderGenerator;
+import org.dhbw.webapplicationgenerator.generator.baseproject.FileFolderGenerator;
+import org.dhbw.webapplicationgenerator.generator.baseproject.MavenFolderGenerator;
+import org.dhbw.webapplicationgenerator.generator.baseproject.RootFilesGenerator;
+import org.dhbw.webapplicationgenerator.generator.baseproject.SourceFolderGenerator;
 import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.springframework.stereotype.Service;
@@ -25,6 +25,8 @@ public class BaseProjectGenerator extends FileFolderGenerator {
      * @return BaseProject
      */
     public Project create(CreationRequest request) {
+        createTmpFolderIfNotExists();
+        createTmp2FolderIfNotExists();
         Project baseProject = new Project();
 
         ProjectDirectory mainDirectory = addDirectory(request.getProject().getTitleWithoutSpaces(), Optional.empty());

@@ -1,7 +1,6 @@
 package org.dhbw.webapplicationgenerator.generator.entity;
 
 import lombok.Getter;
-import org.dhbw.webapplicationgenerator.webclient.exception.ValidationException;
 import org.dhbw.webapplicationgenerator.webclient.exception.WagException;
 
 import java.util.ArrayList;
