@@ -24,6 +24,7 @@ public class CreationRequestValidator {
         validateReferenceAndTableAttributes(request);
         validateUniquenessOfEntities(request);
         validateRelationNames(request);
+        validateDockerRequest(request);
     }
 
     /**
@@ -123,12 +124,12 @@ public class CreationRequestValidator {
                     throw new ValidationException("Name of Relation " + relation + " of entity " + entity + " contains spaces - this is not allowed");
                 }
 
-                if (relation.getCardinalityMin() == null) {
-                    throw new ValidationException("Value of CardinalityMin of Relation " + relation + " of entity " + entity + " is not set");
+                if (relation.getEntityCardinality() == null) {
+                    throw new ValidationException("Value of Entity-Cardinality of Relation " + relation + " of entity " + entity + " is not set");
                 }
 
-                if (relation.getCardinalityMax() == null) {
-                    throw new ValidationException("Value of CardinalityMax of Relation " + relation + " of entity " + entity + " is not set");
+                if (relation.getRelationCardinality() == null) {
+                    throw new ValidationException("Value of Relation-Cardinality of Relation " + relation + " of entity " + entity + " is not set");
                 }
 
                 if (relation.getEntityName() == null) {
@@ -211,4 +212,17 @@ public class CreationRequestValidator {
 
     }
 
+    /**
+     * Validates the docker request
+     * - imageName must be lowercase
+     * @param request CreationRequest
+     */
+    private void validateDockerRequest(CreationRequest request) throws ValidationException {
+        for (char letter : request.getDocker().getImageName().toCharArray()) {
+            if (Character.isUpperCase(letter)) {
+                throw new ValidationException("The provided imageName of docker-data has an uppercase letter but must " +
+                        "only contain lowercase letters!");
+            }
+        }
+    }
 }
