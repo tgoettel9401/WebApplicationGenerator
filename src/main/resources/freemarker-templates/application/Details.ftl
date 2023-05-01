@@ -29,7 +29,7 @@
             <#-- For all toOne relation (hence not toMany) add a simple select to choose the correct option. -->
             <#list relationsToOne as relation>
             <label for="${relation.getName()}">${relation.getTitle()}</label>
-            <select id="${relation.getEntityName()}" name="${relation.getEntityName()}Id" class="form-control"
+            <select id="${relation.getName()}" name="${relation.getEntityName()}Id" class="form-control"
                 th:value="${r"${"}${entityVariableName}.get${relation.getEntityClassName()}()}">
                 <option th:value="null">none</option>
                 <option
@@ -49,7 +49,7 @@
             <#-- For all toMany relation we add a multiple select to choose multiple options. -->
             <#list relationsToMany as relation>
             <label for="${relation.getNamePlural()}">${relation.getTitle()}</label>
-            <select multiple id="${relation.getEntityNamePlural()}" name="${relation.getEntityName()}Ids" class="form-control"
+            <select multiple id="${relation.getNamePlural()}" name="${relation.getEntityName()}Ids" class="form-control"
                     th:value="${r"${"}${entityVariableName}.get${relation.getEntityClassNamePlural()}()}">
                 <option th:value="null">none</option>
                 <option
