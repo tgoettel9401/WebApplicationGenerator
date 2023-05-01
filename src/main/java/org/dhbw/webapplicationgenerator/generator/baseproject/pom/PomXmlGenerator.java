@@ -22,10 +22,10 @@ public class PomXmlGenerator extends FileFolderGenerator {
     private final FreemarkerTemplateProcessor freemarkerTemplateProcessor;
 
     public ProjectFile create(CreationRequest request, ProjectDirectory parent) {
-        return addFile(createPomXmlWithFreemarker(request), parent);
+        return addFile(createPomXml(request), parent);
     }
 
-    private File createPomXmlWithFreemarker(CreationRequest request) {
+    private File createPomXml(CreationRequest request) {
         // Initialize Data Model for Freemarker
         Map<String, Object> dataModel = new HashMap<>();
         dataModel.put("groupId", request.getProject().getGroup());
