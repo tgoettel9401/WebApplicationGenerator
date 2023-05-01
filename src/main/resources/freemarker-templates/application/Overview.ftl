@@ -23,16 +23,16 @@
                 <th>${attribute.getTitle()}</th>
                 </#list>
             </tr>
-            <tr th:each="${entityVariableName} : ${r"$"}{${entityVariableNamePlural}}}">
+            <tr th:each="${entityVariableName} : ${r"$"}{${entityVariableNamePlural}}">
                 <#list attributes as attribute>
-                <td th:text="${r"$"}{${entityVariableName}.get${attribute.getTitle()}()}}"></td>
+                <td th:text="${r"$"}{${entityVariableName}.get${attribute.getTitle()}()}"></td>
                 </#list>
                 <!-- Buttons -->
                 <td>
-                    <a th:href="@{'/${entityVariableNamePlural}/edit/' + ${r"$"}{${entityVariableName}.getId()}">
+                    <a th:href="@{'/${entityVariableNamePlural}/edit/' + ${r"$"}{${entityVariableName}.getId()}}">
                         <input type="button" class="btn btn-light" value="Edit">
                     </a>
-                    <a th:href="@{'/${entityVariableNamePlural}/delete/' + ${r"$"}{${entityVariableName}.getId()}">
+                    <a th:href="@{'/${entityVariableNamePlural}/delete/' + ${r"$"}{${entityVariableName}.getId()}}">
                         <input type="button" class="btn btn-danger" value="Delete">
                     </a>
                 </td>

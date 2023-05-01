@@ -36,7 +36,11 @@
                     th:each="${relation.getEntityName()} : ${r"${"}${relation.getEntityNamePlural()}}"
                     th:text="${r"${"}${relation.getEntityName()}.get${relation.getEntityObject().getReferenceAttribute().getTitle()}()}"
                     th:value="${r"${"}${relation.getEntityName()}.getId()}"
-                    th:selected="${r"${"}${relation.getEntityName()}.equals(${entityVariableName}.get${relation.getEntityClassName()}())}">
+                    <#if relation.getRelationType().isFromMany()>
+                    th:selected="${r"${"}${relation.getEntityName()}.get${entityClassNamePlural}().contains(${entityVariableName})}">
+                    <#else>
+                    th:selected="${r"${"}${entityVariableName}.equals(${relation.getEntityName()}.get${entityClassName}())}">
+                    </#if>
                 </option>
             </select>
             <br>
@@ -46,13 +50,17 @@
             <#list relationsToMany as relation>
             <label for="${relation.getNamePlural()}">${relation.getTitle()}</label>
             <select multiple id="${relation.getEntityNamePlural()}" name="${relation.getEntityName()}Ids" class="form-control"
-                    th:value="${r"${"}${entityVariableName}.get${relation.getEntityClassName()}()}">
+                    th:value="${r"${"}${entityVariableName}.get${relation.getEntityClassNamePlural()}()}">
                 <option th:value="null">none</option>
                 <option
-                        th:each="${relation.getEntityName()} : ${r"${"}${relation.getEntityNamePlural()}}"
-                        th:text="${r"${"}${relation.getEntityName()}.get${relation.getEntityObject().getReferenceAttribute().getTitle()}()}"
-                        th:value="${r"${"}${relation.getEntityName()}.getId()}"
-                        th:selected="${r"${"}${relation.getEntityName()}.get(${entityClassNamePlural}.contains(${relation.getEntityName()}()))}">
+                    th:each="${relation.getEntityName()} : ${r"${"}${relation.getEntityNamePlural()}}"
+                    th:text="${r"${"}${relation.getEntityName()}.get${relation.getEntityObject().getReferenceAttribute().getTitle()}()}"
+                    th:value="${r"${"}${relation.getEntityName()}.getId()}"
+                    <#if relation.getRelationType().isFromMany()>
+                    th:selected="${r"${"}${relation.getEntityName()}.get${entityClassNamePlural}().contains(${entityVariableName})}">
+                    <#else>
+                        th:selected="${r"${"}${entityVariableName}.equals(${relation.getEntityName()}.get${entityClassName}())}">
+                    </#if>
                 </option>
             </select>
             <br>

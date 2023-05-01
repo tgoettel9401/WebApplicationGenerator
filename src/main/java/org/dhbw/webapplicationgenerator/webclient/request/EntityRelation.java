@@ -12,8 +12,17 @@ import java.util.Locale;
 @Data
 public class EntityRelation {
     private String name;
-    private Cardinality cardinalityMin;
-    private Cardinality cardinalityMax;
+
+    /**
+     * Cardinality of the relation on the entity (this side)
+     */
+    private Cardinality entityCardinality;
+
+    /**
+     * Cardinality of the relation on the relation-entity (other side)
+     */
+    private Cardinality relationCardinality;
+
     @JsonProperty("entity") private String entityName;
     private String joinTable;
     private boolean owning = false;
@@ -22,19 +31,19 @@ public class EntityRelation {
     private RequestEntity entityObject;
 
     public RelationType getRelationType() {
-        if (cardinalityMin.equals(Cardinality.ONE) && cardinalityMax.equals(Cardinality.ONE)) {
+        if (entityCardinality.equals(Cardinality.ONE) && relationCardinality.equals(Cardinality.ONE)) {
             return RelationType.ONE_TO_ONE;
         }
-        if (cardinalityMin.equals(Cardinality.ONE) && cardinalityMax.equals(Cardinality.MANY)) {
+        if (entityCardinality.equals(Cardinality.ONE) && relationCardinality.equals(Cardinality.MANY)) {
             return RelationType.ONE_TO_MANY;
         }
-        if (cardinalityMin.equals(Cardinality.MANY) && cardinalityMax.equals(Cardinality.ONE)) {
+        if (entityCardinality.equals(Cardinality.MANY) && relationCardinality.equals(Cardinality.ONE)) {
             return RelationType.MANY_TO_ONE;
         }
-        if (cardinalityMin.equals(Cardinality.MANY) && cardinalityMax.equals(Cardinality.MANY)) {
+        if (entityCardinality.equals(Cardinality.MANY) && relationCardinality.equals(Cardinality.MANY)) {
             return RelationType.MANY_TO_MANY;
         }
-        throw new WagException("The combination of cardinalityMin and cardinalityMax is not known: " + cardinalityMin + ":" + cardinalityMax);
+        throw new WagException("The combination of entityCardinality and relationCardinality is not known: " + entityCardinality + ":" + relationCardinality);
     }
 
     /**

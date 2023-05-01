@@ -13,6 +13,6 @@
         </li>
         </#list>
     </ul>
-    </div>
     <div th:insert="footer.html"></div>
+    </div>
 </body>
