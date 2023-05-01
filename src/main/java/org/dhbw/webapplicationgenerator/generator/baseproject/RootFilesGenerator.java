@@ -18,6 +18,7 @@ public class RootFilesGenerator extends FileFolderGenerator {
 
     private final ResourceFileHelper resourceFileHelper;
     private final PomXmlGenerator pomXmlGenerator;
+    private final ReadmeGenerator readmeGenerator;
 
     /**
      * Creates the Files that reside in the root directory
@@ -27,11 +28,11 @@ public class RootFilesGenerator extends FileFolderGenerator {
     public List<ProjectFile> create(CreationRequest request, ProjectDirectory parent) {
         List<ProjectFile> files = new ArrayList<>();
         try {
-            files.add(addFile(resourceFileHelper.getFile("HELP.md"), parent));
             files.add(addFile(resourceFileHelper.getFile("mvnw"), parent));
             files.add(addFile(resourceFileHelper.getFile("mvnw.cmd"), parent));
             files.add(pomXmlGenerator.create(request, parent));
             files.add(addFile(".gitignore", resourceFileHelper.getFile("gitignore"), parent));
+            files.add(readmeGenerator.create(request, parent));
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
         }

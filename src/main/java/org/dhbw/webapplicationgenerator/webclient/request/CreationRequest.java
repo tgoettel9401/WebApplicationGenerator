@@ -10,4 +10,8 @@ public class CreationRequest {
     private CreationRequestProject project;
     private CreationRequestDocker docker;
     private Set<RequestEntity> entities = new HashSet<>();
+
+    public boolean isDockerEnabled() {
+        return docker != null && docker.isEnabled();
+    }
 }

@@ -24,7 +24,11 @@ public class CreationRequestValidator {
         validateReferenceAndTableAttributes(request);
         validateUniquenessOfEntities(request);
         validateRelationNames(request);
-        validateDockerRequest(request);
+
+        // Docker is only validated if it is enabled
+        if (request.isDockerEnabled()) {
+            validateDockerRequest(request);
+        }
     }
 
     /**
