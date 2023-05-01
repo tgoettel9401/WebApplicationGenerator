@@ -6,7 +6,7 @@ import lombok.Getter;
 public enum JavaBuildTool {
     MAVEN("mvn install"), GRADLE("gradle build");
 
-    private String buildCommand;
+    private final String buildCommand;
 
     JavaBuildTool(String buildCommand) {
         this.buildCommand = buildCommand;
