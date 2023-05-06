@@ -1,7 +1,7 @@
 package org.dhbw.webapplicationgenerator.webclient.request;
 
 import lombok.Data;
-import org.dhbw.webapplicationgenerator.generator.entity.DataType;
+import org.dhbw.webapplicationgenerator.model.request.datamodel.DataType;
 import org.dhbw.webapplicationgenerator.generator.util.Utils;
 
 import java.util.Locale;

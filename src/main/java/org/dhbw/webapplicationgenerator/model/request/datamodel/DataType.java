@@ -1,4 +1,4 @@
-package org.dhbw.webapplicationgenerator.generator.entity;
+package org.dhbw.webapplicationgenerator.model.request.datamodel;
 
 import lombok.Getter;
 import org.dhbw.webapplicationgenerator.webclient.exception.WagException;

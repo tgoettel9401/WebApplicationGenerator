@@ -1,8 +1,9 @@
 package org.dhbw.webapplicationgenerator.webclient;
 
 import lombok.AllArgsConstructor;
-import org.dhbw.webapplicationgenerator.generator.Project;
+import org.dhbw.webapplicationgenerator.model.response.Project;
 import org.dhbw.webapplicationgenerator.generator.ProjectGenerator;
+import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.util.FileCleaner;
 import org.dhbw.webapplicationgenerator.util.ZipHelper;
 import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
@@ -25,7 +26,20 @@ public class ProjectService {
      * @return Project based on the provided request
      * @throws IOException this may happen while zipping the project
      */
-    public ByteArrayOutputStream generate(CreationRequest request) throws IOException {
+    public ByteArrayOutputStream generateOld(CreationRequest request) throws IOException {
+        Project project = projectGenerator.generateOld(request);
+        ByteArrayOutputStream zipStream = zipHelper.zip(project);
+        fileCleaner.performCleanup();
+        return zipStream;
+    }
+
+    /**
+     * Generates the Project based on the provided request
+     * @param request Request for creating the project
+     * @return Project based on the provided request
+     * @throws IOException this may happen while zipping the project
+     */
+    public ByteArrayOutputStream generate(ProjectRequest request) throws IOException {
         Project project = projectGenerator.generate(request);
         ByteArrayOutputStream zipStream = zipHelper.zip(project);
         fileCleaner.performCleanup();

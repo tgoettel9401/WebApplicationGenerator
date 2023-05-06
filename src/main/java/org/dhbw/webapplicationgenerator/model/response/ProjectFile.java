@@ -1,4 +1,4 @@
-package org.dhbw.webapplicationgenerator.generator.model;
+package org.dhbw.webapplicationgenerator.model.response;
 
 import lombok.Data;
 

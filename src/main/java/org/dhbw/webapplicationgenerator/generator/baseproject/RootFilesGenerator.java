@@ -2,8 +2,9 @@ package org.dhbw.webapplicationgenerator.generator.baseproject;
 
 import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.baseproject.pom.PomXmlGenerator;
-import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
-import org.dhbw.webapplicationgenerator.generator.model.ProjectFile;
+import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
+import org.dhbw.webapplicationgenerator.model.response.ProjectDirectory;
+import org.dhbw.webapplicationgenerator.model.response.ProjectFile;
 import org.dhbw.webapplicationgenerator.util.ResourceFileHelper;
 import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.springframework.stereotype.Service;
@@ -25,12 +26,31 @@ public class RootFilesGenerator extends FileFolderGenerator {
      * @param parent Parent directory, usually this is the root directory of the project
      * @return List of Files in the root directory
      */
-    public List<ProjectFile> create(CreationRequest request, ProjectDirectory parent) {
+    public List<ProjectFile> createOld(CreationRequest request, ProjectDirectory parent) {
         List<ProjectFile> files = new ArrayList<>();
         try {
             files.add(addFile(resourceFileHelper.getFile("mvnw"), parent));
             files.add(addFile(resourceFileHelper.getFile("mvnw.cmd"), parent));
-            files.add(pomXmlGenerator.create(request, parent));
+            files.add(pomXmlGenerator.createOld(request, parent));
+            files.add(addFile(".gitignore", resourceFileHelper.getFile("gitignore"), parent));
+            files.add(readmeGenerator.createOld(request, parent));
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+        }
+        return files;
+    }
+
+    /**
+     * Creates the Files that reside in the root directory
+     * @param parent Parent directory, usually this is the root directory of the project
+     * @return List of Files in the root directory
+     */
+    public List<ProjectFile> create(ProjectRequest request, ProjectDirectory parent) {
+        List<ProjectFile> files = new ArrayList<>();
+        try {
+            files.add(addFile(resourceFileHelper.getFile("mvnw"), parent));
+            files.add(addFile(resourceFileHelper.getFile("mvnw.cmd"), parent));
+            files.add(pomXmlGenerator.create(request, parent)); // TODO: Move to MAVEN-Generator to potentially switch to Gradle.
             files.add(addFile(".gitignore", resourceFileHelper.getFile("gitignore"), parent));
             files.add(readmeGenerator.create(request, parent));
         } catch (FileNotFoundException ex) {

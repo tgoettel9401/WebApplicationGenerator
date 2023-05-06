@@ -1,9 +1,9 @@
 package org.dhbw.webapplicationgenerator.generator.security;
 
 import lombok.AllArgsConstructor;
-import org.dhbw.webapplicationgenerator.generator.Project;
+import org.dhbw.webapplicationgenerator.model.response.Project;
 import org.dhbw.webapplicationgenerator.generator.baseproject.FileFolderGenerator;
-import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
+import org.dhbw.webapplicationgenerator.model.response.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.generator.util.PackageNameResolver;
 import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.springframework.stereotype.Service;
@@ -18,6 +18,8 @@ import java.nio.file.Path;
 @Service
 @AllArgsConstructor
 public class SecurityEntitiesGenerator extends FileFolderGenerator {
+
+    // TODO: Properly implement with Freemarker rather than PrintWriter!!
 
     private static final String TMP_PATH = ".tmp/";
     private static final String JAVA_CLASS_ENDING = ".java";

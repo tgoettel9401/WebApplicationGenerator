@@ -1,6 +1,6 @@
 package org.dhbw.webapplicationgenerator.webclient.request;
 
-import org.dhbw.webapplicationgenerator.generator.entity.DataType;
+import org.dhbw.webapplicationgenerator.model.request.datamodel.DataType;
 import org.dhbw.webapplicationgenerator.generator.entity.RelationType;
 import org.dhbw.webapplicationgenerator.webclient.exception.ValidationException;
 import org.dhbw.webapplicationgenerator.webclient.exception.WagException;
@@ -26,7 +26,7 @@ public class CreationRequestValidator {
         validateRelationNames(request);
 
         // Docker is only validated if it is enabled
-        if (request.isDockerEnabled()) {
+        if (request.isDeploymentEnabled()) {
             validateDockerRequest(request);
         }
     }

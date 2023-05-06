@@ -1,8 +1,8 @@
 package org.dhbw.webapplicationgenerator.generator.entity;
 
-import org.dhbw.webapplicationgenerator.generator.Project;
-import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
-import org.dhbw.webapplicationgenerator.generator.model.ProjectFile;
+import org.dhbw.webapplicationgenerator.model.response.Project;
+import org.dhbw.webapplicationgenerator.model.response.ProjectDirectory;
+import org.dhbw.webapplicationgenerator.model.response.ProjectFile;
 import org.dhbw.webapplicationgenerator.webclient.exception.WagException;
 import org.dhbw.webapplicationgenerator.webclient.request.EntityAttribute;
 import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;

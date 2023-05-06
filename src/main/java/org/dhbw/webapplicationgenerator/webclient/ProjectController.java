@@ -1,6 +1,7 @@
 package org.dhbw.webapplicationgenerator.webclient;
 
 import lombok.AllArgsConstructor;
+import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.webclient.exception.ValidationException;
 import org.dhbw.webapplicationgenerator.webclient.exception.WagException;
 import org.dhbw.webapplicationgenerator.webclient.request.*;
@@ -23,6 +24,19 @@ public class ProjectController {
 
     private final ProjectService projectService;
     private final CreationRequestValidator creationRequestValidator;
+    private final ProjectRequestTransformer projectRequestTransformer;
+    private final ProjectRequestValidator projectRequestValidator;
+
+    @PostMapping("generateNew")
+    public byte[] generateByRequestNew(@RequestBody() ProjectRequest request) throws ValidationException, IOException {
+        logger.info("Received generation request for project with title {}", request.getTitle());
+        logger.info("Validating the request");
+        projectRequestTransformer.transform(request);
+        projectRequestValidator.validate(request);
+        logger.info("Validation passed");
+        ByteArrayOutputStream stream = projectService.generate(request);
+        return stream.toByteArray();
+    }
 
     @PostMapping("generate")
     public byte[] generateByRequest(@RequestBody() CreationRequest request) throws IOException, ValidationException {
@@ -32,7 +46,7 @@ public class ProjectController {
         addEntitiesToRelations(request);
         creationRequestValidator.validateManyToManyRelations(request);
         logger.info("Validation passed");
-        ByteArrayOutputStream stream = projectService.generate(request);
+        ByteArrayOutputStream stream = projectService.generateOld(request);
         return stream.toByteArray();
     }
 

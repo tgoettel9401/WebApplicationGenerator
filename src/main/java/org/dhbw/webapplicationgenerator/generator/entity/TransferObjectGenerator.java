@@ -1,12 +1,13 @@
 package org.dhbw.webapplicationgenerator.generator.entity;
 
 import lombok.AllArgsConstructor;
-import org.dhbw.webapplicationgenerator.generator.Project;
+import org.dhbw.webapplicationgenerator.model.response.Project;
 import org.dhbw.webapplicationgenerator.generator.baseproject.FileFolderGenerator;
-import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
+import org.dhbw.webapplicationgenerator.model.response.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.generator.util.FreemarkerTemplateProcessor;
 import org.dhbw.webapplicationgenerator.generator.util.PackageNameResolver;
 import org.dhbw.webapplicationgenerator.generator.util.Utils;
+import org.dhbw.webapplicationgenerator.model.request.datamodel.DataType;
 import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.dhbw.webapplicationgenerator.webclient.request.EntityAttribute;
 import org.dhbw.webapplicationgenerator.webclient.request.RequestEntity;

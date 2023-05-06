@@ -3,8 +3,8 @@ package org.dhbw.webapplicationgenerator.generator.baseproject;
 import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.baseproject.deployment.BuildAndRunScriptGenerator;
 import org.dhbw.webapplicationgenerator.generator.baseproject.deployment.DockerfileGenerator;
-import org.dhbw.webapplicationgenerator.generator.model.ProjectDirectory;
-import org.dhbw.webapplicationgenerator.generator.model.ProjectFile;
+import org.dhbw.webapplicationgenerator.model.response.ProjectDirectory;
+import org.dhbw.webapplicationgenerator.model.response.ProjectFile;
 import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.springframework.stereotype.Service;
 
@@ -29,4 +29,5 @@ public class DeploymentFilesGenerator extends FileFolderGenerator {
         files.add(addFile("Dockerfile", dockerfileGenerator.create(request), parent));
         return files;
     }
+
 }

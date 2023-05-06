@@ -1,4 +1,4 @@
-package org.dhbw.webapplicationgenerator.webclient.request;
+package org.dhbw.webapplicationgenerator.model.request.backend;
 
 import lombok.Getter;
 
