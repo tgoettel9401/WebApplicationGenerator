@@ -78,15 +78,15 @@ public class ProjectRequestValidator {
         }
     }
 
-    private void validateFrontend(ProjectRequest request) {
+    private void validateFrontend() {
         // Currently frontend data is empty, hence nothing needs to be validated here.
     }
 
-    private void validateDatabase(ProjectRequest request) {
+    private void validateDatabase() {
         // Functionality not available, hence skipping validation.
     }
 
-    private void validateRoles(ProjectRequest request) {
+    private void validateRoles() {
         // Currently not in use
         // TODO: Implement?
         // - mentioned entities have to exist
