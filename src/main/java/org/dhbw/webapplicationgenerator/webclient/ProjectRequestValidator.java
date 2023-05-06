@@ -89,6 +89,7 @@ public class ProjectRequestValidator {
     private void validateRoles(ProjectRequest request) {
         // Currently not in use
         // TODO: Implement?
+        // - mentioned entities have to exist
     }
 
     private void throwUnknownException(String type, Strategy strategy) throws ValidationException {

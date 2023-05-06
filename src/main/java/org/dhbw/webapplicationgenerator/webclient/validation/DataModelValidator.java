@@ -22,7 +22,6 @@ public class DataModelValidator implements RequestValidator {
         validateRequiredFields(request);
         validateEntitiesAreUnique(request);
         validateReferenceAndTableAttributes(request);
-        validateRelationEntitiesExist(request);
     }
 
     /**
@@ -133,30 +132,5 @@ public class DataModelValidator implements RequestValidator {
             }
         }
     }
-
-    /**
-     * Validates that referenced relations all exist in the request
-     *
-     * @param request CreationRequest
-     */
-    private void validateRelationEntitiesExist(ProjectRequest request) throws ValidationException {
-
-        // TODO: Verify if this is really needed due to automatic mapping to entities in DataModelTransformer?!
-
-        List<Entity> entities = request.getDataModel().getEntities();
-        List<Relation> relations = request.getDataModel().getRelations();
-        for (Relation relation : relations) {
-            if (!entities.contains(relation.getEntity1())) {
-                throw new ValidationException("The relation " + relation.getName() + " contains the entity1 " +
-                        relation.getEntity1().getName() + " that does not exist in the entities");
-            }
-            if (!entities.contains(relation.getEntity2())) {
-                throw new ValidationException("The relation " + relation.getName() + " contains the entity2 " +
-                        relation.getEntity2().getName() + " that does not exist in the entities");
-            }
-        }
-
-    }
-
 }
 
