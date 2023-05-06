@@ -1,0 +1,153 @@
+{
+  "title": "Student Management",
+  "description": "This application is used for managing students",
+  "deployment": {
+    "enabled": true,
+    "strategy": "DOCKER",
+    "data": {
+      "imageName": "studentmanager",
+      "baseImage": "azul/zulu-openjdk:17"
+    }
+  },
+  "backend": {
+    "enabled": true,
+    "strategy": "SPRING_BOOT",
+    "data": {
+      "group": "com.example",
+      "artifact": "studentmanagement",
+      "javaBuildTool": "MAVEN"
+    }
+  },
+  "frontend": {
+    "enabled": true,
+    "strategy": "THYMELEAF",
+    "data": {}
+  },
+  "dataModel": {
+    "entities": [
+      {
+        "name": "student",
+        "title": "Student",
+        "tableName": "students",
+        "attributes": [
+          {
+            "name": "firstname",
+            "columnName": "first_name",
+            "title": "Vorname",
+            "dataType": "String",
+            "tableAttribute": true
+          },
+          {
+            "name": "lastname",
+            "columnName": "last_name",
+            "title": "Nachname",
+            "dataType": "String",
+            "referenceAttribute": true,
+            "tableAttribute": true
+          },
+          {
+            "name": "birthday",
+            "columnName": "birthday",
+            "title": "Geburtstag",
+            "dataType": "LocalDate"
+          }
+        ]
+      },
+      {
+        "name": "teacher",
+        "title": "Teacher",
+        "tableName": "teachers",
+        "attributes": [
+          {
+            "name": "firstname",
+            "columnName": "first_name",
+            "title": "Vorname",
+            "dataType": "String",
+            "tableAttribute": true
+          },
+          {
+            "name": "lastname",
+            "columnName": "last_name",
+            "title": "Nachname",
+            "dataType": "String",
+            "referenceAttribute": true,
+            "tableAttribute": true
+          }
+        ]
+      },
+      {
+        "name": "room",
+        "title": "Room",
+        "tableName": "rooms",
+        "attributes": [
+          {
+            "name": "name",
+            "columnName": "name",
+            "title": "Name",
+            "dataType": "String",
+            "referenceAttribute": true,
+            "tableAttribute": true
+          }
+        ]
+      },
+      {
+        "name": "course",
+        "title": "Course",
+        "tableName": "courses",
+        "attributes": [
+          {
+            "name": "name",
+            "columnName": "name",
+            "title": "Titel",
+            "dataType": "String",
+            "referenceAttribute": true,
+            "tableAttribute": true
+          }
+        ]
+      }
+    ],
+    "relations": [
+      {
+        "name": "teacher_course",
+        "entityName1": "teacher",
+        "entityName2": "course",
+        "cardinality1": "0",
+        "cardinality2": "n"
+      },
+      {
+        "name": "room_course",
+        "entityName1": "room",
+        "entityName2": "course",
+        "attributeName1": "course",
+        "attributeName2": "room",
+        "cardinality1": "1",
+        "cardinality2": "1",
+        "owningSide": "course"
+      },
+      {
+        "name": "course_student",
+        "entityName1": "course",
+        "entityName2": "student",
+        "attributeName1": "students",
+        "attributeName2": "courses",
+        "cardinality1": "n",
+        "cardinality2": "m",
+        "joinTable": "student_course"
+      }
+    ]
+  },
+  "roles": [
+    {
+      "name": "ADMIN",
+      "resources": [
+        "student", "teacher", "courses"
+      ]
+    },
+    {
+      "name": "STUDENT",
+      "resources": [
+        "student"
+      ]
+    }
+  ]
+}
