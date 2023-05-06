@@ -15,7 +15,7 @@ public class DockerValidator implements RequestValidator{
      */
     public void validate(ProjectRequest request) throws ValidationException {
         Strategy strategy = request.getDeployment().getStrategy();
-        if (request.isDeploymentEnabled() && strategy.equals(.equals(Strategy.DOCKER)) {
+        if (request.isDeploymentEnabled() && strategy.equals(Strategy.DOCKER)) {
             DockerData data = (DockerData) request.getDeployment().getData();
             for (char letter : data.getImageName().toCharArray()) {
                 if (Character.isUpperCase(letter)) {
