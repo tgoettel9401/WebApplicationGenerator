@@ -29,10 +29,10 @@ public class ProjectRequestValidator {
         validateProject(request);
         validateDeployment(request);
         validateBackend(request);
-        validateFrontend(request);
-        validateDatabase(request);
+        validateFrontend();
+        validateDatabase();
         this.dataModelValidator.validate(request);
-        validateRoles(request);
+        validateRoles();
     }
 
     private void validateProject(ProjectRequest request) throws ValidationException {
