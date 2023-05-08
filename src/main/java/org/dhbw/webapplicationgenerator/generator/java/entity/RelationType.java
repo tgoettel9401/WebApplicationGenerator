@@ -1,4 +1,4 @@
-package org.dhbw.webapplicationgenerator.generator.entity;
+package org.dhbw.webapplicationgenerator.generator.java.entity;
 
 import lombok.Getter;
 

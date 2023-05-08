@@ -1,7 +1,7 @@
 package org.dhbw.webapplicationgenerator.webclient.request;
 
 import org.dhbw.webapplicationgenerator.model.request.datamodel.DataType;
-import org.dhbw.webapplicationgenerator.generator.entity.RelationType;
+import org.dhbw.webapplicationgenerator.generator.java.entity.RelationType;
 import org.dhbw.webapplicationgenerator.webclient.exception.ValidationException;
 import org.dhbw.webapplicationgenerator.webclient.exception.WagException;
 import org.springframework.stereotype.Service;

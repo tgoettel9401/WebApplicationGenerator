@@ -1,8 +1,10 @@
-package org.dhbw.webapplicationgenerator.generator.baseproject;
+package org.dhbw.webapplicationgenerator.generator.baseproject.spring;
 
 import lombok.AllArgsConstructor;
+import org.dhbw.webapplicationgenerator.generator.baseproject.FileFolderGenerator;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.model.request.backend.SpringBootData;
+import org.dhbw.webapplicationgenerator.model.response.Project;
 import org.dhbw.webapplicationgenerator.model.response.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.model.response.ProjectFile;
 import org.dhbw.webapplicationgenerator.generator.util.FreemarkerTemplateProcessor;
@@ -19,6 +21,11 @@ public class MainFileGenerator extends FileFolderGenerator {
     private static final String JAVA_CLASS_ENDING = ".java";
 
     private final FreemarkerTemplateProcessor freemarkerTemplateProcessor;
+
+    public Project addMainFile(Project project, ProjectRequest request, ProjectDirectory parent) {
+        create(request, parent);
+        return project;
+    }
 
     public ProjectFile createOld(CreationRequest request, ProjectDirectory parent) {
 

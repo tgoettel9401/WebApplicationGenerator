@@ -1,6 +1,7 @@
 package org.dhbw.webapplicationgenerator.generator.baseproject;
 
 import lombok.AllArgsConstructor;
+import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.model.response.Project;
 import org.dhbw.webapplicationgenerator.model.response.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.generator.util.FreemarkerTemplateProcessor;
@@ -29,8 +30,15 @@ public class ExceptionGenerator extends FileFolderGenerator{
      * @return ExceptionClasses
      */
     public Project create(Project project, CreationRequest request) {
-        ProjectDirectory mainDir = getMainProjectDirectory(project, request);
+        ProjectDirectory mainDir = getMainProjectDirectoryOld(project, request);
         ProjectDirectory exceptionDir = addDirectory("exception", Optional.of(mainDir));
+        String packageName = packageNameResolver.resolveException(request);
+        addFile(createNotFoundException(packageName), exceptionDir);
+        return project;
+    }
+
+    public Project create(Project project, ProjectRequest request, ProjectDirectory parent) {
+        ProjectDirectory exceptionDir = addDirectory("exception", Optional.of(parent));
         String packageName = packageNameResolver.resolveException(request);
         addFile(createNotFoundException(packageName), exceptionDir);
         return project;

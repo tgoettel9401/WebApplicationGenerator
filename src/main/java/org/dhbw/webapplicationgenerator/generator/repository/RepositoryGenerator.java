@@ -1,6 +1,9 @@
 package org.dhbw.webapplicationgenerator.generator.repository;
 
 import lombok.AllArgsConstructor;
+import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
+import org.dhbw.webapplicationgenerator.model.request.datamodel.DataModel;
+import org.dhbw.webapplicationgenerator.model.request.datamodel.Entity;
 import org.dhbw.webapplicationgenerator.model.response.Project;
 import org.dhbw.webapplicationgenerator.generator.baseproject.FileFolderGenerator;
 import org.dhbw.webapplicationgenerator.model.response.ProjectDirectory;
@@ -24,8 +27,13 @@ public class RepositoryGenerator extends FileFolderGenerator {
     private final FreemarkerTemplateProcessor freemarkerTemplateProcessor;
 
     public Project create(Project project, CreationRequest request) {
-        ProjectDirectory artifactDir = getMainProjectDirectory(project, request);
+        ProjectDirectory artifactDir = getMainProjectDirectoryOld(project, request);
         create(request, artifactDir);
+        return project;
+    }
+
+    public Project create(Project project, ProjectRequest request, ProjectDirectory parent) {
+        create(request, parent);
         return project;
     }
 
@@ -36,7 +44,32 @@ public class RepositoryGenerator extends FileFolderGenerator {
         }
     }
 
+    private void create(ProjectRequest request, ProjectDirectory parent) {
+        ProjectDirectory domainDir = addDirectory("repository", Optional.of(parent));
+        DataModel dataModel = request.getDataModel();
+        for (Entity entity : dataModel.getEntities()) {
+            addFile(createRepository(entity, request), domainDir);
+        }
+    }
+
     private File createRepository(RequestEntity entity, CreationRequest request) {
+
+        // Initialize Data Model for Freemarker
+        Map<String, Object> dataModel = new HashMap<>();
+        dataModel.put("packageName", packageNameResolver.resolveRepository(request));
+        dataModel.put("imports", getImports(entity, request));
+        dataModel.put("entityClassName", entity.getTitle());
+        dataModel.put("relationsToOne", entity.getRelations().stream()
+                .filter(relation -> !relation.getRelationType().isToMany())
+                .collect(Collectors.toList())
+        );
+
+        // Process the template and return the file
+        String filename = entity.getClassName() + "Repository" + JAVA_CLASS_ENDING;
+        return freemarkerTemplateProcessor.process("Repository.ftl", dataModel, filename);
+    }
+
+    private File createRepository(Entity entity, ProjectRequest request) {
 
         // Initialize Data Model for Freemarker
         Map<String, Object> dataModel = new HashMap<>();
@@ -68,4 +101,21 @@ public class RepositoryGenerator extends FileFolderGenerator {
         imports.add(packageNameResolver.resolveEntity(request) + "." + entity.getTitle());
         return imports;
     }
+
+    private List<String> getImports(Entity entity, ProjectRequest request) {
+        List<String> imports = new ArrayList<>();
+
+        // Basic imports
+        imports.add("org.springframework.data.jpa.repository.JpaRepository");
+
+        // Add the lists if there is any toOne-relation.
+        if (entity.getRelations().stream().anyMatch(relation -> !relation.getRelationType().isToMany())) {
+            imports.add("java.util.List");
+        }
+
+        // Entity import
+        imports.add(packageNameResolver.resolveEntity(request) + "." + entity.getTitle());
+        return imports;
+    }
+
 }

@@ -1,6 +1,8 @@
 package org.dhbw.webapplicationgenerator.generator.baseproject;
 
 import lombok.AllArgsConstructor;
+import org.dhbw.webapplicationgenerator.generator.baseproject.spring.MainFileGenerator;
+import org.dhbw.webapplicationgenerator.generator.baseproject.spring.MainTestFileGenerator;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.model.request.backend.SpringBootData;
 import org.dhbw.webapplicationgenerator.model.response.ProjectDirectory;

@@ -46,11 +46,9 @@ public class RootFilesGenerator extends FileFolderGenerator {
      * @return List of Files in the root directory
      */
     public List<ProjectFile> create(ProjectRequest request, ProjectDirectory parent) {
+        // TODO: Move to BaseProjectGenerator and remove this file.
         List<ProjectFile> files = new ArrayList<>();
         try {
-            files.add(addFile(resourceFileHelper.getFile("mvnw"), parent));
-            files.add(addFile(resourceFileHelper.getFile("mvnw.cmd"), parent));
-            files.add(pomXmlGenerator.create(request, parent)); // TODO: Move to MAVEN-Generator to potentially switch to Gradle.
             files.add(addFile(".gitignore", resourceFileHelper.getFile("gitignore"), parent));
             files.add(readmeGenerator.create(request, parent));
         } catch (FileNotFoundException ex) {

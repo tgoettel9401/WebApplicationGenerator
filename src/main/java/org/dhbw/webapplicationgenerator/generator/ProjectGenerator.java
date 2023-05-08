@@ -3,13 +3,19 @@ package org.dhbw.webapplicationgenerator.generator;
 import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.baseproject.ExceptionGenerator;
 import org.dhbw.webapplicationgenerator.generator.baseproject.FileFolderGenerator;
-import org.dhbw.webapplicationgenerator.generator.entity.EntityGenerator;
-import org.dhbw.webapplicationgenerator.generator.entity.TransferObjectGenerator;
+import org.dhbw.webapplicationgenerator.generator.java.entity.EntityGenerator;
+import org.dhbw.webapplicationgenerator.generator.java.entity.TransferObjectGenerator;
 import org.dhbw.webapplicationgenerator.generator.frontend.FrontendControllerGenerator;
 import org.dhbw.webapplicationgenerator.generator.frontend.FrontendGenerator;
 import org.dhbw.webapplicationgenerator.generator.frontend.WebMvcConfigGenerator;
 import org.dhbw.webapplicationgenerator.generator.repository.RepositoryGenerator;
 import org.dhbw.webapplicationgenerator.generator.security.SecurityGenerator;
+import org.dhbw.webapplicationgenerator.generator.strategies.GenerationStrategy;
+import org.dhbw.webapplicationgenerator.generator.strategies.deployment.DockerGenerator;
+import org.dhbw.webapplicationgenerator.generator.strategies.database.FlywayGenerator;
+import org.dhbw.webapplicationgenerator.generator.strategies.backend.SpringBootGenerator;
+import org.dhbw.webapplicationgenerator.generator.strategies.frontend.FrontendStrategy;
+import org.dhbw.webapplicationgenerator.generator.strategies.frontend.ThymeleafGenerator;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.model.response.Project;
 import org.dhbw.webapplicationgenerator.util.FileCleaner;
@@ -25,6 +31,19 @@ public class ProjectGenerator extends FileFolderGenerator {
     private final Logger logger = LoggerFactory.getLogger(ProjectGenerator.class);
 
     private final BaseProjectGenerator baseProjectGenerator;
+
+    // Backend Strategies
+    private final SpringBootGenerator springBootGenerator;
+
+    // Frontend Strategies
+    private final ThymeleafGenerator thymeleafGenerator;
+
+    // Deployment Strategies
+    private final DockerGenerator dockerGenerator;
+
+    // Database Strategies
+    private final FlywayGenerator flywayGenerator;
+
     private final EntityGenerator entityGenerator;
     private final TransferObjectGenerator transferObjectGenerator;
     private final RepositoryGenerator repositoryGenerator;
@@ -48,7 +67,7 @@ public class ProjectGenerator extends FileFolderGenerator {
         logger.info("Generating new project with title {}", request.getProject().getTitle());
         fileCleaner.performCleanup(); // In case of previous errors, we perform a cleanup to be safe.
         Project baseProject = this.baseProjectGenerator.createOld(request);
-        Project projectWithEntites = this.entityGenerator.create(baseProject, request);
+        Project projectWithEntites = this.entityGenerator.createOld(baseProject, request);
         Project projectWithTransferObjects = this.transferObjectGenerator.create(projectWithEntites, request);
         Project projectWithRepositories =  this.repositoryGenerator.create(projectWithTransferObjects, request);
         Project projectWithMvcConfig = this.mvcConfigGenerator.create(projectWithRepositories, request);
@@ -66,24 +85,29 @@ public class ProjectGenerator extends FileFolderGenerator {
     public Project generate(ProjectRequest request) {
 
         // Create temp-folders
+        logger.info("Preparing temp-folders");
         prepareTmpFolders();
 
-        // Create project builder and provide the needed necessary generators.
-        ProjectBuilder builder = new ProjectBuilder(baseProjectGenerator);
+        // Assign strategies.
+        logger.info("Assigning strategies");
+        GenerationStrategy backendStrategy = this.springBootGenerator;
+        FrontendStrategy frontendStrategy = this.thymeleafGenerator;
+        GenerationStrategy databaseStrategy = this.flywayGenerator;
+        GenerationStrategy deploymentStrategy = this.dockerGenerator;
 
+        // Create Builder and build project
+        logger.info("Preparing the projectBuilder");
+        ProjectBuilder builder = new ProjectBuilder()
+                .baseProjectStrategy(baseProjectGenerator)
+                .backendStrategy(backendStrategy)
+                .frontendStrategy(frontendStrategy)
+                .deploymentStrategy(deploymentStrategy)
+                .databaseStrategy(databaseStrategy);
         logger.info("Generating new project with title {}", request.getTitle());
+        Project project = builder.build(request);
+        logger.info("Constructing of project done");
 
-        return builder
-                .addBaseProject(request)
-                .addDataModel(request)
-                .addFrontend()
-                .build();
-
-        // TODO: Properly implement, also check if the step is enabled or not.
-        /*
-        Project projectWithFrontendController = this.frontendControllerGenerator.create(projectWithExceptions, request);
-        Project projectWithFrontend = this.frontendGenerator.create(projectWithFrontendController, request);
-        return this.securityGenerator.create(projectWithFrontend, request);*/
+        return project;
     }
 
     /**

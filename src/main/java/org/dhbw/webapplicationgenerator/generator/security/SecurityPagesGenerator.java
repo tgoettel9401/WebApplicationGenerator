@@ -1,13 +1,10 @@
 package org.dhbw.webapplicationgenerator.generator.security;
 
 import lombok.AllArgsConstructor;
-import org.dhbw.webapplicationgenerator.model.response.Project;
 import org.dhbw.webapplicationgenerator.generator.baseproject.FileFolderGenerator;
-import org.dhbw.webapplicationgenerator.model.response.ProjectDirectory;
+import org.dhbw.webapplicationgenerator.model.response.Project;
 import org.dhbw.webapplicationgenerator.util.ResourceFileHelper;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
 
 @Service
 @AllArgsConstructor
@@ -20,6 +17,8 @@ public class SecurityPagesGenerator extends FileFolderGenerator {
 
     public Project create(Project project) {
 
+        // TODO: Move to Frontend-Generation.
+        /*
         ProjectDirectory templatesDir = getTemplatesDirectory(project);
 
         try {
@@ -28,7 +27,7 @@ public class SecurityPagesGenerator extends FileFolderGenerator {
             addFile(resourceFileHelper.getFile("users.html"), templatesDir);
         } catch (IOException ex) {
             ex.printStackTrace();
-        }
+        }*/
         return project;
     }
 }

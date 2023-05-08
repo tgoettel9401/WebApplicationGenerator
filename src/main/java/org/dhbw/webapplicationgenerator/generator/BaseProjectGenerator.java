@@ -41,13 +41,17 @@ public class BaseProjectGenerator extends FileFolderGenerator {
         return baseProject;
     }
 
+    /**
+     * Creates the Base Project, namely the root folder and files residing in that folder (.gitignore or README).
+     * @param request Request containing the relevant information of the project to be created
+     * @return BaseProject
+     */
     public Project create(ProjectRequest request) {
+        // TODO: Refactor and remove the rootFilesGenerator entirely.
+        //  The files from rootFilesGenerator can also be created in this file.
         Project baseProject = new Project();
         ProjectDirectory mainDirectory = addDirectory(request.getTitleWithoutSpaces(), Optional.empty());
-        // TODO: Either create Maven or Gradle folder. Also extract to Maven-Generation step.
-        this.mavenFolderGenerator.create(mainDirectory);
         this.rootFilesGenerator.create(request, mainDirectory);
-        this.sourceFolderGenerator.create(request, mainDirectory);
         baseProject.setFileStructure(mainDirectory);
         return baseProject;
     }

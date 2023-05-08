@@ -1,8 +1,10 @@
 package org.dhbw.webapplicationgenerator.generator.security;
 
 import lombok.AllArgsConstructor;
+import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.model.response.Project;
 import org.dhbw.webapplicationgenerator.generator.baseproject.FileFolderGenerator;
+import org.dhbw.webapplicationgenerator.model.response.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,14 @@ public class SecurityGenerator extends FileFolderGenerator {
         Project projectWithUserDataInitializer = userDataInitializationGenerator.create(projectWithWebSecurityConfig, request);
         Project projectWithUserController = userControllerGenerator.create(projectWithUserDataInitializer, request);
         Project projectWithSecurityEntities = securityEntitiesGenerator.create(projectWithUserController, request);
+        return securityPagesGenerator.create(projectWithSecurityEntities);
+    }
+
+    public Project create(Project project, ProjectRequest request, ProjectDirectory parent) {
+        Project projectWithWebSecurityConfig = webSecurityConfigGenerator.create(project, request, parent);
+        Project projectWithUserDataInitializer = userDataInitializationGenerator.create(projectWithWebSecurityConfig, request, parent);
+        Project projectWithUserController = userControllerGenerator.create(projectWithUserDataInitializer, request);
+        Project projectWithSecurityEntities = securityEntitiesGenerator.create(projectWithUserController, request, parent);
         return securityPagesGenerator.create(projectWithSecurityEntities);
     }
 

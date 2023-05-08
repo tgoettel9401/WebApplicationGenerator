@@ -1,101 +1,127 @@
 package org.dhbw.webapplicationgenerator.generator;
 
-import org.dhbw.webapplicationgenerator.generator.strategies.BackendStrategy;
-import org.dhbw.webapplicationgenerator.generator.strategies.DatabaseStrategy;
-import org.dhbw.webapplicationgenerator.generator.strategies.DeploymentStrategy;
-import org.dhbw.webapplicationgenerator.generator.strategies.FrontendStrategy;
+import org.dhbw.webapplicationgenerator.generator.strategies.GenerationStrategy;
+import org.dhbw.webapplicationgenerator.generator.strategies.frontend.FrontendStrategy;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.model.response.Project;
+import org.dhbw.webapplicationgenerator.webclient.exception.WagException;
 
 public class ProjectBuilder {
+
+    private BaseProjectGenerator baseProjectStrategy;
+    private GenerationStrategy backendStrategy;
+    private FrontendStrategy frontendStrategy;
+    private GenerationStrategy databaseStrategy;
+    private GenerationStrategy deploymentStrategy;
+
     private Project currentProject;
 
-    private final BaseProjectGenerator baseProjectGenerator;
-
-    private BackendStrategy backendStrategy;
-    private FrontendStrategy frontendStrategy;
-    private DeploymentStrategy deploymentStrategy;
-    private DatabaseStrategy databaseStrategy;
-
-    public ProjectBuilder(Project project, BaseProjectGenerator baseProjectGenerator) {
-        this.baseProjectGenerator = baseProjectGenerator;
-        this.currentProject = project;
+    /**
+     * Builds the project using the defined strategies, strategies are only executed (and also are only mandatory to
+     * be set prior to this action) if they are enabled in the request.
+     * @param request Request to construct the project.
+     * @return Constructed Project.
+     */
+    public Project build(ProjectRequest request) {
+        createBaseProject(request);
+        addBackend(request);
+        addFrontend(request);
+        addDatabase(request);
+        addDeployment(request);
+        return currentProject;
     }
-
-    public ProjectBuilder(BaseProjectGenerator baseProjectGenerator) {
-        this.baseProjectGenerator = baseProjectGenerator;
-        this.currentProject = new Project();
-    }
-
-    // TODO: Add
 
     /**
-     * Builds the Project based on the defined strategies and the specified request.
-     * @return
+     * Set the baseProjectStrategy
+     * @param strategy strategy constructing the baseProject
+     * @return builder
      */
-    public Project build() {
-        return this.currentProject;
-    }
-
-    public ProjectBuilder setBackendStrategy(BackendStrategy backendStrategy) {
-        this.backendStrategy = backendStrategy;
+    public ProjectBuilder baseProjectStrategy(BaseProjectGenerator strategy) {
+        this.baseProjectStrategy = strategy;
         return this;
     }
 
-    public ProjectBuilder setFrontendStrategy(FrontendStrategy frontendStrategy) {
-        this.frontendStrategy = frontendStrategy;
+    /**
+     * Set the backendStrategy
+     * @param strategy strategy constructing the backend
+     * @return builder
+     */
+    public ProjectBuilder backendStrategy(GenerationStrategy strategy) {
+        this.backendStrategy = strategy;
         return this;
     }
 
-    public ProjectBuilder setDeploymentStrategy(DeploymentStrategy deploymentStrategy) {
-        this.deploymentStrategy = deploymentStrategy;
+    /**
+     * Set the frontendStrategy
+     * @param strategy strategy constructing the frontend
+     * @return builder
+     */
+    public ProjectBuilder frontendStrategy(FrontendStrategy strategy) {
+        this.frontendStrategy = strategy;
         return this;
     }
 
-    public ProjectBuilder setDatabaseStrategy(DatabaseStrategy databaseStrategy) {
-        this.databaseStrategy = databaseStrategy;
+    /**
+     * Set the databaseStrategy
+     * @param strategy strategy constructing the database
+     * @return builder
+     */
+    public ProjectBuilder databaseStrategy(GenerationStrategy strategy) {
+        this.databaseStrategy = strategy;
         return this;
     }
 
-    // TODO: Add
-    public ProjectBuilder addBackend() {
-        // TODO: Move baseProject creation here as this mainly depends on the selected Backend!
-        // TODO: Add backend-steps potentially in the strategy as e.g. MvcConfig is specific to SpringBoot.
-        /*
-        Project projectWithMvcConfig = this.mvcConfigGenerator.create(projectWithRepositories, request);
-        Project projectWithExceptions = this.exceptionGenerator.create(projectWithMvcConfig, request);
-         */
+    /**
+     * Set the deploymentStrategy
+     * @param strategy strategy constructing the deployment
+     * @return builder
+     */
+    public ProjectBuilder deploymentStrategy(GenerationStrategy strategy) {
+        this.deploymentStrategy = strategy;
         return this;
     }
 
-    // TODO: Add
-    public ProjectBuilder addFrontend() {
-        return this;
+    private void createBaseProject(ProjectRequest request) {
+        if (baseProjectStrategy == null) {
+            throw new WagException("Using baseproject strategy without setting the strategy.");
+        }
+        this.currentProject = baseProjectStrategy.create(request);
     }
 
-    // TODO: Add
-    public ProjectBuilder addDatabase() {
-        return this;
+    private void addBackend(ProjectRequest request) {
+        if (request.isBackendEnabled()) {
+            if (backendStrategy == null) {
+                throw new WagException("Using backend strategy without setting the strategy.");
+            }
+            this.currentProject = backendStrategy.create(request, this.currentProject);
+        }
     }
 
-    // TODO: Add
-    public ProjectBuilder addDocker() {
-        return this;
+    private void addFrontend(ProjectRequest request) {
+        if (request.isFrontendEnabled()) {
+            if (frontendStrategy == null) {
+                throw new WagException("Using frontend strategy without setting the strategy.");
+            }
+            // TOOD: this.currentProject = frontendStrategy.create(request, this.currentProject);
+        }
     }
 
-    public ProjectBuilder addBaseProject(ProjectRequest request) {
-        this.currentProject = this.baseProjectGenerator.create(request);
-        return this;
+    private void addDatabase(ProjectRequest request) {
+        if (request.isDatabaseEnabled()) {
+            if (databaseStrategy == null) {
+                throw new WagException("Using database strategy without setting the strategy.");
+            }
+            // TODO: this.currentProject = databaseStrategy.create(request, this.currentProject);
+        }
     }
 
-    public ProjectBuilder addDataModel(ProjectRequest request) {
-        // TODO: Implement
-        /*Project projectWithEntites = this.entityGenerator.create(baseProject, request);
-        Project projectWithTransferObjects = this.transferObjectGenerator.create(projectWithEntites, request);
-        Project projectWithRepositories =  this.repositoryGenerator.create(projectWithTransferObjects, request);
-        */
-        // TODO: Add logic.
-        return this;
+    private void addDeployment(ProjectRequest request) {
+        if (request.isDeploymentEnabled()) {
+            if (deploymentStrategy == null) {
+                throw new WagException("Using deployment strategy without setting the strategy.");
+            }
+            // TODO: this.currentProject = deploymentStrategy.create(request, this.currentProject);
+        }
     }
 
 }

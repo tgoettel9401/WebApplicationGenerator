@@ -1,5 +1,6 @@
 package org.dhbw.webapplicationgenerator.generator.entity;
 
+import org.dhbw.webapplicationgenerator.generator.java.entity.EntityGenerator;
 import org.dhbw.webapplicationgenerator.model.response.Project;
 import org.dhbw.webapplicationgenerator.model.response.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.model.response.ProjectFile;
@@ -112,7 +113,7 @@ class EntityGeneratorTest {
 
         request.setEntities(entities);
 
-        Project createdProject = entityGenerator.create(baseProject, request);
+        Project createdProject = entityGenerator.createOld(baseProject, request);
 
         ProjectDirectory createdRootDir = (ProjectDirectory) createdProject.getFileStructure();
         ProjectDirectory createdSrcDir = (ProjectDirectory) createdRootDir.getChildren().stream()

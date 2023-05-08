@@ -1,4 +1,4 @@
-package org.dhbw.webapplicationgenerator.webclient.request;
+package org.dhbw.webapplicationgenerator.model.request.datamodel;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -6,11 +6,18 @@ import lombok.ToString;
 import org.dhbw.webapplicationgenerator.generator.java.entity.RelationType;
 import org.dhbw.webapplicationgenerator.generator.util.Utils;
 import org.dhbw.webapplicationgenerator.webclient.exception.WagException;
+import org.dhbw.webapplicationgenerator.webclient.request.Cardinality;
 
 import java.util.Locale;
 
+/**
+ * This class differs from Relation-class that it is specific to a concrete Entity and formulated from this perspective.
+ * Hence, its parameter names as well as utility methods have different names.
+ * Objects are usually created during Request-Transformation.
+ */
 @Data
 public class EntityRelation {
+
     private String name;
 
     /**
@@ -31,7 +38,7 @@ public class EntityRelation {
      * Entity-Object on the relation-side
      */
     @ToString.Exclude
-    private RequestEntity entityObject;
+    private Entity entityObject;
 
     public RelationType getRelationType() {
         if (entityCardinality.equals(Cardinality.ONE) && relationCardinality.equals(Cardinality.ONE)) {

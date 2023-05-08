@@ -6,10 +6,11 @@ import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.model.request.Strategy;
 import org.dhbw.webapplicationgenerator.model.request.backend.Backend;
 import org.dhbw.webapplicationgenerator.model.request.backend.SpringBootData;
-import org.dhbw.webapplicationgenerator.model.request.datamodel.Entity;
-import org.dhbw.webapplicationgenerator.model.request.datamodel.Relation;
 import org.dhbw.webapplicationgenerator.model.request.database.Database;
 import org.dhbw.webapplicationgenerator.model.request.database.FlywayData;
+import org.dhbw.webapplicationgenerator.model.request.datamodel.Entity;
+import org.dhbw.webapplicationgenerator.model.request.datamodel.EntityRelation;
+import org.dhbw.webapplicationgenerator.model.request.datamodel.Relation;
 import org.dhbw.webapplicationgenerator.model.request.deployment.Deployment;
 import org.dhbw.webapplicationgenerator.model.request.deployment.DockerData;
 import org.dhbw.webapplicationgenerator.model.request.frontend.Frontend;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class ProjectRequestTransformer {
@@ -97,17 +99,72 @@ public class ProjectRequestTransformer {
         List<Entity> entities = request.getDataModel().getEntities();
         List<Relation> relations = request.getDataModel().getRelations();
         for (Relation relation : relations) {
+
+            // Add entity1
             String entityName1 = relation.getEntityName1();
             Entity entity1 = entities.stream().filter(entity -> entity.getName().equals(entityName1)).findFirst()
                     .orElseThrow(() -> new WagException("For relation " + relation.getName() +
                             " the first entity with name " + entityName1 + " has not been found in entities-list."));
             relation.setEntity1(entity1);
+
+            // Add entity2
             String entityName2 = relation.getEntityName2();
             Entity entity2 = entities.stream().filter(entity -> entity.getName().equals(entityName2)).findFirst()
                     .orElseThrow(() -> new WagException("For relation " + relation.getName() +
                             " the second entity with name " + entityName2 + " has not been found in entities-list."));
             relation.setEntity2(entity2);
+
+            // Set the owning-entity if it has been specified in the request (field owningSide). This field is optional
+            // though and hence neither of following if statements may be reached.
+            if (relation.getOwningSide() != null && relation.getOwningSide().equals(entityName1)) {
+                relation.setOwningEntity(entity1);
+            }
+            if (relation.getOwningSide() != null && relation.getOwningSide().equals(entityName2)) {
+                relation.setOwningEntity(entity2);
+            }
         }
+        for (Entity entity : entities) {
+            addEntityRelationsToEntity(entity, relations);
+        }
+    }
+
+    private void addEntityRelationsToEntity(Entity entity, List<Relation> relations) {
+
+        // Extract relations for this entity as entity1 and then as entity2.
+        List<Relation> entity1Relations = relations.stream()
+                .filter(relation -> relation.getEntity1().equals(entity))
+                .collect(Collectors.toList());
+        List<Relation> entity2Relations = relations.stream()
+                .filter(relation -> relation.getEntity2().equals(entity))
+                .collect(Collectors.toList());
+
+        for (Relation relation : entity1Relations) {
+            EntityRelation entityRelation = new EntityRelation();
+            entityRelation.setName(relation.getName());
+            entityRelation.setEntityName(relation.getEntityName2());
+            entityRelation.setEntityCardinality(relation.getCardinality1());
+            entityRelation.setRelationCardinality(relation.getCardinality2());
+            entityRelation.setJoinTable(relation.getJoinTable());
+            boolean isOwning = relation.getOwningEntity() != null && relation.getOwningEntity().equals(entity);
+            entityRelation.setOwning(isOwning);
+            entityRelation.setEntityObject(relation.getEntity2());
+            entity.getRelations().add(entityRelation);
+        }
+
+        for (Relation relation : entity2Relations) {
+            // TODO: Use attribute-name as well!
+            EntityRelation entityRelation = new EntityRelation();
+            entityRelation.setName(relation.getName());
+            entityRelation.setEntityName(relation.getEntityName1());
+            entityRelation.setEntityCardinality(relation.getCardinality2());
+            entityRelation.setRelationCardinality(relation.getCardinality1());
+            entityRelation.setJoinTable(relation.getJoinTable());
+            boolean isOwning = relation.getOwningEntity() != null && relation.getOwningEntity().equals(entity);
+            entityRelation.setOwning(isOwning);
+            entityRelation.setEntityObject(relation.getEntity1());
+            entity.getRelations().add(entityRelation);
+        }
+
     }
 
 }
