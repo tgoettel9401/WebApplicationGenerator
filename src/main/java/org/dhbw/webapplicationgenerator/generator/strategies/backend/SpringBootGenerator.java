@@ -45,6 +45,42 @@ public class SpringBootGenerator extends FileFolderGenerator implements BackendS
     private final SecurityGenerator securityGenerator;
 
     @Override
+    public Project create(ProjectRequest request, Project project) {
+
+        ProjectDirectory rootDir = (ProjectDirectory) project.getFileStructure();
+
+        // Create Source Folder (JavaBuildToolGenerator)
+        SpringBootData springBootData = (SpringBootData) request.getBackend().getData();
+        JavaBuildToolGenerator javaBuildToolGenerator = getBuildToolGenerator(springBootData);
+        javaBuildToolGenerator.createFolderStructure(request, rootDir);
+
+        // Find main and resources directory for project
+        ProjectDirectory mainDir = javaBuildToolGenerator.getMainDirectory(project, springBootData);
+        ProjectDirectory mainTestDir = javaBuildToolGenerator.getMainTestDirectory(project, springBootData);
+        ProjectDirectory resourcesDir = javaBuildToolGenerator.getResourcesDirectory(project);
+
+        // Create basic files dependent to either the Spring-Framework or the selected Build-Tool
+        project = javaBuildToolGenerator.addBuildToolFiles(project, request);
+        project = this.applicationPropertiesGenerator.addApplicationProperties(project, resourcesDir);
+        project = this.mvcConfigGenerator.create(project, request, mainDir);
+        project = this.mainFileGenerator.addMainFile(project, request, mainDir);
+        project = this.mainTestFileGenerator.addMainTestFile(project, request, mainTestDir);
+        project = this.exceptionGenerator.create(project, request, mainDir);
+
+        // Create domain model
+        project = this.entityGenerator.create(project, request, mainDir);
+        project = this.transferObjectGenerator.create(project, request, mainDir);
+        project = this.repositoryGenerator.create(project, request, mainDir);
+
+        // Create SecurityController, entities and
+        project = this.securityGenerator.create(project, request, mainDir);
+        // TODO: Add security to its own strategy, even though this mainly depends on the backend.
+
+        return project;
+
+    }
+
+    @Override
     public UnaryOperator<ProjectDirectory> getFrontendDirectoryFinder() {
         return projectDirectory -> {
             List<ProjectDirectory> directories = projectDirectory.getChildren().stream()
@@ -68,43 +104,6 @@ public class SpringBootGenerator extends FileFolderGenerator implements BackendS
         SpringBootData springBootData = (SpringBootData) data;
         JavaBuildToolGenerator buildToolGenerator = getBuildToolGenerator(springBootData);
         return projectDirectory -> buildToolGenerator.getMainDirectory(projectDirectory, springBootData);
-    }
-
-    @Override
-    public Project create(ProjectRequest request, Project project) {
-
-        ProjectDirectory rootDir = (ProjectDirectory) project.getFileStructure();
-
-        // Create Source Folder (JavaBuildToolGenerator)
-        SpringBootData springBootData = (SpringBootData) request.getBackend().getData();
-        JavaBuildToolGenerator javaBuildToolGenerator = getBuildToolGenerator(springBootData);
-        javaBuildToolGenerator.createFolderStructure(request, rootDir);
-
-        // Find main and resources directory for project
-        ProjectDirectory mainDir = javaBuildToolGenerator.getMainDirectory(project, springBootData);
-        ProjectDirectory mainTestDir = javaBuildToolGenerator.getMainTestDirectory(project, springBootData);
-        ProjectDirectory resourcesDir = javaBuildToolGenerator.getResourcesDirectory(project);
-
-        // Create basic files dependent to either the Spring-Framework or the selected Build-Tool
-        project = javaBuildToolGenerator.addBuildToolFiles(project, request);
-        project = this.applicationPropertiesGenerator.addApplicationProperties(project, resourcesDir);
-        project = this.mainFileGenerator.addMainFile(project, request, mainDir);
-        project = this.mainTestFileGenerator.addMainTestFile(project, request, mainTestDir);
-        project = this.mvcConfigGenerator.create(project, request, mainDir);
-        project = this.exceptionGenerator.create(project, request, mainDir);
-
-        // Create domain model
-        project = this.entityGenerator.create(project, request, mainDir);
-        project = this.transferObjectGenerator.create(project, request, mainDir);
-        project = this.repositoryGenerator.create(project, request, mainDir);
-
-        // Create SecurityController, entities and
-        project = this.securityGenerator.create(project, request, mainDir);
-        // TODO: Only generate Controllers like so if frontend is Thymeleaf. Maybe even move to FrontendGenerator,
-        //  even though it is actually part of the Backend?
-
-        return project;
-
     }
 
     private JavaBuildToolGenerator getBuildToolGenerator(SpringBootData data) {

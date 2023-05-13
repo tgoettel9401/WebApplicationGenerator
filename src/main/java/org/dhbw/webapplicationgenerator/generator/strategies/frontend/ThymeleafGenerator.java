@@ -31,10 +31,7 @@ public class ThymeleafGenerator implements FrontendStrategy {
                           UnaryOperator<ProjectDirectory> mainSourceFolderFinder) {
 
         // Throw exception if a mandatory finder-function has not been set before
-        if (frontendDirectoryFinder == null || mainSourceFolderFinder == null) {
-            throw new WagException("Used Thymeleaf Generator without setting the frontendDirectoryFinder or " +
-                    "mainSourceFolderFinder before!");
-        }
+        validateFindersArePresent(frontendDirectoryFinder, mainSourceFolderFinder);
 
         // Extract needed directories
         ProjectDirectory rootDirectory = (ProjectDirectory) project.getFileStructure();
@@ -46,6 +43,14 @@ public class ThymeleafGenerator implements FrontendStrategy {
         project = this.frontendControllerGenerator.create(project, request, mainSourceDirectory);
         project = this.securityPagesGenerator.create(project);
         return project;
+    }
+
+    private void validateFindersArePresent(UnaryOperator<ProjectDirectory> frontendDirectoryFinder,
+                                           UnaryOperator<ProjectDirectory> mainSourceFolderFinder) {
+        if (frontendDirectoryFinder == null || mainSourceFolderFinder == null) {
+            throw new WagException("Used Thymeleaf Generator without setting the frontendDirectoryFinder or " +
+                    "mainSourceFolderFinder before!");
+        }
     }
 
 }
