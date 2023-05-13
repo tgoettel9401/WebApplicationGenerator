@@ -73,8 +73,9 @@ public class SpringBootGenerator extends FileFolderGenerator implements BackendS
         project = this.repositoryGenerator.create(project, request, mainDir);
 
         // Create SecurityController, entities and
-        project = this.securityGenerator.create(project, request, mainDir);
-        // TODO: Add security to its own strategy, even though this mainly depends on the backend.
+        project = this.securityGenerator.create(project, request);
+        // TODO: Add security to its own strategy, even though this mainly depends on the backend. It is already
+        //      combined into this single securityGenerator.
 
         return project;
 

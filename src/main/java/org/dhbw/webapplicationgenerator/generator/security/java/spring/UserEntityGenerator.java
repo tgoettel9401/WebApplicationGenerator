@@ -16,18 +16,25 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class WebSecurityConfigGenerator extends FileFolderGenerator {
+public class UserEntityGenerator extends FileFolderGenerator {
 
     private final PackageNameResolver packageNameResolver;
     private final FreemarkerTemplateProcessor freemarkerTemplateProcessor;
 
+    /**
+     * Adds the AppUser-Entity to the project.
+     * @param project Project to be updated
+     * @param request Request to construct the project
+     * @return Updated Project
+     */
     public Project add(Project project, ProjectRequest request) {
-        ProjectDirectory serviceDirectory = addDirectory("config", Optional.of(getMainProjectDirectory(project, request)));
+        ProjectDirectory entityDirectory = addDirectory("domain",
+                Optional.of(getMainProjectDirectory(project, request)));
         Map<String, Object> dataModel = new HashMap<>();
-        dataModel.put("packageName", packageNameResolver.resolveConfig(request));
-        String filename = "WebSecurityConfig" + JAVA_CLASS_ENDING;
-        File file = freemarkerTemplateProcessor.process("WebSecurityConfig.ftl", dataModel, filename);
-        addFile(file, serviceDirectory);
+        dataModel.put("packageName", packageNameResolver.resolveEntity(request));
+        String filename = "AppUser" + JAVA_CLASS_ENDING;
+        File file = freemarkerTemplateProcessor.process("AppUserEntity.ftl", dataModel, filename);
+        addFile(file, entityDirectory);
         return project;
     }
 

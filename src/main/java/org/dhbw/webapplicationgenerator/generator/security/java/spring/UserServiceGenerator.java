@@ -14,7 +14,7 @@ import java.util.*;
 
 @Service
 @AllArgsConstructor
-public class UserControllerGenerator extends FileFolderGenerator {
+public class UserServiceGenerator extends FileFolderGenerator {
 
     private static final String JAVA_CLASS_ENDING = ".java";
 
@@ -22,33 +22,31 @@ public class UserControllerGenerator extends FileFolderGenerator {
     private final FreemarkerTemplateProcessor freemarkerTemplateProcessor;
 
     /**
-     * Adds the UserDataInitializer to the project.
+     * Adds the AppUserService to the project.
      * @param project Project to be updated
      * @param request Request to construct the project
      * @return Updated Project
      */
     public Project add(Project project, ProjectRequest request) {
-        ProjectDirectory controllerDirectory = addDirectory("controller",
-                Optional.of(getMainProjectDirectory(project, request)));
+        ProjectDirectory serviceDirectory = addDirectory("service", Optional.of(getMainProjectDirectory(project, request)));
         Map<String, Object> dataModel = new HashMap<>();
-        dataModel.put("packageName", packageNameResolver.resolveConfig(request));
+        dataModel.put("packageName", packageNameResolver.resolveService(request));
         dataModel.put("applicationImports", getApplicationImports(request));
-        String filename = "AppUserController" + JAVA_CLASS_ENDING;
-        File file = freemarkerTemplateProcessor.process("AppUserController.ftl", dataModel, filename);
-        addFile(file, controllerDirectory);
+        String filename = "AppUserService" + JAVA_CLASS_ENDING;
+        File file = freemarkerTemplateProcessor.process("AppUserService.ftl", dataModel, filename);
+        addFile(file, serviceDirectory);
         return project;
     }
 
     private List<String> getApplicationImports(ProjectRequest request) {
         String entityPackageName = packageNameResolver.resolveEntity(request);
-        String repositoryPackageName = packageNameResolver.resolveRepository(request);
-        String servicePackageName = packageNameResolver.resolveService(request);
         String transferObjectPackageName = packageNameResolver.resolveTransferObjects(request);
+        String repositoryPackageName = packageNameResolver.resolveRepository(request);
         List<String> applicationImports = new ArrayList<>();
-        applicationImports.add(servicePackageName + ".AppUserService");
-        applicationImports.add(repositoryPackageName + ".AppUserRepository");
-        applicationImports.add(entityPackageName + ".AppUser");
         applicationImports.add(transferObjectPackageName + ".RegistrationRequest");
+        applicationImports.add(entityPackageName + ".Role");
+        applicationImports.add(entityPackageName + ".AppUser");
+        applicationImports.add(repositoryPackageName + ".AppUserRepository");
         return applicationImports;
     }
 

@@ -23,8 +23,6 @@ public class WebMvcConfigGenerator extends FileFolderGenerator {
     private final PackageNameResolver packageNameResolver;
     private final FreemarkerTemplateProcessor freemarkerTemplateProcessor;
 
-    // TODO: Move to backend?! Or rather frontend because it is only needed due to frontend?
-
     public Project create(Project project, ProjectRequest request, ProjectDirectory parent) {
         create(request, parent);
         return project;
@@ -38,7 +36,6 @@ public class WebMvcConfigGenerator extends FileFolderGenerator {
     }
 
     private File createWebMvcConfigFile(List<Entity> entities, String packageName) {
-        // TODO: Freemarker
 
         // Initialize imports
         List<String> imports = new ArrayList<>();
