@@ -32,6 +32,9 @@ public class UserDataInitializationGenerator extends FileFolderGenerator {
         Map<String, Object> dataModel = new HashMap<>();
         dataModel.put("packageName", packageNameResolver.resolveConfig(request));
         dataModel.put("applicationImports", getApplicationImports(request));
+        dataModel.put("defaultUsername", request.getSecurity().getDefaultUsername());
+        dataModel.put("defaultPassword", request.getSecurity().getDefaultPassword());
+        dataModel.put("defaultAdminEmail", request.getSecurity().getDefaultAdminEmail());
         String filename = "UserDataInitializer" + JAVA_CLASS_ENDING;
         File file = freemarkerTemplateProcessor.process("UserDataInitializer.ftl", dataModel, filename);
         addFile(file, configDirectory);

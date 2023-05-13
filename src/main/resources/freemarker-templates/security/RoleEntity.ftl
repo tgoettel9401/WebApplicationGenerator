@@ -1,4 +1,5 @@
 <#-- @ftlvariable name="packageName" type="java.lang.String" -->
+<#-- @ftlvariable name="roleTableName" type="java.lang.String" -->
 package ${packageName};
 
 import org.springframework.security.core.GrantedAuthority;
@@ -7,6 +8,7 @@ import javax.persistence.*;
 import java.util.Collection;
 
 @Entity
+@Table(name = "${roleTableName}")
 public class Role {
 
     @Id

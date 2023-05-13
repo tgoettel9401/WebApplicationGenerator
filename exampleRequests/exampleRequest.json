@@ -27,6 +27,7 @@
     "enabled": true,
     "defaultUsername": "admin",
     "defaultPassword": "secret",
+    "defaultAdminEmail": "admin@email.com",
     "userTableName": "app_users",
     "roleTableName": "roles"
   },
