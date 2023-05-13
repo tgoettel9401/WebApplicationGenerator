@@ -4,7 +4,10 @@ import org.dhbw.webapplicationgenerator.generator.strategies.GenerationStrategy;
 import org.dhbw.webapplicationgenerator.generator.strategies.frontend.FrontendStrategy;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.model.response.Project;
+import org.dhbw.webapplicationgenerator.model.response.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.webclient.exception.WagException;
+
+import java.util.function.UnaryOperator;
 
 public class ProjectBuilder {
 
@@ -13,6 +16,10 @@ public class ProjectBuilder {
     private FrontendStrategy frontendStrategy;
     private GenerationStrategy databaseStrategy;
     private GenerationStrategy deploymentStrategy;
+
+    // Directory Finder
+    private UnaryOperator<ProjectDirectory> frontendDirectoryFinder;
+    private UnaryOperator<ProjectDirectory> mainSourceDirectoryFinder;
 
     private Project currentProject;
 
@@ -81,6 +88,27 @@ public class ProjectBuilder {
         return this;
     }
 
+    /**
+     * Set the frontendDirectoryFinder
+     * @param frontendDirectoryFinder function to find the frontendDirectory with rootDir of project as parameter
+     * @return builder
+     */
+    public ProjectBuilder frontendDirectoryFinder(UnaryOperator<ProjectDirectory> frontendDirectoryFinder) {
+        this.frontendDirectoryFinder = frontendDirectoryFinder;
+        return this;
+    }
+
+    /**
+     * Set the mainSourceDirectoryFinder
+     * @param mainSourceDirectoryFinder function to find the mainSourceDirectory (of backend)
+     *                                  with rootDir of project as parameter
+     * @return builder
+     */
+    public ProjectBuilder mainSourceDirectoryFinder(UnaryOperator<ProjectDirectory> mainSourceDirectoryFinder) {
+        this.mainSourceDirectoryFinder = mainSourceDirectoryFinder;
+        return this;
+    }
+
     private void createBaseProject(ProjectRequest request) {
         if (baseProjectStrategy == null) {
             throw new WagException("Using baseproject strategy without setting the strategy.");
@@ -102,7 +130,7 @@ public class ProjectBuilder {
             if (frontendStrategy == null) {
                 throw new WagException("Using frontend strategy without setting the strategy.");
             }
-            this.currentProject = frontendStrategy.create(request, this.currentProject);
+            this.currentProject = frontendStrategy.create(request, this.currentProject, frontendDirectoryFinder, mainSourceDirectoryFinder);
         }
     }
 

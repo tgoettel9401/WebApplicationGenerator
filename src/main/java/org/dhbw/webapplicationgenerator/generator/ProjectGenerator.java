@@ -5,7 +5,7 @@ import org.dhbw.webapplicationgenerator.generator.baseproject.ExceptionGenerator
 import org.dhbw.webapplicationgenerator.generator.baseproject.FileFolderGenerator;
 import org.dhbw.webapplicationgenerator.generator.java.entity.EntityGenerator;
 import org.dhbw.webapplicationgenerator.generator.java.entity.TransferObjectGenerator;
-import org.dhbw.webapplicationgenerator.generator.frontend.FrontendControllerGenerator;
+import org.dhbw.webapplicationgenerator.generator.thymeleaf.FrontendControllerGenerator;
 import org.dhbw.webapplicationgenerator.generator.thymeleaf.FrontendGenerator;
 import org.dhbw.webapplicationgenerator.generator.frontend.WebMvcConfigGenerator;
 import org.dhbw.webapplicationgenerator.generator.repository.RepositoryGenerator;
@@ -18,6 +18,7 @@ import org.dhbw.webapplicationgenerator.generator.strategies.backend.SpringBootG
 import org.dhbw.webapplicationgenerator.generator.strategies.frontend.FrontendStrategy;
 import org.dhbw.webapplicationgenerator.generator.strategies.frontend.ThymeleafGenerator;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
+import org.dhbw.webapplicationgenerator.model.request.backend.BackendData;
 import org.dhbw.webapplicationgenerator.model.response.Project;
 import org.dhbw.webapplicationgenerator.model.response.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.util.FileCleaner;
@@ -92,16 +93,17 @@ public class ProjectGenerator extends FileFolderGenerator {
         logger.info("Preparing temp-folders");
         prepareTmpFolders();
 
+        logger.info("Extracting data and converting to BackendData");
+        BackendData data = (BackendData) request.getBackend().getData();
+
         // Assign strategies.
         logger.info("Assigning strategies");
-        BackendStrategy backendStrategy = this.springBootGenerator;
-        FrontendStrategy frontendStrategy = this.thymeleafGenerator;
+        BackendStrategy backendStrategy = this.springBootGenerator; // TODO: Set generator according to request
+        FrontendStrategy frontendStrategy = this.thymeleafGenerator; // TODO: Set generator according to request
         GenerationStrategy databaseStrategy = this.flywayGenerator;
         GenerationStrategy deploymentStrategy = this.dockerGenerator;
-
-        logger.info("Setting frontendDirectoryFinder according to the BackendStrategy");
         UnaryOperator<ProjectDirectory> frontendDirectoryFinder = backendStrategy.getFrontendDirectoryFinder();
-        frontendStrategy.setFrontendDirectoryFinder(frontendDirectoryFinder);
+        UnaryOperator<ProjectDirectory> mainSourceDirectoryFinder = backendStrategy.getMainSourceDirectoryFinder(data);
 
         // Create Builder and build project
         logger.info("Preparing the projectBuilder");
@@ -110,7 +112,11 @@ public class ProjectGenerator extends FileFolderGenerator {
                 .backendStrategy(backendStrategy)
                 .frontendStrategy(frontendStrategy)
                 .deploymentStrategy(deploymentStrategy)
-                .databaseStrategy(databaseStrategy);
+                .databaseStrategy(databaseStrategy)
+                .frontendDirectoryFinder(frontendDirectoryFinder)
+                .mainSourceDirectoryFinder(mainSourceDirectoryFinder);
+
+        // Build the project
         logger.info("Generating new project with title {}", request.getTitle());
         Project project = builder.build(request);
         logger.info("Constructing of project done");

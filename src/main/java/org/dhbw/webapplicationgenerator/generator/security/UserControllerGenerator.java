@@ -48,7 +48,8 @@ public class UserControllerGenerator extends FileFolderGenerator {
 
     public Project create(Project project, ProjectRequest request) {
 
-        ProjectDirectory controllerDir = getControllerDirectory(project, request);
+        ProjectDirectory mainSourceDir = getMainProjectDirectory(project, request);
+        ProjectDirectory controllerDir = addDirectory("controller", Optional.of(mainSourceDir));
         ProjectDirectory transferObjectDir = getTransferObjectDirectory(project, request);
         ProjectDirectory serviceDir = addDirectory("service", Optional.of(getMainProjectDirectory(project, request)));
 

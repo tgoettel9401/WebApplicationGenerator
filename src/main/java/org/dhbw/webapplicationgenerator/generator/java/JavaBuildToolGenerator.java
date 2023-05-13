@@ -19,9 +19,8 @@ public abstract class JavaBuildToolGenerator extends FileFolderGenerator {
     /**
      * Creates the Src-Directory including test and main folder. The relevant base files like Main-Class are also contained.
      * @param parent Parent directory, usually this is the root directory of the project
-     * @return Src-Directory
      */
-    public ProjectDirectory createFolderStructure(ProjectRequest request, ProjectDirectory parent) {
+    public void createFolderStructure(ProjectRequest request, ProjectDirectory parent) {
         ProjectDirectory src = addDirectory("src", Optional.of(parent));
 
         // Main-Folder
@@ -34,8 +33,6 @@ public abstract class JavaBuildToolGenerator extends FileFolderGenerator {
         ProjectDirectory test = addDirectory("test", Optional.of(src));
         ProjectDirectory javaTest = addDirectory("java", Optional.of(test));
         addGroupPackage(request, javaTest);
-
-        return src;
     }
 
     /**
@@ -46,6 +43,16 @@ public abstract class JavaBuildToolGenerator extends FileFolderGenerator {
      */
     public ProjectDirectory getMainDirectory(Project project, JavaData javaData) {
         ProjectDirectory rootDir = (ProjectDirectory) project.getFileStructure();
+        return getMainDirectory(rootDir, javaData);
+    }
+
+    /**
+     * Returns the main project directory, usually in path /src/main/group/artifact
+     * @param rootDir rootFolder of the project
+     * @param javaData javaData that has been provided in the request.
+     * @return ProjectDirectory for main
+     */
+    public ProjectDirectory getMainDirectory(ProjectDirectory rootDir, JavaData javaData) {
         // TODO: Refactor, add findChild(String childName) to ProjectDirectory!
         ProjectDirectory srcDir = (ProjectDirectory) rootDir.getChildren().stream().filter(child -> child.getTitle().equals("src"))
                 .findFirst().orElseThrow(() -> new RuntimeException("Finding main directory failed due to missing src folder"));

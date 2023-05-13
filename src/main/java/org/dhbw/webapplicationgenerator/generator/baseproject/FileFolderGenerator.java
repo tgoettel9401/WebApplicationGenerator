@@ -136,19 +136,38 @@ public class FileFolderGenerator {
     }
 
     /**
-     * Adds a directory to the specified parent folder
+     * Adds a directory to the specified parent folder. If the directory already exists, it returns the existing
+     * directory.
      * @param title String
      * @param parent Optional parent directory the folder should be added to. If the Optional is empty, it will be
      *               added as root directory
-     * @return newly created directory
+     * @return newly created directory (or existing directory)
      */
     public ProjectDirectory addDirectory(String title, Optional<ProjectDirectory> parent) {
+
+        // Prepare directory.
         ProjectDirectory projectDirectory = new ProjectDirectory();
         projectDirectory.setTitle(title);
 
+        // Parent exists => directory should be added in the parent
         if (parent.isPresent()) {
-            projectDirectory.setPath(parent.get().getPath() + title + "/");
-            parent.get().addChild(projectDirectory);
+
+            // Check if the directory to be added already exists
+            Optional<ProjectDirectory> existingDirectory = parent.get().getDirectoryChildren().stream()
+                    .filter(dir -> dir.getTitle().equals(title))
+                    .findAny();
+
+            // If the directory already exists though, it should be returned
+            if (existingDirectory.isPresent()) {
+                return existingDirectory.get();
+            }
+
+            // Otherwise a new directory is created
+            else {
+                projectDirectory.setPath(parent.get().getPath() + title + "/");
+                parent.get().addChild(projectDirectory);
+            }
+
         } else {
             projectDirectory.setPath(title + "/");
         }
