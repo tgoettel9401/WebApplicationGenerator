@@ -13,7 +13,7 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class DeploymentFilesGenerator extends FileFolderGenerator {
+public class DockerGeneratorOld extends FileFolderGenerator {
 
     private final BuildAndRunScriptGenerator buildAndRunScriptGenerator;
     private final DockerfileGenerator dockerfileGenerator;
@@ -23,10 +23,10 @@ public class DeploymentFilesGenerator extends FileFolderGenerator {
      * @param parent Parent directory, usually this is the root directory of the project
      * @return List of Deployment Files
      */
-    public List<ProjectFile> create(CreationRequest request, ProjectDirectory parent) {
+    public List<ProjectFile> createOld(CreationRequest request, ProjectDirectory parent) {
         List<ProjectFile> files = new ArrayList<>();
-        files.add(addFile("buildAndRun.sh", buildAndRunScriptGenerator.create(request), parent));
-        files.add(addFile("Dockerfile", dockerfileGenerator.create(request), parent));
+        files.add(addFile("buildAndRun.sh", buildAndRunScriptGenerator.createOld(request), parent));
+        files.add(addFile("Dockerfile", dockerfileGenerator.createOld(request), parent));
         return files;
     }
 

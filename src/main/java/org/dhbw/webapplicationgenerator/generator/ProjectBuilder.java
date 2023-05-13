@@ -111,7 +111,7 @@ public class ProjectBuilder {
             if (databaseStrategy == null) {
                 throw new WagException("Using database strategy without setting the strategy.");
             }
-            // TODO: this.currentProject = databaseStrategy.create(request, this.currentProject);
+            this.currentProject = databaseStrategy.create(request, this.currentProject);
         }
     }
 
@@ -120,7 +120,7 @@ public class ProjectBuilder {
             if (deploymentStrategy == null) {
                 throw new WagException("Using deployment strategy without setting the strategy.");
             }
-            // TODO: this.currentProject = deploymentStrategy.create(request, this.currentProject);
+            this.currentProject = deploymentStrategy.create(request, this.currentProject);
         }
     }
 
