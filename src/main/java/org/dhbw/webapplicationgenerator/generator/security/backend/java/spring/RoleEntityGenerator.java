@@ -1,4 +1,4 @@
-package org.dhbw.webapplicationgenerator.generator.security.java.spring;
+package org.dhbw.webapplicationgenerator.generator.security.backend.java.spring;
 
 import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.util.FileFolderGenerator;

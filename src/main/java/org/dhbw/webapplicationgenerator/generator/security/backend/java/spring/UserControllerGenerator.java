@@ -1,4 +1,4 @@
-package org.dhbw.webapplicationgenerator.generator.security.java.spring;
+package org.dhbw.webapplicationgenerator.generator.security.backend.java.spring;
 
 import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.util.FileFolderGenerator;
@@ -14,7 +14,7 @@ import java.util.*;
 
 @Service
 @AllArgsConstructor
-public class UserServiceGenerator extends FileFolderGenerator {
+public class UserControllerGenerator extends FileFolderGenerator {
 
     private static final String JAVA_CLASS_ENDING = ".java";
 
@@ -22,31 +22,33 @@ public class UserServiceGenerator extends FileFolderGenerator {
     private final FreemarkerTemplateProcessor freemarkerTemplateProcessor;
 
     /**
-     * Adds the AppUserService to the project.
+     * Adds the UserDataInitializer to the project.
      * @param project Project to be updated
      * @param request Request to construct the project
      * @return Updated Project
      */
     public Project add(Project project, ProjectRequest request) {
-        ProjectDirectory serviceDirectory = addDirectory("service", Optional.of(getMainProjectDirectory(project, request)));
+        ProjectDirectory controllerDirectory = addDirectory("controller",
+                Optional.of(getMainProjectDirectory(project, request)));
         Map<String, Object> dataModel = new HashMap<>();
-        dataModel.put("packageName", packageNameResolver.resolveService(request));
+        dataModel.put("packageName", packageNameResolver.resolveConfig(request));
         dataModel.put("applicationImports", getApplicationImports(request));
-        String filename = "AppUserService" + JAVA_CLASS_ENDING;
-        File file = freemarkerTemplateProcessor.process("AppUserService.ftl", dataModel, filename);
-        addFile(file, serviceDirectory);
+        String filename = "AppUserController" + JAVA_CLASS_ENDING;
+        File file = freemarkerTemplateProcessor.process("AppUserController.ftl", dataModel, filename);
+        addFile(file, controllerDirectory);
         return project;
     }
 
     private List<String> getApplicationImports(ProjectRequest request) {
         String entityPackageName = packageNameResolver.resolveEntity(request);
-        String transferObjectPackageName = packageNameResolver.resolveTransferObjects(request);
         String repositoryPackageName = packageNameResolver.resolveRepository(request);
+        String servicePackageName = packageNameResolver.resolveService(request);
+        String transferObjectPackageName = packageNameResolver.resolveTransferObjects(request);
         List<String> applicationImports = new ArrayList<>();
-        applicationImports.add(transferObjectPackageName + ".RegistrationRequest");
-        applicationImports.add(entityPackageName + ".Role");
-        applicationImports.add(entityPackageName + ".AppUser");
+        applicationImports.add(servicePackageName + ".AppUserService");
         applicationImports.add(repositoryPackageName + ".AppUserRepository");
+        applicationImports.add(entityPackageName + ".AppUser");
+        applicationImports.add(transferObjectPackageName + ".RegistrationRequest");
         return applicationImports;
     }
 

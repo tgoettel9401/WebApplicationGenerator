@@ -1,4 +1,4 @@
-package org.dhbw.webapplicationgenerator.generator.security.java.spring;
+package org.dhbw.webapplicationgenerator.generator.security.backend.java;
 
 import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.util.FileFolderGenerator;
@@ -16,28 +16,27 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class UserRepositoryGenerator extends FileFolderGenerator {
+public class UserEntityGenerator extends FileFolderGenerator {
 
     private final PackageNameResolver packageNameResolver;
     private final FreemarkerTemplateProcessor freemarkerTemplateProcessor;
 
     /**
-     * Adds the AppUser-Repository to the project.
+     * Adds the AppUser-Entity to the project.
      * @param project Project to be updated
      * @param request Request to construct the project
      * @return Updated Project
      */
     public Project add(Project project, ProjectRequest request) {
-        ProjectDirectory transferObjectDirectory = addDirectory("repository",
+        ProjectDirectory entityDirectory = addDirectory("domain",
                 Optional.of(getMainProjectDirectory(project, request)));
         Map<String, Object> dataModel = new HashMap<>();
-        dataModel.put("packageName", packageNameResolver.resolveRepository(request));
-        dataModel.put("appUserEntityImport", packageNameResolver.resolveEntity(request) + ".AppUser");
-        String filename = "AppUserRepository" + JAVA_CLASS_ENDING;
-        File file = freemarkerTemplateProcessor.process("AppUserRepository.ftl", dataModel, filename);
-        addFile(file, transferObjectDirectory);
+        dataModel.put("packageName", packageNameResolver.resolveEntity(request));
+        dataModel.put("userTableName", request.getSecurity().getUserTableName());
+        String filename = "AppUser" + JAVA_CLASS_ENDING;
+        File file = freemarkerTemplateProcessor.process("AppUserEntity.ftl", dataModel, filename);
+        addFile(file, entityDirectory);
         return project;
     }
 
 }
-

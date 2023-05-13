@@ -1,8 +1,8 @@
-package org.dhbw.webapplicationgenerator.generator.frontend;
+package org.dhbw.webapplicationgenerator.generator.frontend.thymeleaf;
 
+import org.dhbw.webapplicationgenerator.generator.frontend.FrontendStrategy;
 import org.dhbw.webapplicationgenerator.generator.thymeleaf.FrontendControllerGenerator;
 import org.dhbw.webapplicationgenerator.generator.thymeleaf.FrontendGenerator;
-import org.dhbw.webapplicationgenerator.generator.thymeleaf.SecurityPagesGenerator;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.model.response.Project;
 import org.dhbw.webapplicationgenerator.model.response.ProjectDirectory;
@@ -15,14 +15,12 @@ import java.util.function.UnaryOperator;
 public class ThymeleafGenerator implements FrontendStrategy {
 
     private final FrontendGenerator frontendGenerator;
-    private final SecurityPagesGenerator securityPagesGenerator;
+
     private final FrontendControllerGenerator frontendControllerGenerator;
 
     public ThymeleafGenerator(FrontendGenerator frontendGenerator,
-                              SecurityPagesGenerator securityPagesGenerator,
                               FrontendControllerGenerator frontendControllerGenerator) {
         this.frontendGenerator = frontendGenerator;
-        this.securityPagesGenerator = securityPagesGenerator;
         this.frontendControllerGenerator = frontendControllerGenerator;
     }
 
@@ -41,7 +39,6 @@ public class ThymeleafGenerator implements FrontendStrategy {
         // Create files and finally return updated project.
         project = this.frontendGenerator.create(project, request, frontendDirectory);
         project = this.frontendControllerGenerator.create(project, request, mainSourceDirectory);
-        project = this.securityPagesGenerator.create(project);
         return project;
     }
 

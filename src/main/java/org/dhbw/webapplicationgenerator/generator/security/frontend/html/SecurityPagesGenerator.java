@@ -1,4 +1,4 @@
-package org.dhbw.webapplicationgenerator.generator.thymeleaf;
+package org.dhbw.webapplicationgenerator.generator.security.frontend.html;
 
 import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.util.FileFolderGenerator;
@@ -15,7 +15,7 @@ public class SecurityPagesGenerator extends FileFolderGenerator {
 
     private final ResourceFileHelper resourceFileHelper;
 
-    public Project create(Project project) {
+    public Project add(Project project) {
 
         ProjectDirectory templatesDir = getTemplatesDirectory(project);
 

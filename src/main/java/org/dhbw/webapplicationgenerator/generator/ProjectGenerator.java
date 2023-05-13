@@ -4,13 +4,14 @@ import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.baseproject.BaseProjectGenerator;
 import org.dhbw.webapplicationgenerator.generator.database.DatabaseStrategy;
 import org.dhbw.webapplicationgenerator.generator.deployment.DeploymentStrategy;
+import org.dhbw.webapplicationgenerator.generator.security.SecurityGenerator;
 import org.dhbw.webapplicationgenerator.generator.util.FileFolderGenerator;
 import org.dhbw.webapplicationgenerator.generator.backend.BackendStrategy;
 import org.dhbw.webapplicationgenerator.generator.backend.spring.SpringBootGenerator;
 import org.dhbw.webapplicationgenerator.generator.database.FlywayGenerator;
 import org.dhbw.webapplicationgenerator.generator.deployment.docker.DockerGenerator;
 import org.dhbw.webapplicationgenerator.generator.frontend.FrontendStrategy;
-import org.dhbw.webapplicationgenerator.generator.frontend.ThymeleafGenerator;
+import org.dhbw.webapplicationgenerator.generator.frontend.thymeleaf.ThymeleafGenerator;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.model.request.backend.BackendData;
 import org.dhbw.webapplicationgenerator.model.response.Project;
@@ -29,6 +30,7 @@ public class ProjectGenerator extends FileFolderGenerator {
     private final Logger logger = LoggerFactory.getLogger(ProjectGenerator.class);
 
     private final BaseProjectGenerator baseProjectGenerator;
+    private final SecurityGenerator securityGenerator;
     private final FileCleaner fileCleaner;
 
     // Backend Strategies
@@ -74,6 +76,7 @@ public class ProjectGenerator extends FileFolderGenerator {
                 .frontendStrategy(frontendStrategy)
                 .deploymentStrategy(deploymentStrategy)
                 .databaseStrategy(databaseStrategy)
+                .securityGenerator(securityGenerator)
                 .frontendDirectoryFinder(frontendDirectoryFinder)
                 .mainSourceDirectoryFinder(mainSourceDirectoryFinder);
 

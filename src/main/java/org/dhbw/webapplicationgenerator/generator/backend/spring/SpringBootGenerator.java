@@ -11,8 +11,7 @@ import org.dhbw.webapplicationgenerator.generator.backend.java.other.ExceptionGe
 import org.dhbw.webapplicationgenerator.generator.baseproject.spring.ApplicationPropertiesGenerator;
 import org.dhbw.webapplicationgenerator.generator.baseproject.spring.MainFileGenerator;
 import org.dhbw.webapplicationgenerator.generator.baseproject.spring.MainTestFileGenerator;
-import org.dhbw.webapplicationgenerator.generator.security.SecurityGenerator;
-import org.dhbw.webapplicationgenerator.generator.security.java.spring.WebMvcConfigGenerator;
+import org.dhbw.webapplicationgenerator.generator.security.backend.java.spring.WebMvcConfigGenerator;
 import org.dhbw.webapplicationgenerator.generator.util.FileFolderGenerator;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.model.request.backend.BackendData;
@@ -42,7 +41,6 @@ public class SpringBootGenerator extends FileFolderGenerator implements BackendS
     private final RepositoryGenerator repositoryGenerator;
     private final WebMvcConfigGenerator mvcConfigGenerator;
     private final ExceptionGenerator exceptionGenerator;
-    private final SecurityGenerator securityGenerator;
 
     @Override
     public Project create(Project project, ProjectRequest request) {
@@ -71,11 +69,6 @@ public class SpringBootGenerator extends FileFolderGenerator implements BackendS
         project = this.entityGenerator.create(project, request, mainDir);
         project = this.transferObjectGenerator.create(project, request, mainDir);
         project = this.repositoryGenerator.create(project, request, mainDir);
-
-        // Create SecurityController, entities and
-        project = this.securityGenerator.create(project, request);
-        // TODO: Add security to its own strategy, even though this mainly depends on the backend. It is already
-        //      combined into this single securityGenerator.
 
         return project;
 
