@@ -102,7 +102,7 @@ public class ProjectBuilder {
             if (frontendStrategy == null) {
                 throw new WagException("Using frontend strategy without setting the strategy.");
             }
-            // TOOD: this.currentProject = frontendStrategy.create(request, this.currentProject);
+            this.currentProject = frontendStrategy.create(request, this.currentProject);
         }
     }
 

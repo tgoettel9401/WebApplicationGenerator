@@ -9,12 +9,22 @@ import java.util.List;
 public class ProjectDirectory implements StructureElement {
 
     private String title;
-    private Boolean hasChildren;
     private String path;
     private List<StructureElement> children = new ArrayList<>();
 
-    public Boolean hasChildren() {
-        return this.hasChildren;
+    @Override
+    public List<ProjectDirectory> getDirectoryChildren() {
+        List<ProjectDirectory> directories = new ArrayList<>();
+        for (StructureElement child : children) {
+            if (child.hasChildren()) {
+                directories.add((ProjectDirectory) child);
+            }
+        }
+        return directories;
+    }
+
+    public boolean hasChildren() {
+        return !this.children.isEmpty();
     }
 
     public void addChild(StructureElement child) {

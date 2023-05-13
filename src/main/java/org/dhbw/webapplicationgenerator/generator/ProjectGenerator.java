@@ -11,6 +11,7 @@ import org.dhbw.webapplicationgenerator.generator.frontend.WebMvcConfigGenerator
 import org.dhbw.webapplicationgenerator.generator.repository.RepositoryGenerator;
 import org.dhbw.webapplicationgenerator.generator.security.SecurityGenerator;
 import org.dhbw.webapplicationgenerator.generator.strategies.GenerationStrategy;
+import org.dhbw.webapplicationgenerator.generator.strategies.backend.BackendStrategy;
 import org.dhbw.webapplicationgenerator.generator.strategies.deployment.DockerGenerator;
 import org.dhbw.webapplicationgenerator.generator.strategies.database.FlywayGenerator;
 import org.dhbw.webapplicationgenerator.generator.strategies.backend.SpringBootGenerator;
@@ -18,11 +19,14 @@ import org.dhbw.webapplicationgenerator.generator.strategies.frontend.FrontendSt
 import org.dhbw.webapplicationgenerator.generator.strategies.frontend.ThymeleafGenerator;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.model.response.Project;
+import org.dhbw.webapplicationgenerator.model.response.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.util.FileCleaner;
 import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import java.util.function.UnaryOperator;
 
 @Service
 @AllArgsConstructor
@@ -73,7 +77,7 @@ public class ProjectGenerator extends FileFolderGenerator {
         Project projectWithMvcConfig = this.mvcConfigGenerator.create(projectWithRepositories, request);
         Project projectWithExceptions = this.exceptionGenerator.create(projectWithMvcConfig, request);
         Project projectWithFrontendController = this.frontendControllerGenerator.create(projectWithExceptions, request);
-        Project projectWithFrontend = this.frontendGenerator.create(projectWithFrontendController, request);
+        Project projectWithFrontend = this.frontendGenerator.createOld(projectWithFrontendController, request);
         return this.securityGenerator.create(projectWithFrontend, request);
     }
 
@@ -90,10 +94,14 @@ public class ProjectGenerator extends FileFolderGenerator {
 
         // Assign strategies.
         logger.info("Assigning strategies");
-        GenerationStrategy backendStrategy = this.springBootGenerator;
+        BackendStrategy backendStrategy = this.springBootGenerator;
         FrontendStrategy frontendStrategy = this.thymeleafGenerator;
         GenerationStrategy databaseStrategy = this.flywayGenerator;
         GenerationStrategy deploymentStrategy = this.dockerGenerator;
+
+        logger.info("Setting frontendDirectoryFinder according to the BackendStrategy");
+        UnaryOperator<ProjectDirectory> frontendDirectoryFinder = backendStrategy.getFrontendDirectoryFinder();
+        frontendStrategy.setFrontendDirectoryFinder(frontendDirectoryFinder);
 
         // Create Builder and build project
         logger.info("Preparing the projectBuilder");

@@ -2,9 +2,9 @@
 <#-- @ftlvariable name="entityVariableNamePlural" type="java.lang.String" -->
 <#-- @ftlvariable name="entityClassName" type="java.lang.String" -->
 <#-- @ftlvariable name="entityClassNamePlural" type="java.lang.String" -->
-<#-- @ftlvariable name="attributes" type="java.util.Set<org.dhbw.webapplicationgenerator.webclient.request.EntityAttribute>" -->
-<#-- @ftlvariable name="relationsToOne" type="java.util.List<org.dhbw.webapplicationgenerator.webclient.request.EntityRelation>" -->
-<#-- @ftlvariable name="relationsToMany" type="java.util.List<org.dhbw.webapplicationgenerator.webclient.request.EntityRelation>" -->
+<#-- @ftlvariable name="attributes" type="java.util.Set<org.dhbw.webapplicationgenerator.model.request.datamodel.Attribute>" -->
+<#-- @ftlvariable name="relationsToOne" type="java.util.List<org.dhbw.webapplicationgenerator.model.request.datamodel.EntityRelation>" -->
+<#-- @ftlvariable name="relationsToMany" type="java.util.List<org.dhbw.webapplicationgenerator.model.request.datamodel.EntityRelation>" -->
 <#-- Header -->
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <div th:insert="main.html"></div>
@@ -21,7 +21,7 @@
             <#-- For all attributes add an input of the right DataType -->
             <#list attributes as attribute>
             <label for="${attribute.getName()}">${attribute.getTitle()}</label>
-            <input type="${attribute.getDataTypeObject().getInputType()}" id="${attribute.getName()}" name="${attribute.getName()}" class="input-group"
+            <input type="${attribute.getDataType().getInputType()}" id="${attribute.getName()}" name="${attribute.getName()}" class="input-group"
                th:value="${r"${"}${entityVariableName}.get${attribute.getTitle()}()}">
             <br>
             </#list>

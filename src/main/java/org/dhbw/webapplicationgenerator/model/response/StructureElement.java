@@ -5,8 +5,9 @@ import java.util.List;
 public interface StructureElement {
     String getTitle();
     void setTitle(String title);
-    Boolean hasChildren();
+    boolean hasChildren();
     List<StructureElement> getChildren();
+    List<ProjectDirectory> getDirectoryChildren();
     void addChild(StructureElement child);
     StructureLevel getLevel();
 

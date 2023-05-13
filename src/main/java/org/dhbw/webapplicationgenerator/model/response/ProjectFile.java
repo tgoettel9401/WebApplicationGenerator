@@ -15,13 +15,18 @@ public class ProjectFile implements StructureElement {
     private String path;
 
     @Override
-    public Boolean hasChildren() {
+    public boolean hasChildren() {
         return false;
     }
 
     @Override
     public List<StructureElement> getChildren() {
         return new ArrayList<>();
+    }
+
+    @Override
+    public List<ProjectDirectory> getDirectoryChildren() {
+        throw new UnsupportedOperationException("Used getDirectoryChildren() on a ProjectFile.");
     }
 
     @Override

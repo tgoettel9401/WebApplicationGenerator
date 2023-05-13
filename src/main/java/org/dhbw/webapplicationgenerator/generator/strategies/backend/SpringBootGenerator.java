@@ -15,7 +15,6 @@ import org.dhbw.webapplicationgenerator.generator.java.entity.EntityGenerator;
 import org.dhbw.webapplicationgenerator.generator.java.entity.TransferObjectGenerator;
 import org.dhbw.webapplicationgenerator.generator.repository.RepositoryGenerator;
 import org.dhbw.webapplicationgenerator.generator.security.SecurityGenerator;
-import org.dhbw.webapplicationgenerator.generator.strategies.GenerationStrategy;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.model.request.backend.JavaBuildTool;
 import org.dhbw.webapplicationgenerator.model.request.backend.SpringBootData;
@@ -24,9 +23,13 @@ import org.dhbw.webapplicationgenerator.model.response.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.webclient.exception.WagException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
+
 @Service
 @AllArgsConstructor
-public class SpringBootGenerator extends FileFolderGenerator implements GenerationStrategy {
+public class SpringBootGenerator extends FileFolderGenerator implements BackendStrategy {
 
     private final MavenGenerator mavenGenerator;
     private final GradleGenerator gradleGenerator;
@@ -41,6 +44,25 @@ public class SpringBootGenerator extends FileFolderGenerator implements Generati
     private final ExceptionGenerator exceptionGenerator;
     private final FrontendControllerGenerator frontendControllerGenerator;
     private final SecurityGenerator securityGenerator;
+
+    @Override
+    public UnaryOperator<ProjectDirectory> getFrontendDirectoryFinder() {
+        return projectDirectory -> {
+            List<ProjectDirectory> directories = projectDirectory.getChildren().stream()
+                    .filter(dir -> dir.getTitle().equals("src"))
+                    .flatMap(dir -> dir.getDirectoryChildren().stream())
+                    .filter(dir -> dir.getTitle().equals("main"))
+                    .flatMap(dir -> dir.getDirectoryChildren().stream())
+                    .filter(dir -> dir.getTitle().equals("resources"))
+                    .collect(Collectors.toList());
+            if (directories.isEmpty()) {
+                throw new WagException("Resources directory not found");
+            } else if (directories.size() >= 2) {
+                throw new WagException("Multiple resources directories found");
+            }
+            return directories.get(0);
+        };
+    }
 
     @Override
     public Project create(ProjectRequest request, Project project) {
