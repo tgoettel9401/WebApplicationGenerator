@@ -2,16 +2,18 @@ package org.dhbw.webapplicationgenerator.generator.baseproject.pom;
 
 import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.baseproject.FileFolderGenerator;
+import org.dhbw.webapplicationgenerator.generator.util.FreemarkerTemplateProcessor;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.model.request.backend.SpringBootData;
 import org.dhbw.webapplicationgenerator.model.response.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.model.response.ProjectFile;
-import org.dhbw.webapplicationgenerator.generator.util.FreemarkerTemplateProcessor;
-import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @AllArgsConstructor
@@ -23,28 +25,8 @@ public class PomXmlGenerator extends FileFolderGenerator {
 
     private final FreemarkerTemplateProcessor freemarkerTemplateProcessor;
 
-    public ProjectFile createOld(CreationRequest request, ProjectDirectory parent) {
-        return addFile(createPomXmlOld(request), parent);
-    }
-
     public ProjectFile create(ProjectRequest request, ProjectDirectory parent) {
         return addFile(createPomXml(request), parent);
-    }
-
-    private File createPomXmlOld(CreationRequest request) {
-        // Initialize Data Model for Freemarker
-        Map<String, Object> dataModel = new HashMap<>();
-        dataModel.put("groupId", request.getProject().getGroup());
-        dataModel.put("artifactId", request.getProject().getArtifact());
-        dataModel.put("projectTitle", request.getProject().getTitleWithoutSpaces());
-        dataModel.put("projectDescription", request.getProject().getDescription());
-        dataModel.put("springBootVersion", "2.6.3");
-        dataModel.put("javaVersion", "11");
-        dataModel.put("dependencies", createDependencies());
-
-        // Process the template and return the file
-        String filename = "pom.xml";
-        return freemarkerTemplateProcessor.process("pom.ftl", dataModel, filename);
     }
 
     private File createPomXml(ProjectRequest request) {

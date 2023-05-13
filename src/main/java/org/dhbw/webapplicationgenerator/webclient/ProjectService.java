@@ -6,7 +6,6 @@ import org.dhbw.webapplicationgenerator.generator.ProjectGenerator;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.util.FileCleaner;
 import org.dhbw.webapplicationgenerator.util.ZipHelper;
-import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -19,19 +18,6 @@ public class ProjectService {
     private final ProjectGenerator projectGenerator;
     private final ZipHelper zipHelper;
     private final FileCleaner fileCleaner;
-
-    /**
-     * Generates the Project based on the provided request
-     * @param request Request for creating the project
-     * @return Project based on the provided request
-     * @throws IOException this may happen while zipping the project
-     */
-    public ByteArrayOutputStream generateOld(CreationRequest request) throws IOException {
-        Project project = projectGenerator.generateOld(request);
-        ByteArrayOutputStream zipStream = zipHelper.zip(project);
-        fileCleaner.performCleanup();
-        return zipStream;
-    }
 
     /**
      * Generates the Project based on the provided request

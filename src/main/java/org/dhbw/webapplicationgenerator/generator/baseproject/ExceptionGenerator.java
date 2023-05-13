@@ -6,7 +6,6 @@ import org.dhbw.webapplicationgenerator.model.response.Project;
 import org.dhbw.webapplicationgenerator.model.response.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.generator.util.FreemarkerTemplateProcessor;
 import org.dhbw.webapplicationgenerator.generator.util.PackageNameResolver;
-import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -29,14 +28,6 @@ public class ExceptionGenerator extends FileFolderGenerator{
      * @param request Request the project should be created/updated with
      * @return ExceptionClasses
      */
-    public Project create(Project project, CreationRequest request) {
-        ProjectDirectory mainDir = getMainProjectDirectoryOld(project, request);
-        ProjectDirectory exceptionDir = addDirectory("exception", Optional.of(mainDir));
-        String packageName = packageNameResolver.resolveException(request);
-        addFile(createNotFoundException(packageName), exceptionDir);
-        return project;
-    }
-
     public Project create(Project project, ProjectRequest request, ProjectDirectory parent) {
         ProjectDirectory exceptionDir = addDirectory("exception", Optional.of(parent));
         String packageName = packageNameResolver.resolveException(request);

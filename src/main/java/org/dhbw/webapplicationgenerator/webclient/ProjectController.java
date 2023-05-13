@@ -23,7 +23,6 @@ public class ProjectController {
     private final Logger logger = LoggerFactory.getLogger(ProjectController.class);
 
     private final ProjectService projectService;
-    private final CreationRequestValidator creationRequestValidator;
     private final ProjectRequestTransformer projectRequestTransformer;
     private final ProjectRequestValidator projectRequestValidator;
 
@@ -36,32 +35,6 @@ public class ProjectController {
         logger.info("Validation passed");
         ByteArrayOutputStream stream = projectService.generate(request);
         return stream.toByteArray();
-    }
-
-    @PostMapping("generate")
-    public byte[] generateByRequest(@RequestBody() CreationRequest request) throws IOException, ValidationException {
-        logger.info("Received generation request for project with title {}", request.getProject().getTitle());
-        logger.info("Validating the request");
-        creationRequestValidator.validate(request);
-        addEntitiesToRelations(request);
-        creationRequestValidator.validateManyToManyRelations(request);
-        logger.info("Validation passed");
-        ByteArrayOutputStream stream = projectService.generateOld(request);
-        return stream.toByteArray();
-    }
-
-    public void addEntitiesToRelations(CreationRequest request) {
-        Set<RequestEntity> entities = new HashSet<>(request.getEntities());
-        for (RequestEntity entity : request.getEntities()) {
-            for (EntityRelation relation : entity.getRelations()) {
-                relation.setEntityObject(
-                        entities.stream()
-                                .filter(e -> e.getName().equals(relation.getEntityName()))
-                                .findFirst()
-                                .orElseThrow(() -> new WagException("Relation-Entity " + relation.getEntityName() + " is not found")
-                                ));
-            }
-        }
     }
 
 }

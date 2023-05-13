@@ -8,11 +8,7 @@ import org.dhbw.webapplicationgenerator.generator.strategies.GenerationStrategy;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.model.response.Project;
 import org.dhbw.webapplicationgenerator.model.response.ProjectDirectory;
-import org.dhbw.webapplicationgenerator.model.response.ProjectFile;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @AllArgsConstructor

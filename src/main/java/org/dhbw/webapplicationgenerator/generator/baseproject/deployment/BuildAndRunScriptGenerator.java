@@ -6,7 +6,6 @@ import org.dhbw.webapplicationgenerator.generator.util.FreemarkerTemplateProcess
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.model.request.backend.JavaData;
 import org.dhbw.webapplicationgenerator.model.request.deployment.DockerData;
-import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -18,17 +17,6 @@ import java.util.Map;
 public class BuildAndRunScriptGenerator extends FileFolderGenerator {
 
     private final FreemarkerTemplateProcessor freemarkerTemplateProcessor;
-
-    public File createOld(CreationRequest request) {
-        // Initialize Data Model for Freemarker
-        Map<String, Object> dataModel = new HashMap<>();
-        dataModel.put("imageName", request.getDocker().getImageName());
-        dataModel.put("buildCommand", request.getDocker().getJavaBuildTool().getBuildCommand());
-
-        // Process the template and return the file
-        String filename = "buildAndRun.sh";
-        return freemarkerTemplateProcessor.process("BuildAndRun.ftl", dataModel, filename);
-    }
 
     public File create(ProjectRequest request) {
 

@@ -1,12 +1,11 @@
 package org.dhbw.webapplicationgenerator.generator.security;
 
 import lombok.AllArgsConstructor;
+import org.dhbw.webapplicationgenerator.generator.baseproject.FileFolderGenerator;
+import org.dhbw.webapplicationgenerator.generator.util.PackageNameResolver;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.model.response.Project;
-import org.dhbw.webapplicationgenerator.generator.baseproject.FileFolderGenerator;
 import org.dhbw.webapplicationgenerator.model.response.ProjectDirectory;
-import org.dhbw.webapplicationgenerator.generator.util.PackageNameResolver;
-import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -27,17 +26,6 @@ public class SecurityEntitiesGenerator extends FileFolderGenerator {
 
     private final PackageNameResolver packageNameResolver;
 
-    public Project create(Project project, CreationRequest request) {
-
-        ProjectDirectory artifactDir = getMainProjectDirectoryOld(project, request);
-        try {
-            create(request, artifactDir);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return project;
-    }
-
     public Project create(Project project, ProjectRequest request, ProjectDirectory parent) {
         try {
             create(request, parent);
@@ -45,25 +33,6 @@ public class SecurityEntitiesGenerator extends FileFolderGenerator {
             ex.printStackTrace();
         }
         return project;
-    }
-
-    private void create(CreationRequest request, ProjectDirectory parent) throws IOException {
-
-        ProjectDirectory domainDir = (ProjectDirectory) parent.getChildren().stream()
-                .filter(dir -> dir.getTitle().equals("domain"))
-                .findFirst().orElseThrow(() -> new RuntimeException("Creating entity failed due to missing domain folder"));
-
-        ProjectDirectory repositoryDir = (ProjectDirectory) parent.getChildren().stream()
-                .filter(dir -> dir.getTitle().equals("repository"))
-                .findFirst().orElseThrow(() -> new RuntimeException("Creating repository failed due to missing repository folder"));
-
-        String packageName = packageNameResolver.resolveEntity(request);
-
-        addFile(addUserEntity(packageName), domainDir);
-        addFile(addRoleEntity(packageName), domainDir);
-        addFile(addUserRepository(request), repositoryDir);
-        addFile(addRoleRepository(request), repositoryDir);
-
     }
 
     private void create(ProjectRequest request, ProjectDirectory parent) throws IOException {
@@ -86,6 +55,7 @@ public class SecurityEntitiesGenerator extends FileFolderGenerator {
     }
 
     private File addUserEntity(String packageName) throws IOException {
+        // TODO: Freemarker
         File file = new File(String.valueOf(Files.createFile(Path.of(TMP_PATH + "AppUser" + JAVA_CLASS_ENDING))));
         FileWriter fileWriter = new FileWriter(file);
         try (PrintWriter printWriter = new PrintWriter(fileWriter)) {
@@ -204,6 +174,7 @@ public class SecurityEntitiesGenerator extends FileFolderGenerator {
     }
 
     private File addRoleEntity(String packageName) throws IOException {
+        // TODO: Freemarker
         File file = new File(String.valueOf(Files.createFile(Path.of(TMP_PATH + "Role" + JAVA_CLASS_ENDING))));
         FileWriter fileWriter = new FileWriter(file);
         try (PrintWriter printWriter = new PrintWriter(fileWriter)) {
@@ -287,25 +258,8 @@ public class SecurityEntitiesGenerator extends FileFolderGenerator {
         return file;
     }
 
-    private File addUserRepository(CreationRequest request) throws IOException {
-        File file = new File(String.valueOf(Files.createFile(Path.of(TMP_PATH + "AppUserRepository" + JAVA_CLASS_ENDING))));
-        FileWriter fileWriter = new FileWriter(file);
-        try (PrintWriter printWriter = new PrintWriter(fileWriter)) {
-            printWriter.println("package " + packageNameResolver.resolveRepository(request) + ";");
-            printWriter.println();
-            printWriter.println("import " + packageNameResolver.resolveEntity(request) + ".AppUser;");
-            printWriter.println("import org.springframework.data.jpa.repository.JpaRepository;");
-            printWriter.println("import java.util.Optional;");
-            printWriter.println();
-            printWriter.println("public interface " + "AppUserRepository extends JpaRepository<AppUser, Long> {");
-            printWriter.println("Optional<AppUser> findByUsername(String username);");
-            printWriter.println("}");
-            printWriter.println();
-        }
-        return file;
-    }
-
     private File addUserRepository(ProjectRequest request) throws IOException {
+        // TODO: Freemarker
         File file = new File(String.valueOf(Files.createFile(Path.of(TMP_PATH + "AppUserRepository" + JAVA_CLASS_ENDING))));
         FileWriter fileWriter = new FileWriter(file);
         try (PrintWriter printWriter = new PrintWriter(fileWriter)) {
@@ -317,22 +271,6 @@ public class SecurityEntitiesGenerator extends FileFolderGenerator {
             printWriter.println();
             printWriter.println("public interface " + "AppUserRepository extends JpaRepository<AppUser, Long> {");
             printWriter.println("Optional<AppUser> findByUsername(String username);");
-            printWriter.println("}");
-            printWriter.println();
-        }
-        return file;
-    }
-
-    private File addRoleRepository(CreationRequest request) throws IOException {
-        File file = new File(String.valueOf(Files.createFile(Path.of(TMP_PATH + "RoleRepository" + JAVA_CLASS_ENDING))));
-        FileWriter fileWriter = new FileWriter(file);
-        try (PrintWriter printWriter = new PrintWriter(fileWriter)) {
-            printWriter.println("package " + packageNameResolver.resolveRepository(request) + ";");
-            printWriter.println();
-            printWriter.println("import " + packageNameResolver.resolveEntity(request) + ".Role;");
-            printWriter.println("import org.springframework.data.jpa.repository.JpaRepository;");
-            printWriter.println();
-            printWriter.println("public interface " + "RoleRepository extends JpaRepository<Role, Long> {");
             printWriter.println("}");
             printWriter.println();
         }
@@ -340,6 +278,7 @@ public class SecurityEntitiesGenerator extends FileFolderGenerator {
     }
 
     private File addRoleRepository(ProjectRequest request) throws IOException {
+        // TODO: Freemarker
         File file = new File(String.valueOf(Files.createFile(Path.of(TMP_PATH + "RoleRepository" + JAVA_CLASS_ENDING))));
         FileWriter fileWriter = new FileWriter(file);
         try (PrintWriter printWriter = new PrintWriter(fileWriter)) {

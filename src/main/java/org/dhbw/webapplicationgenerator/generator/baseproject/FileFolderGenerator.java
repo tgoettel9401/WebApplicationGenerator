@@ -6,7 +6,6 @@ import org.dhbw.webapplicationgenerator.model.response.Project;
 import org.dhbw.webapplicationgenerator.model.response.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.model.response.ProjectFile;
 import org.dhbw.webapplicationgenerator.generator.util.Utils;
-import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -32,22 +31,6 @@ public class FileFolderGenerator {
      * @param request CreationRequest that has been transmitted from consumer
      * @return ProjectDirectory for main
      */
-    public ProjectDirectory getMainProjectDirectoryOld(Project project, CreationRequest request) {
-        ProjectDirectory rootDir = (ProjectDirectory) project.getFileStructure();
-        ProjectDirectory srcDir = (ProjectDirectory) rootDir.getChildren().stream().filter(child -> child.getTitle().equals("src"))
-                .findFirst().orElseThrow(() -> new RuntimeException("Creating entity failed due to missing src folder"));
-        ProjectDirectory mainDir = (ProjectDirectory) srcDir.getChildren().stream().filter(child -> child.getTitle().equals("main"))
-                .findFirst().orElseThrow(() -> new RuntimeException("Creating entity failed due to missing main folder"));
-        ProjectDirectory groupDir = (ProjectDirectory) mainDir.getChildren().stream().filter(child1 -> child1.getTitle().equals("java"))
-                .findFirst().orElseThrow(() -> new RuntimeException("Creating entity failed due to missing java folder"));
-        for (String groupPart : request.getProject().getGroup().split("\\.")) {
-            groupDir = (ProjectDirectory) groupDir.getChildren().stream().filter(child -> child.getTitle().equals(groupPart)).findFirst()
-                    .orElseThrow(() -> new RuntimeException("Creating entity failed due to missing group folder"));
-        }
-        return (ProjectDirectory) groupDir.getChildren().stream().filter(child -> child.getTitle().equals(request.getProject().getArtifact()))
-                .findFirst().orElseThrow(() -> new RuntimeException("Creating entity failed due to missing artifact folder"));
-    }
-
     public ProjectDirectory getMainProjectDirectory(Project project, ProjectRequest request) {
         ProjectDirectory rootDir = (ProjectDirectory) project.getFileStructure();
         ProjectDirectory srcDir = (ProjectDirectory) rootDir.getChildren().stream().filter(child -> child.getTitle().equals("src"))
@@ -96,32 +79,10 @@ public class FileFolderGenerator {
      * @param project current Project object
      * @return ProjectDirectory for resources
      */
-    public ProjectDirectory getControllerDirectory(Project project, CreationRequest request) {
-        ProjectDirectory artifactDir = getMainProjectDirectoryOld(project, request);
-        return (ProjectDirectory) artifactDir.getChildren().stream().filter(child -> child.getTitle().equals("controller"))
-                .findFirst().orElseThrow(() -> new RuntimeException("Creating controller failed due to missing controller folder"));
-    }
-
-    /**
-     * Returns the controller directory, usually in path {mainDir}/controller
-     * @param project current Project object
-     * @return ProjectDirectory for resources
-     */
     public ProjectDirectory getControllerDirectory(Project project, ProjectRequest request) {
         ProjectDirectory artifactDir = getMainProjectDirectory(project, request);
         return (ProjectDirectory) artifactDir.getChildren().stream().filter(child -> child.getTitle().equals("controller"))
                 .findFirst().orElseThrow(() -> new RuntimeException("Creating controller failed due to missing controller folder"));
-    }
-
-    /**
-     * Returns the transferObject directory, usually in path {mainDir}/transferObject
-     * @param project current Project object
-     * @return ProjectDirectory for resources
-     */
-    public ProjectDirectory getTransferObjectDirectory(Project project, CreationRequest request) {
-        ProjectDirectory artifactDir = getMainProjectDirectoryOld(project, request);
-        return (ProjectDirectory) artifactDir.getChildren().stream().filter(child -> child.getTitle().equals("transferObject"))
-                .findFirst().orElseThrow(() -> new RuntimeException("Creating transferObject failed due to missing transferObject folder"));
     }
 
     /**
