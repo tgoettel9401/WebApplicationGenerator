@@ -18,11 +18,13 @@ import java.util.Optional;
 public class FileFolderGenerator {
 
     protected static final String JAVA_CLASS_ENDING = ".java";
+    protected static final String TMP_PATH = ".tmp/";
+    protected static final String TMP_2_PATH = ".tmp2/";
 
-    private final Path tmpPath = Path.of(".tmp");
-    private final Path tmp2Path = Path.of(".tmp2");
 
     // TODO: Migrate directory calculation to some more specific place, probably Java.
+
+    // TODO: Refactor methods to use Java-Streams and flatMap.
 
     /**
      * Returns the main project directory, usually in path /src/main/group/artifact
@@ -165,8 +167,10 @@ public class FileFolderGenerator {
      * Creates the .tmp folder if it does not exist yet.
      */
     public void createTmpFolderIfNotExists() {
+        Path tmpPath = Path.of(TMP_PATH);
         if (!Files.exists(tmpPath)) {
             try {
+
                 Files.createDirectory(tmpPath);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -178,6 +182,7 @@ public class FileFolderGenerator {
      * Creates the .tmp2 folder if it does not exist yet.
      */
     public void createTmp2FolderIfNotExists() {
+        Path tmp2Path = Path.of(TMP_2_PATH);
         if (!Files.exists(tmp2Path)) {
             try {
                 Files.createDirectory(tmp2Path);
