@@ -23,6 +23,13 @@
     "strategy": "THYMELEAF",
     "data": {}
   },
+  "security": {
+    "enabled": true,
+    "defaultUsername": "admin",
+    "defaultPassword": "secret",
+    "userTableName": "app_users",
+    "roleTableName": "roles"
+  },
   "dataModel": {
     "entities": [
       {

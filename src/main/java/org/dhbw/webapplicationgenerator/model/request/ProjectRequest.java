@@ -6,6 +6,7 @@ import org.dhbw.webapplicationgenerator.model.request.datamodel.DataModel;
 import org.dhbw.webapplicationgenerator.model.request.database.Database;
 import org.dhbw.webapplicationgenerator.model.request.deployment.Deployment;
 import org.dhbw.webapplicationgenerator.model.request.frontend.Frontend;
+import org.dhbw.webapplicationgenerator.model.request.security.Security;
 
 @Data
 public class ProjectRequest {
@@ -16,6 +17,7 @@ public class ProjectRequest {
     private Frontend<?> frontend;
     private Database<?> database;
     private DataModel dataModel;
+    private Security security;
 
     public boolean isDeploymentEnabled() {
         return deployment != null && deployment.isEnabled();
@@ -31,6 +33,10 @@ public class ProjectRequest {
 
     public boolean isDatabaseEnabled() {
         return database != null && database.isEnabled();
+    }
+
+    public boolean isSecurityEnabled() {
+        return security != null && security.isEnabled();
     }
 
     public String getTitleWithoutSpaces() {
