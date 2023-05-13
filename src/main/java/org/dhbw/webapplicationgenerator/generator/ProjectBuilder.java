@@ -1,7 +1,10 @@
 package org.dhbw.webapplicationgenerator.generator;
 
-import org.dhbw.webapplicationgenerator.generator.strategies.GenerationStrategy;
-import org.dhbw.webapplicationgenerator.generator.strategies.frontend.FrontendStrategy;
+import org.dhbw.webapplicationgenerator.generator.backend.BackendStrategy;
+import org.dhbw.webapplicationgenerator.generator.baseproject.BaseProjectGenerator;
+import org.dhbw.webapplicationgenerator.generator.database.DatabaseStrategy;
+import org.dhbw.webapplicationgenerator.generator.deployment.DeploymentStrategy;
+import org.dhbw.webapplicationgenerator.generator.frontend.FrontendStrategy;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.model.response.Project;
 import org.dhbw.webapplicationgenerator.model.response.ProjectDirectory;
@@ -12,10 +15,10 @@ import java.util.function.UnaryOperator;
 public class ProjectBuilder {
 
     private BaseProjectGenerator baseProjectStrategy;
-    private GenerationStrategy backendStrategy;
+    private BackendStrategy backendStrategy;
     private FrontendStrategy frontendStrategy;
-    private GenerationStrategy databaseStrategy;
-    private GenerationStrategy deploymentStrategy;
+    private DatabaseStrategy databaseStrategy;
+    private DeploymentStrategy deploymentStrategy;
 
     // Directory Finder
     private UnaryOperator<ProjectDirectory> frontendDirectoryFinder;
@@ -53,7 +56,7 @@ public class ProjectBuilder {
      * @param strategy strategy constructing the backend
      * @return builder
      */
-    public ProjectBuilder backendStrategy(GenerationStrategy strategy) {
+    public ProjectBuilder backendStrategy(BackendStrategy strategy) {
         this.backendStrategy = strategy;
         return this;
     }
@@ -73,7 +76,7 @@ public class ProjectBuilder {
      * @param strategy strategy constructing the database
      * @return builder
      */
-    public ProjectBuilder databaseStrategy(GenerationStrategy strategy) {
+    public ProjectBuilder databaseStrategy(DatabaseStrategy strategy) {
         this.databaseStrategy = strategy;
         return this;
     }
@@ -83,7 +86,7 @@ public class ProjectBuilder {
      * @param strategy strategy constructing the deployment
      * @return builder
      */
-    public ProjectBuilder deploymentStrategy(GenerationStrategy strategy) {
+    public ProjectBuilder deploymentStrategy(DeploymentStrategy strategy) {
         this.deploymentStrategy = strategy;
         return this;
     }
@@ -121,7 +124,7 @@ public class ProjectBuilder {
             if (backendStrategy == null) {
                 throw new WagException("Using backend strategy without setting the strategy.");
             }
-            this.currentProject = backendStrategy.create(request, this.currentProject);
+            this.currentProject = backendStrategy.create(this.currentProject, request);
         }
     }
 
@@ -139,7 +142,7 @@ public class ProjectBuilder {
             if (databaseStrategy == null) {
                 throw new WagException("Using database strategy without setting the strategy.");
             }
-            this.currentProject = databaseStrategy.create(request, this.currentProject);
+            this.currentProject = databaseStrategy.create(this.currentProject, request);
         }
     }
 
@@ -148,7 +151,7 @@ public class ProjectBuilder {
             if (deploymentStrategy == null) {
                 throw new WagException("Using deployment strategy without setting the strategy.");
             }
-            this.currentProject = deploymentStrategy.create(request, this.currentProject);
+            this.currentProject = deploymentStrategy.create(this.currentProject, request);
         }
     }
 

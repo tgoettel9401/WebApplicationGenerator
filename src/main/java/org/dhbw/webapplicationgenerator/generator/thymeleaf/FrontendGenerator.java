@@ -1,7 +1,7 @@
 package org.dhbw.webapplicationgenerator.generator.thymeleaf;
 
 import lombok.AllArgsConstructor;
-import org.dhbw.webapplicationgenerator.generator.baseproject.FileFolderGenerator;
+import org.dhbw.webapplicationgenerator.generator.util.FileFolderGenerator;
 import org.dhbw.webapplicationgenerator.generator.util.FreemarkerTemplateProcessor;
 import org.dhbw.webapplicationgenerator.generator.util.Utils;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;

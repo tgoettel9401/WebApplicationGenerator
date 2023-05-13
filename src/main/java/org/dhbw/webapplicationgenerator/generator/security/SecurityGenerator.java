@@ -1,7 +1,11 @@
 package org.dhbw.webapplicationgenerator.generator.security;
 
 import lombok.AllArgsConstructor;
-import org.dhbw.webapplicationgenerator.generator.baseproject.FileFolderGenerator;
+import org.dhbw.webapplicationgenerator.generator.security.java.SecurityEntitiesGenerator;
+import org.dhbw.webapplicationgenerator.generator.security.java.spring.UserControllerGenerator;
+import org.dhbw.webapplicationgenerator.generator.security.java.spring.UserDataInitializationGenerator;
+import org.dhbw.webapplicationgenerator.generator.security.java.spring.WebSecurityConfigGenerator;
+import org.dhbw.webapplicationgenerator.generator.util.FileFolderGenerator;
 import org.dhbw.webapplicationgenerator.generator.thymeleaf.SecurityPagesGenerator;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.model.response.Project;

@@ -1,14 +1,16 @@
 package org.dhbw.webapplicationgenerator.generator;
 
 import lombok.AllArgsConstructor;
-import org.dhbw.webapplicationgenerator.generator.baseproject.FileFolderGenerator;
-import org.dhbw.webapplicationgenerator.generator.strategies.GenerationStrategy;
-import org.dhbw.webapplicationgenerator.generator.strategies.backend.BackendStrategy;
-import org.dhbw.webapplicationgenerator.generator.strategies.backend.SpringBootGenerator;
-import org.dhbw.webapplicationgenerator.generator.strategies.database.FlywayGenerator;
-import org.dhbw.webapplicationgenerator.generator.strategies.deployment.DockerGenerator;
-import org.dhbw.webapplicationgenerator.generator.strategies.frontend.FrontendStrategy;
-import org.dhbw.webapplicationgenerator.generator.strategies.frontend.ThymeleafGenerator;
+import org.dhbw.webapplicationgenerator.generator.baseproject.BaseProjectGenerator;
+import org.dhbw.webapplicationgenerator.generator.database.DatabaseStrategy;
+import org.dhbw.webapplicationgenerator.generator.deployment.DeploymentStrategy;
+import org.dhbw.webapplicationgenerator.generator.util.FileFolderGenerator;
+import org.dhbw.webapplicationgenerator.generator.backend.BackendStrategy;
+import org.dhbw.webapplicationgenerator.generator.backend.spring.SpringBootGenerator;
+import org.dhbw.webapplicationgenerator.generator.database.FlywayGenerator;
+import org.dhbw.webapplicationgenerator.generator.deployment.docker.DockerGenerator;
+import org.dhbw.webapplicationgenerator.generator.frontend.FrontendStrategy;
+import org.dhbw.webapplicationgenerator.generator.frontend.ThymeleafGenerator;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.model.request.backend.BackendData;
 import org.dhbw.webapplicationgenerator.model.response.Project;
@@ -59,8 +61,8 @@ public class ProjectGenerator extends FileFolderGenerator {
         logger.info("Assigning strategies");
         BackendStrategy backendStrategy = this.springBootGenerator; // TODO: Set generator according to request
         FrontendStrategy frontendStrategy = this.thymeleafGenerator; // TODO: Set generator according to request
-        GenerationStrategy databaseStrategy = this.flywayGenerator;
-        GenerationStrategy deploymentStrategy = this.dockerGenerator;
+        DatabaseStrategy databaseStrategy = this.flywayGenerator;
+        DeploymentStrategy deploymentStrategy = this.dockerGenerator;
         UnaryOperator<ProjectDirectory> frontendDirectoryFinder = backendStrategy.getFrontendDirectoryFinder();
         UnaryOperator<ProjectDirectory> mainSourceDirectoryFinder = backendStrategy.getMainSourceDirectoryFinder(data);
 

@@ -3,7 +3,7 @@ package org.dhbw.webapplicationgenerator.webclient.request;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.ToString;
-import org.dhbw.webapplicationgenerator.generator.java.entity.RelationType;
+import org.dhbw.webapplicationgenerator.model.request.datamodel.RelationType;
 import org.dhbw.webapplicationgenerator.generator.util.Utils;
 import org.dhbw.webapplicationgenerator.webclient.exception.WagException;
 

@@ -1,6 +1,7 @@
 package org.dhbw.webapplicationgenerator.generator.baseproject;
 
 import lombok.AllArgsConstructor;
+import org.dhbw.webapplicationgenerator.generator.util.FileFolderGenerator;
 import org.dhbw.webapplicationgenerator.generator.util.FreemarkerTemplateProcessor;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.model.response.ProjectDirectory;
