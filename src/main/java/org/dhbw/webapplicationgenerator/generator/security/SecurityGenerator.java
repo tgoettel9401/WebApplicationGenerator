@@ -1,9 +1,10 @@
 package org.dhbw.webapplicationgenerator.generator.security;
 
 import lombok.AllArgsConstructor;
-import org.dhbw.webapplicationgenerator.generator.Project;
-import org.dhbw.webapplicationgenerator.generator.baseproject.FileFolderGenerator;
-import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
+import org.dhbw.webapplicationgenerator.generator.security.java.spring.*;
+import org.dhbw.webapplicationgenerator.generator.util.FileFolderGenerator;
+import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
+import org.dhbw.webapplicationgenerator.model.response.Project;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -11,10 +12,14 @@ import org.springframework.stereotype.Service;
 public class SecurityGenerator extends FileFolderGenerator {
 
     private final WebSecurityConfigGenerator webSecurityConfigGenerator;
-    private final UserDataInitializationGenerator userDataInitializationGenerator;
     private final UserControllerGenerator userControllerGenerator;
-    private final SecurityEntitiesGenerator securityEntitiesGenerator;
-    private final SecurityPagesGenerator securityPagesGenerator;
+    private final RegistrationRequestGenerator registrationRequestGenerator;
+    private final UserServiceGenerator userServiceGenerator;
+    private final UserDataInitializationGenerator userDataInitializationGenerator;
+    private final RoleEntityGenerator roleEntityGenerator;
+    private final RoleRepositoryGenerator roleRepositoryGenerator;
+    private final UserEntityGenerator userEntityGenerator;
+    private final UserRepositoryGenerator userRepositoryGenerator;
 
     /**
      * Creates the Project with Security integrated. This consists of a WebSecurityConfig, a UserDataInitializer,
@@ -22,12 +27,17 @@ public class SecurityGenerator extends FileFolderGenerator {
      * @param request Request containing the relevant information of the project to be created
      * @return Project with Security included
      */
-    public Project create(Project project, CreationRequest request) {
-        Project projectWithWebSecurityConfig = webSecurityConfigGenerator.create(project, request);
-        Project projectWithUserDataInitializer = userDataInitializationGenerator.create(projectWithWebSecurityConfig, request);
-        Project projectWithUserController = userControllerGenerator.create(projectWithUserDataInitializer, request);
-        Project projectWithSecurityEntities = securityEntitiesGenerator.create(projectWithUserController, request);
-        return securityPagesGenerator.create(projectWithSecurityEntities);
+    public Project create(Project project, ProjectRequest request) {
+        project = webSecurityConfigGenerator.add(project, request);
+        project = registrationRequestGenerator.add(project, request);
+        project = userServiceGenerator.add(project, request);
+        project = userDataInitializationGenerator.add(project, request);
+        project = userControllerGenerator.add(project, request);
+        project = roleEntityGenerator.add(project,request);
+        project = roleRepositoryGenerator.add(project,request);
+        project = userEntityGenerator.add(project,request);
+        project = userRepositoryGenerator.add(project,request);
+        return project;
     }
 
 }

@@ -1,4 +1,4 @@
-<#-- @ftlvariable name="entities" type="java.util.Set<org.dhbw.webapplicationgenerator.webclient.request.RequestEntity>" -->
+<#-- @ftlvariable name="entities" type="java.util.List<org.dhbw.webapplicationgenerator.model.request.datamodel.Entity>" -->
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <div th:fragment="navbar">
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">

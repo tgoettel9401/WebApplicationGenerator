@@ -1,54 +1,100 @@
 package org.dhbw.webapplicationgenerator.generator;
 
 import lombok.AllArgsConstructor;
-import org.dhbw.webapplicationgenerator.generator.baseproject.ExceptionGenerator;
-import org.dhbw.webapplicationgenerator.generator.entity.EntityGenerator;
-import org.dhbw.webapplicationgenerator.generator.entity.TransferObjectGenerator;
-import org.dhbw.webapplicationgenerator.generator.frontend.FrontendControllerGenerator;
-import org.dhbw.webapplicationgenerator.generator.frontend.FrontendGenerator;
-import org.dhbw.webapplicationgenerator.generator.frontend.WebMvcConfigGenerator;
-import org.dhbw.webapplicationgenerator.generator.repository.RepositoryGenerator;
-import org.dhbw.webapplicationgenerator.generator.security.SecurityGenerator;
+import org.dhbw.webapplicationgenerator.generator.baseproject.BaseProjectGenerator;
+import org.dhbw.webapplicationgenerator.generator.database.DatabaseStrategy;
+import org.dhbw.webapplicationgenerator.generator.deployment.DeploymentStrategy;
+import org.dhbw.webapplicationgenerator.generator.util.FileFolderGenerator;
+import org.dhbw.webapplicationgenerator.generator.backend.BackendStrategy;
+import org.dhbw.webapplicationgenerator.generator.backend.spring.SpringBootGenerator;
+import org.dhbw.webapplicationgenerator.generator.database.FlywayGenerator;
+import org.dhbw.webapplicationgenerator.generator.deployment.docker.DockerGenerator;
+import org.dhbw.webapplicationgenerator.generator.frontend.FrontendStrategy;
+import org.dhbw.webapplicationgenerator.generator.frontend.ThymeleafGenerator;
+import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
+import org.dhbw.webapplicationgenerator.model.request.backend.BackendData;
+import org.dhbw.webapplicationgenerator.model.response.Project;
+import org.dhbw.webapplicationgenerator.model.response.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.util.FileCleaner;
-import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.function.UnaryOperator;
+
 @Service
 @AllArgsConstructor
-public class ProjectGenerator {
+public class ProjectGenerator extends FileFolderGenerator {
 
     private final Logger logger = LoggerFactory.getLogger(ProjectGenerator.class);
 
     private final BaseProjectGenerator baseProjectGenerator;
-    private final EntityGenerator entityGenerator;
-    private final TransferObjectGenerator transferObjectGenerator;
-    private final RepositoryGenerator repositoryGenerator;
-    private final WebMvcConfigGenerator mvcConfigGenerator;
-    private final ExceptionGenerator exceptionGenerator;
-    private final FrontendControllerGenerator frontendControllerGenerator;
-    private final FrontendGenerator frontendGenerator;
-    private final SecurityGenerator securityGenerator;
     private final FileCleaner fileCleaner;
+
+    // Backend Strategies
+    private final SpringBootGenerator springBootGenerator;
+
+    // Frontend Strategies
+    private final ThymeleafGenerator thymeleafGenerator;
+
+    // Deployment Strategies
+    private final DockerGenerator dockerGenerator;
+
+    // Database Strategies
+    private final FlywayGenerator flywayGenerator;
 
     /**
      * Generates the Project based on the provided request
      * @param request Request for creating the project
      * @return Project based on the provided request
      */
-    public Project generate(CreationRequest request) {
-        logger.info("Generating new project with title {}", request.getProject().getTitle());
-        fileCleaner.performCleanup(); // In case of previous errors, we perform a cleanup to be safe.
-        Project baseProject = this.baseProjectGenerator.create(request);
-        Project projectWithEntites = this.entityGenerator.create(baseProject, request);
-        Project projectWithTransferObjects = this.transferObjectGenerator.create(projectWithEntites, request);
-        Project projectWithRepositories =  this.repositoryGenerator.create(projectWithTransferObjects, request);
-        Project projectWithMvcConfig = this.mvcConfigGenerator.create(projectWithRepositories, request);
-        Project projectWithExceptions = this.exceptionGenerator.create(projectWithMvcConfig, request);
-        Project projectWithFrontendController = this.frontendControllerGenerator.create(projectWithExceptions, request);
-        Project projectWithFrontend = this.frontendGenerator.create(projectWithFrontendController, request);
-        return this.securityGenerator.create(projectWithFrontend, request);
+    public Project generate(ProjectRequest request) {
+
+        // Create temp-folders
+        logger.info("Preparing temp-folders");
+        prepareTmpFolders();
+
+        logger.info("Extracting data and converting to BackendData");
+        BackendData data = (BackendData) request.getBackend().getData();
+
+        // Assign strategies.
+        logger.info("Assigning strategies");
+        BackendStrategy backendStrategy = this.springBootGenerator; // TODO: Set generator according to request
+        FrontendStrategy frontendStrategy = this.thymeleafGenerator; // TODO: Set generator according to request
+        DatabaseStrategy databaseStrategy = this.flywayGenerator;
+        DeploymentStrategy deploymentStrategy = this.dockerGenerator;
+        UnaryOperator<ProjectDirectory> frontendDirectoryFinder = backendStrategy.getFrontendDirectoryFinder();
+        UnaryOperator<ProjectDirectory> mainSourceDirectoryFinder = backendStrategy.getMainSourceDirectoryFinder(data);
+
+        // Create Builder and build project
+        logger.info("Preparing the projectBuilder");
+        ProjectBuilder builder = new ProjectBuilder()
+                .baseProjectStrategy(baseProjectGenerator)
+                .backendStrategy(backendStrategy)
+                .frontendStrategy(frontendStrategy)
+                .deploymentStrategy(deploymentStrategy)
+                .databaseStrategy(databaseStrategy)
+                .frontendDirectoryFinder(frontendDirectoryFinder)
+                .mainSourceDirectoryFinder(mainSourceDirectoryFinder);
+
+        // Build the project
+        logger.info("Generating new project with title {}", request.getTitle());
+        Project project = builder.build(request);
+        logger.info("Constructing of project done");
+
+        return project;
+    }
+
+    /**
+     * Prepares the Temp-Folders ./tmp and ./tmp2.
+     */
+    private void prepareTmpFolders() {
+        // In case of previous errors, we perform a cleanup to be safe.
+        fileCleaner.performCleanup();
+
+        // Next we create the temp-folders from scratch.
+        createTmpFolderIfNotExists();
+        createTmp2FolderIfNotExists();
     }
 
 }

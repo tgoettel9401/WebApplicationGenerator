@@ -4,7 +4,7 @@
 <#-- @ftlvariable name="projectDescription" type="java.lang.String" -->
 <#-- @ftlvariable name="springBootVersion" type="java.lang.String" -->
 <#-- @ftlvariable name="javaVersion" type="java.lang.String" -->
-<#-- @ftlvariable name="dependencies" type="java.util.List<org.dhbw.webapplicationgenerator.generator.baseproject.pom.PomXmlDependency>" -->
+<#-- @ftlvariable name="dependencies" type="java.util.List<org.dhbw.webapplicationgenerator.generator.backend.java.buildtool.Dependency>" -->
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">

@@ -1,8 +1,8 @@
 package org.dhbw.webapplicationgenerator.util;
 
-import org.dhbw.webapplicationgenerator.generator.Project;
-import org.dhbw.webapplicationgenerator.generator.model.ProjectFile;
-import org.dhbw.webapplicationgenerator.generator.model.StructureElement;
+import org.dhbw.webapplicationgenerator.model.response.Project;
+import org.dhbw.webapplicationgenerator.model.response.ProjectFile;
+import org.dhbw.webapplicationgenerator.model.response.StructureElement;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;

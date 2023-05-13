@@ -2,7 +2,7 @@
 <#-- @ftlvariable name="entityVariableNamePlural" type="java.lang.String" -->
 <#-- @ftlvariable name="entityClassName" type="java.lang.String" -->
 <#-- @ftlvariable name="entityClassNamePlural" type="java.lang.String" -->
-<#-- @ftlvariable name="attributes" type="java.util.Set<org.dhbw.webapplicationgenerator.webclient.request.EntityAttribute>" -->
+<#-- @ftlvariable name="attributes" type="java.util.Set<org.dhbw.webapplicationgenerator.model.request.datamodel.Attribute>" -->
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <!-- Add Main file -->

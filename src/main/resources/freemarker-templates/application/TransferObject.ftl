@@ -2,8 +2,8 @@
 <#-- @ftlvariable name="packageName" type="java.lang.String" -->
 <#-- @ftlvariable name="imports" type="java.util.List<java.lang.String>" -->
 <#-- @ftlvariable name="className" type="java.lang.String" -->
-<#-- @ftlvariable name="attributes" type="java.util.List<org.dhbw.webapplicationgenerator.webclient.request.EntityAttribute>" -->
-<#-- @ftlvariable name="relations" type="java.util.List<org.dhbw.webapplicationgenerator.webclient.request.EntityRelation>" -->
+<#-- @ftlvariable name="attributes" type="java.util.List<org.dhbw.webapplicationgenerator.model.request.datamodel.Attribute>" -->
+<#-- @ftlvariable name="relations" type="java.util.List<org.dhbw.webapplicationgenerator.model.request.datamodel.EntityRelation>" -->
 
 <#-- Package -->
 package ${packageName};
@@ -21,10 +21,10 @@ public class ${className}Request implements Serializable {
 
     <#list attributes as attribute>
         <#-- LocalDate attributes need a DateTimeFormat -->
-        <#if attribute.getDataType() == "LocalDate">
+        <#if attribute.getDataType() == "LOCAL_DATE">
     @DateTimeFormat(pattern = "yyyy-MM-dd")
         </#if>
-    private ${attribute.getDataType()} ${attribute.getName()};
+    private ${attribute.getDataType().getName()} ${attribute.getName()};
 
     </#list>
     <#-- Add either the id (toOne) or the ids (toMany) of the relation-entity -->
@@ -47,11 +47,11 @@ public class ${className}Request implements Serializable {
 
     <#-- Getter and Setter for other attributes -->
     <#list attributes as attribute>
-    public ${attribute.getDataType()} get${attribute.getTitle()}() {
+    public ${attribute.getDataType().getName()} get${attribute.getTitle()}() {
         return ${attribute.getName()};
     }
 
-    public void set${attribute.getTitle()}(${attribute.getDataType()} ${attribute.getName()}) {
+    public void set${attribute.getTitle()}(${attribute.getDataType().getName()} ${attribute.getName()}) {
         this.${attribute.getName()} = ${attribute.getName()};
     }
 

@@ -1,41 +1,45 @@
 package org.dhbw.webapplicationgenerator.generator.util;
 
-import org.dhbw.webapplicationgenerator.webclient.request.CreationRequest;
+import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
+import org.dhbw.webapplicationgenerator.model.request.backend.JavaData;
 import org.springframework.stereotype.Service;
 
 @Service
 public class PackageNameResolver {
 
-    public String resolveEntity(CreationRequest request) {
+    // TODO: Add to Java-part because only relevant for Java.
+
+    public String resolveEntity(ProjectRequest request) {
         return basePackage(request) + ".domain";
     }
 
-    public String resolveTransferObjects(CreationRequest request) {
+    public String resolveTransferObjects(ProjectRequest request) {
         return basePackage(request) + ".transferObject";
     }
 
-    public String resolveRepository(CreationRequest request) {
+    public String resolveRepository(ProjectRequest request) {
         return basePackage(request) + ".repository";
     }
 
-    public String resolveController(CreationRequest request) {
+    public String resolveController(ProjectRequest request) {
         return basePackage(request) + ".controller";
     }
 
-    public String resolveService(CreationRequest request) {
+    public String resolveService(ProjectRequest request) {
         return basePackage(request) + ".service";
     }
 
-    public String resolveConfig(CreationRequest request) {
+    public String resolveConfig(ProjectRequest request) {
         return basePackage(request) + ".config";
     }
 
-    public String resolveException(CreationRequest request) {
+    public String resolveException(ProjectRequest request) {
         return basePackage(request) + ".exception";
     }
 
-    private String basePackage(CreationRequest request) {
-        return request.getProject().getGroup() + "." + request.getProject().getArtifact();
+    private String basePackage(ProjectRequest request) {
+        JavaData data = (JavaData) request.getBackend().getData();
+        return data.getGroup() + "." + data.getArtifact();
     }
 
 }
