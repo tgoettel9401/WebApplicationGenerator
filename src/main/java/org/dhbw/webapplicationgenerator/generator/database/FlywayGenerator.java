@@ -9,7 +9,7 @@ public class FlywayGenerator implements DatabaseStrategy {
 
     @Override
     public Project create(Project project, ProjectRequest request) {
-        // TODO: Implement
+        // Has not been implemented in the Master Thesis, but is considered in the concept.
         return project;
     }
 
