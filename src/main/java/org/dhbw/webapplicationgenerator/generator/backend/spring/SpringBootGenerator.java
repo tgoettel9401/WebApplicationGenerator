@@ -59,7 +59,7 @@ public class SpringBootGenerator extends FileFolderGenerator implements BackendS
 
         // Create basic files dependent to either the Spring-Framework or the selected Build-Tool
         project = javaBuildToolGenerator.addBuildToolFiles(project, request);
-        project = this.applicationPropertiesGenerator.addApplicationProperties(project, resourcesDir);
+        project = this.applicationPropertiesGenerator.addApplicationProperties(project, request, resourcesDir);
         project = this.mvcConfigGenerator.create(project, request, mainDir);
         project = this.mainFileGenerator.addMainFile(project, request, mainDir);
         project = this.mainTestFileGenerator.addMainTestFile(project, request, mainTestDir);
