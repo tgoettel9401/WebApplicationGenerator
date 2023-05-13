@@ -6,7 +6,7 @@ import org.dhbw.webapplicationgenerator.generator.baseproject.FileFolderGenerato
 import org.dhbw.webapplicationgenerator.generator.java.entity.EntityGenerator;
 import org.dhbw.webapplicationgenerator.generator.java.entity.TransferObjectGenerator;
 import org.dhbw.webapplicationgenerator.generator.frontend.FrontendControllerGenerator;
-import org.dhbw.webapplicationgenerator.generator.frontend.FrontendGenerator;
+import org.dhbw.webapplicationgenerator.generator.thymeleaf.FrontendGenerator;
 import org.dhbw.webapplicationgenerator.generator.frontend.WebMvcConfigGenerator;
 import org.dhbw.webapplicationgenerator.generator.repository.RepositoryGenerator;
 import org.dhbw.webapplicationgenerator.generator.security.SecurityGenerator;

@@ -1,4 +1,4 @@
-package org.dhbw.webapplicationgenerator.generator.frontend;
+package org.dhbw.webapplicationgenerator.generator.thymeleaf;
 
 import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;

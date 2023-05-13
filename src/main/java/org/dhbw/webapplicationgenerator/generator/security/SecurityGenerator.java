@@ -1,6 +1,7 @@
 package org.dhbw.webapplicationgenerator.generator.security;
 
 import lombok.AllArgsConstructor;
+import org.dhbw.webapplicationgenerator.generator.thymeleaf.SecurityPagesGenerator;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.model.response.Project;
 import org.dhbw.webapplicationgenerator.generator.baseproject.FileFolderGenerator;
@@ -36,8 +37,7 @@ public class SecurityGenerator extends FileFolderGenerator {
         Project projectWithWebSecurityConfig = webSecurityConfigGenerator.create(project, request, parent);
         Project projectWithUserDataInitializer = userDataInitializationGenerator.create(projectWithWebSecurityConfig, request, parent);
         Project projectWithUserController = userControllerGenerator.create(projectWithUserDataInitializer, request);
-        Project projectWithSecurityEntities = securityEntitiesGenerator.create(projectWithUserController, request, parent);
-        return securityPagesGenerator.create(projectWithSecurityEntities);
+        return securityEntitiesGenerator.create(projectWithUserController, request, parent);
     }
 
 }
