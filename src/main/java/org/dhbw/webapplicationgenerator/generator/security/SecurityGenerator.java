@@ -1,6 +1,7 @@
 package org.dhbw.webapplicationgenerator.generator.security;
 
 import lombok.AllArgsConstructor;
+import org.dhbw.webapplicationgenerator.generator.security.java.UserEntityGenerator;
 import org.dhbw.webapplicationgenerator.generator.security.java.spring.*;
 import org.dhbw.webapplicationgenerator.generator.util.FileFolderGenerator;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;

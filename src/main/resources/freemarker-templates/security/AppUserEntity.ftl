@@ -1,11 +1,12 @@
 <#-- @ftlvariable name="packageName" type="java.lang.String" -->
+<#-- @ftlvariable name="userTableName" type="java.lang.String" -->
 package ${packageName};
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "app_users")
+@Table(name = "${userTableName}")
 public class AppUser {
 
     @Id

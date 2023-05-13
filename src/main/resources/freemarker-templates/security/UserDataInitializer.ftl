@@ -1,5 +1,8 @@
 <#-- @ftlvariable name="packageName" type="java.lang.String" -->
 <#-- @ftlvariable name="applicationImports" type="java.util.List<java.lang.String>" -->
+<#-- @ftlvariable name="defaultUsername" type="java.lang.String" -->
+<#-- @ftlvariable name="defaultPassword" type="java.lang.String" -->
+<#-- @ftlvariable name="defaultAdminEmail" type="java.lang.String" -->
 package ${packageName};
 
 <#list applicationImports as applicationImport>
@@ -34,9 +37,9 @@ public class UserDataInitializer implements ApplicationRunner {
         AppUser user = new AppUser();
         user.setFirstName("Admin");
         user.setLastName("User");
-        user.setPassword(passwordEncoder.encode("secret"));
-        user.setUsername("admin");
-        user.setEmail("admin@data.com");
+        user.setPassword(passwordEncoder.encode("${defaultPassword}"));
+        user.setUsername("${defaultUsername}");
+        user.setEmail("${defaultAdminEmail}");
         user.setRoles(Arrays.asList(adminRole));
         userRepository.save(user);
     }

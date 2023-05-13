@@ -32,6 +32,7 @@ public class RoleEntityGenerator extends FileFolderGenerator {
                 Optional.of(getMainProjectDirectory(project, request)));
         Map<String, Object> dataModel = new HashMap<>();
         dataModel.put("packageName", packageNameResolver.resolveEntity(request));
+        dataModel.put("roleTableName", request.getSecurity().getRoleTableName());
         String filename = "Role" + JAVA_CLASS_ENDING;
         File file = freemarkerTemplateProcessor.process("RoleEntity.ftl", dataModel, filename);
         addFile(file, entityDirectory);

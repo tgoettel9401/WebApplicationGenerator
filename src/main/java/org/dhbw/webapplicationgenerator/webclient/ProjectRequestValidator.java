@@ -32,6 +32,7 @@ public class ProjectRequestValidator {
         validateFrontend();
         validateDatabase();
         this.dataModelValidator.validate(request);
+        validateSecurity(request);
         validateRoles();
     }
 
@@ -79,6 +80,7 @@ public class ProjectRequestValidator {
     }
 
     private void validateFrontend() {
+        // TODO: Implement
         // Currently frontend data is empty, hence nothing needs to be validated here.
     }
 
@@ -86,10 +88,24 @@ public class ProjectRequestValidator {
         // Functionality not available, hence skipping validation.
     }
 
+    private void validateSecurity(ProjectRequest request) throws ValidationException {
+        // Skip validation if security is disabled
+        if (!request.getSecurity().isEnabled()) {
+            return;
+        }
+
+        // Password must not be empty.
+        if (request.getSecurity().getDefaultPassword().isBlank()) {
+            throw new ValidationException("Default-Password must not be empty");
+        }
+        // TODO: Implement
+    }
+
     private void validateRoles() {
         // Currently not in use
         // TODO: Implement?
         // - mentioned entities have to exist
+        // - also the functionality for this has yet to be implemented
     }
 
     private void throwUnknownException(String type, Strategy strategy) throws ValidationException {

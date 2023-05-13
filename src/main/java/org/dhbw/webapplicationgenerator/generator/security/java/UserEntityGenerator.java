@@ -1,4 +1,4 @@
-package org.dhbw.webapplicationgenerator.generator.security.java.spring;
+package org.dhbw.webapplicationgenerator.generator.security.java;
 
 import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.util.FileFolderGenerator;
@@ -32,6 +32,7 @@ public class UserEntityGenerator extends FileFolderGenerator {
                 Optional.of(getMainProjectDirectory(project, request)));
         Map<String, Object> dataModel = new HashMap<>();
         dataModel.put("packageName", packageNameResolver.resolveEntity(request));
+        dataModel.put("userTableName", request.getSecurity().getUserTableName());
         String filename = "AppUser" + JAVA_CLASS_ENDING;
         File file = freemarkerTemplateProcessor.process("AppUserEntity.ftl", dataModel, filename);
         addFile(file, entityDirectory);
