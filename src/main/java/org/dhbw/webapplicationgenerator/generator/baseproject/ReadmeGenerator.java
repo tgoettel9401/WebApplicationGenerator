@@ -31,8 +31,7 @@ public class ReadmeGenerator extends FileFolderGenerator {
         // Initialize Data Model for Freemarker
         Map<String, Object> dataModel = new HashMap<>();
         dataModel.put("isDeploymentEnabled", request.getDeployment() == null || request.getDeployment().isEnabled());
-        dataModel.put("deploymentStrategy", request.getDeployment().getStrategy());
-        // TODO: Add Deployment-part to Readme rather than Docker. Also make Readme more general and dependent on the strategies!
+        dataModel.put("isSecurityEnabled", request.isSecurityEnabled());
 
         // Process the template and return the file
         String filename = "README.md";
