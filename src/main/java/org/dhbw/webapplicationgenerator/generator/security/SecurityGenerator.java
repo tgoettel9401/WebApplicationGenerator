@@ -1,8 +1,9 @@
 package org.dhbw.webapplicationgenerator.generator.security;
 
 import lombok.AllArgsConstructor;
-import org.dhbw.webapplicationgenerator.generator.security.java.UserEntityGenerator;
-import org.dhbw.webapplicationgenerator.generator.security.java.spring.*;
+import org.dhbw.webapplicationgenerator.generator.security.backend.java.UserEntityGenerator;
+import org.dhbw.webapplicationgenerator.generator.security.backend.java.spring.*;
+import org.dhbw.webapplicationgenerator.generator.security.frontend.html.SecurityPagesGenerator;
 import org.dhbw.webapplicationgenerator.generator.util.FileFolderGenerator;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.model.response.Project;
@@ -21,6 +22,8 @@ public class SecurityGenerator extends FileFolderGenerator {
     private final RoleRepositoryGenerator roleRepositoryGenerator;
     private final UserEntityGenerator userEntityGenerator;
     private final UserRepositoryGenerator userRepositoryGenerator;
+    private final SecurityPagesGenerator securityPagesGenerator;
+
 
     /**
      * Creates the Project with Security integrated. This consists of a WebSecurityConfig, a UserDataInitializer,
@@ -29,6 +32,12 @@ public class SecurityGenerator extends FileFolderGenerator {
      * @return Project with Security included
      */
     public Project create(Project project, ProjectRequest request) {
+        project = addSpringBackendSecurity(project, request);
+        project = addHtmlFrontendSecurity(project);
+        return project;
+    }
+
+    private Project addSpringBackendSecurity(Project project, ProjectRequest request) {
         project = webSecurityConfigGenerator.add(project, request);
         project = registrationRequestGenerator.add(project, request);
         project = userServiceGenerator.add(project, request);
@@ -38,6 +47,11 @@ public class SecurityGenerator extends FileFolderGenerator {
         project = roleRepositoryGenerator.add(project,request);
         project = userEntityGenerator.add(project,request);
         project = userRepositoryGenerator.add(project,request);
+        return project;
+    }
+
+    private Project addHtmlFrontendSecurity(Project project) {
+        project = securityPagesGenerator.add(project);
         return project;
     }
 

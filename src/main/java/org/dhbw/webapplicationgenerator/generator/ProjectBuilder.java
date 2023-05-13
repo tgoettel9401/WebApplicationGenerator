@@ -5,6 +5,7 @@ import org.dhbw.webapplicationgenerator.generator.baseproject.BaseProjectGenerat
 import org.dhbw.webapplicationgenerator.generator.database.DatabaseStrategy;
 import org.dhbw.webapplicationgenerator.generator.deployment.DeploymentStrategy;
 import org.dhbw.webapplicationgenerator.generator.frontend.FrontendStrategy;
+import org.dhbw.webapplicationgenerator.generator.security.SecurityGenerator;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.model.response.Project;
 import org.dhbw.webapplicationgenerator.model.response.ProjectDirectory;
@@ -19,6 +20,7 @@ public class ProjectBuilder {
     private FrontendStrategy frontendStrategy;
     private DatabaseStrategy databaseStrategy;
     private DeploymentStrategy deploymentStrategy;
+    private SecurityGenerator securityGenerator;
 
     // Directory Finder
     private UnaryOperator<ProjectDirectory> frontendDirectoryFinder;
@@ -38,6 +40,7 @@ public class ProjectBuilder {
         addFrontend(request);
         addDatabase(request);
         addDeployment(request);
+        addSecurity(request);
         return currentProject;
     }
 
@@ -112,6 +115,16 @@ public class ProjectBuilder {
         return this;
     }
 
+    /**
+     * Set the deploymentStrategy
+     * @param securityGenerator strategy constructing the security-files.
+     * @return builder
+     */
+    public ProjectBuilder securityGenerator(SecurityGenerator securityGenerator) {
+        this.securityGenerator = securityGenerator;
+        return this;
+    }
+
     private void createBaseProject(ProjectRequest request) {
         if (baseProjectStrategy == null) {
             throw new WagException("Using baseproject strategy without setting the strategy.");
@@ -152,6 +165,15 @@ public class ProjectBuilder {
                 throw new WagException("Using deployment strategy without setting the strategy.");
             }
             this.currentProject = deploymentStrategy.create(this.currentProject, request);
+        }
+    }
+
+    private void addSecurity(ProjectRequest request) {
+        if (request.isSecurityEnabled()) {
+            if (securityGenerator == null) {
+                throw new WagException("Using security strategy without setting the strategy.");
+            }
+            this.currentProject = securityGenerator.create(this.currentProject, request);
         }
     }
 

@@ -1,4 +1,4 @@
-package org.dhbw.webapplicationgenerator.generator.security.java.spring;
+package org.dhbw.webapplicationgenerator.generator.security.backend.java.spring;
 
 import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.util.FileFolderGenerator;
@@ -16,18 +16,25 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class WebSecurityConfigGenerator extends FileFolderGenerator {
+public class RegistrationRequestGenerator extends FileFolderGenerator {
 
     private final PackageNameResolver packageNameResolver;
     private final FreemarkerTemplateProcessor freemarkerTemplateProcessor;
 
+    /**
+     * Adds the RegistrationRequest to the project.
+     * @param project Project to be updated
+     * @param request Request to construct the project
+     * @return Updated Project
+     */
     public Project add(Project project, ProjectRequest request) {
-        ProjectDirectory serviceDirectory = addDirectory("config", Optional.of(getMainProjectDirectory(project, request)));
+        ProjectDirectory transferObjectDirectory = addDirectory("transferObject",
+                Optional.of(getMainProjectDirectory(project, request)));
         Map<String, Object> dataModel = new HashMap<>();
-        dataModel.put("packageName", packageNameResolver.resolveConfig(request));
-        String filename = "WebSecurityConfig" + JAVA_CLASS_ENDING;
-        File file = freemarkerTemplateProcessor.process("WebSecurityConfig.ftl", dataModel, filename);
-        addFile(file, serviceDirectory);
+        dataModel.put("packageName", packageNameResolver.resolveTransferObjects(request));
+        String filename = "RegistrationRequest" + JAVA_CLASS_ENDING;
+        File file = freemarkerTemplateProcessor.process("RegistrationRequest.ftl", dataModel, filename);
+        addFile(file, transferObjectDirectory);
         return project;
     }
 
