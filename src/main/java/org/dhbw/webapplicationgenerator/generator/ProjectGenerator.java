@@ -1,17 +1,18 @@
 package org.dhbw.webapplicationgenerator.generator;
 
 import lombok.AllArgsConstructor;
-import org.dhbw.webapplicationgenerator.generator.baseproject.BaseProjectGenerator;
-import org.dhbw.webapplicationgenerator.generator.database.DatabaseStrategy;
-import org.dhbw.webapplicationgenerator.generator.deployment.DeploymentStrategy;
-import org.dhbw.webapplicationgenerator.generator.security.SecurityGenerator;
-import org.dhbw.webapplicationgenerator.generator.util.FileFolderGenerator;
 import org.dhbw.webapplicationgenerator.generator.backend.BackendStrategy;
 import org.dhbw.webapplicationgenerator.generator.backend.spring.SpringBootGenerator;
+import org.dhbw.webapplicationgenerator.generator.baseproject.BaseProjectGenerator;
+import org.dhbw.webapplicationgenerator.generator.database.DatabaseStrategy;
 import org.dhbw.webapplicationgenerator.generator.database.FlywayGenerator;
+import org.dhbw.webapplicationgenerator.generator.deployment.DeploymentStrategy;
 import org.dhbw.webapplicationgenerator.generator.deployment.docker.DockerGenerator;
 import org.dhbw.webapplicationgenerator.generator.frontend.FrontendStrategy;
 import org.dhbw.webapplicationgenerator.generator.frontend.thymeleaf.ThymeleafGenerator;
+import org.dhbw.webapplicationgenerator.generator.frontend.vaadin.VaadinGenerator;
+import org.dhbw.webapplicationgenerator.generator.security.SecurityGenerator;
+import org.dhbw.webapplicationgenerator.generator.util.FileFolderGenerator;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.model.request.backend.BackendData;
 import org.dhbw.webapplicationgenerator.model.response.Project;
@@ -38,6 +39,7 @@ public class ProjectGenerator extends FileFolderGenerator {
 
     // Frontend Strategies
     private final ThymeleafGenerator thymeleafGenerator;
+    private VaadinGenerator vaadinGenerator;
 
     // Deployment Strategies
     private final DockerGenerator dockerGenerator;
@@ -62,7 +64,18 @@ public class ProjectGenerator extends FileFolderGenerator {
         // Assign strategies.
         logger.info("Assigning strategies");
         BackendStrategy backendStrategy = this.springBootGenerator; // TODO: Set generator according to request
-        FrontendStrategy frontendStrategy = this.thymeleafGenerator; // TODO: Set generator according to request
+
+        FrontendStrategy frontendStrategy;
+        switch(request.getFrontend().getStrategy()) {
+            case THYMELEAF:
+                frontendStrategy = this.thymeleafGenerator;
+                break;
+            case VAADIN:
+                frontendStrategy = this.vaadinGenerator;
+                break;
+            default:
+                frontendStrategy = null;
+        }
         DatabaseStrategy databaseStrategy = this.flywayGenerator;
         DeploymentStrategy deploymentStrategy = this.dockerGenerator;
         UnaryOperator<ProjectDirectory> frontendDirectoryFinder = backendStrategy.getFrontendDirectoryFinder();

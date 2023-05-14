@@ -48,6 +48,10 @@ public class RepositoryGenerator extends FileFolderGenerator {
                 .filter(relation -> !relation.getRelationType().isToMany())
                 .collect(Collectors.toList())
         );
+        dataModel.put("relationsToMany", entity.getRelations().stream()
+                .filter(relation -> relation.getRelationType().isToMany())
+                .collect(Collectors.toList())
+        );
 
         // Process the template and return the file
         String filename = entity.getClassName() + "Repository" + JAVA_CLASS_ENDING;
@@ -61,7 +65,7 @@ public class RepositoryGenerator extends FileFolderGenerator {
         imports.add("org.springframework.data.jpa.repository.JpaRepository");
 
         // Add the lists if there is any toOne-relation.
-        if (entity.getRelations().stream().anyMatch(relation -> !relation.getRelationType().isToMany())) {
+        if (entity.getRelations().stream().anyMatch(relation -> relation.getRelationType().isToMany())) {
             imports.add("java.util.List");
         }
 

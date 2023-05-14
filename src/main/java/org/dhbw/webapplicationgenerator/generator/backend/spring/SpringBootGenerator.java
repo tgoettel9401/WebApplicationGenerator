@@ -11,7 +11,6 @@ import org.dhbw.webapplicationgenerator.generator.backend.java.other.ExceptionGe
 import org.dhbw.webapplicationgenerator.generator.baseproject.spring.ApplicationPropertiesGenerator;
 import org.dhbw.webapplicationgenerator.generator.baseproject.spring.MainFileGenerator;
 import org.dhbw.webapplicationgenerator.generator.baseproject.spring.MainTestFileGenerator;
-import org.dhbw.webapplicationgenerator.generator.security.backend.java.spring.WebMvcConfigGenerator;
 import org.dhbw.webapplicationgenerator.generator.util.FileFolderGenerator;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.model.request.backend.BackendData;

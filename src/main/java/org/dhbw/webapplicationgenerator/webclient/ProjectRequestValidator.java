@@ -90,7 +90,7 @@ public class ProjectRequestValidator {
 
     private void validateSecurity(ProjectRequest request) throws ValidationException {
         // Skip validation if security is disabled
-        if (!request.getSecurity().isEnabled()) {
+        if (request.getSecurity() == null || !request.getSecurity().isEnabled()) {
             return;
         }
 

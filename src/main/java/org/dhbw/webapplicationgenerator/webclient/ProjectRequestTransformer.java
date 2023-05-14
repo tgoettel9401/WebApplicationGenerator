@@ -15,6 +15,7 @@ import org.dhbw.webapplicationgenerator.model.request.deployment.Deployment;
 import org.dhbw.webapplicationgenerator.model.request.deployment.DockerData;
 import org.dhbw.webapplicationgenerator.model.request.frontend.Frontend;
 import org.dhbw.webapplicationgenerator.model.request.frontend.ThymeleafData;
+import org.dhbw.webapplicationgenerator.model.request.frontend.VaadinData;
 import org.dhbw.webapplicationgenerator.webclient.exception.WagException;
 import org.springframework.stereotype.Service;
 
@@ -79,7 +80,12 @@ public class ProjectRequestTransformer {
             JavaType type = new ObjectMapper().getTypeFactory().constructParametricType(Frontend.class, ThymeleafData.class);
             Frontend<ThymeleafData> thymeleaf = mapper.convertValue(request.getFrontend(), type);
             request.setFrontend(thymeleaf);
-        } else {
+        } else if (Objects.requireNonNull(strategy) == Strategy.VAADIN) {
+            JavaType type = new ObjectMapper().getTypeFactory().constructParametricType(Frontend.class, VaadinData.class);
+            Frontend<VaadinData> vaadin = mapper.convertValue(request.getFrontend(), type);
+            request.setFrontend(vaadin);
+        }
+        else {
             throw new WagException("Unknown Frontend-Strategy supplied");
         }
     }
