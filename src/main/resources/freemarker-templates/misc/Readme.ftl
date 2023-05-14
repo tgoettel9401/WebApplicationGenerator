@@ -15,4 +15,6 @@ Due to zipping and unzipping the Sourcecode currently all files are not executab
 ## Security
 In your application a default security configuration has been setup. The default-username and default-password you have set in your request were automatically configured. If you left that data empty, default values have been used. You can check the Security-Class in request-model for the used values.
 Please disable the seeded default-username & -password in a Production environment and properly set your login-information!
+Also mind that h2-console is active per default and excluded to authentication (if you have h2-console enabled). You should disable that in your Production environment.
+Default username and password can be found in application.properties.
 </#if>

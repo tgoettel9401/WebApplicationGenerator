@@ -15,7 +15,13 @@
     "data": {
       "group": "com.example",
       "artifact": "studentmanagement",
-      "javaBuildTool": "MAVEN"
+      "javaBuildTool": "MAVEN",
+      "javaVersion": "11",
+      "springBootVersion": "2.7.1",
+      "springDocVersion": "1.6.13",
+      "apiPath": "/api",
+      "h2ConsolePath": "/api",
+      "h2ConsoleEnabled": true
     }
   },
   "frontend": {

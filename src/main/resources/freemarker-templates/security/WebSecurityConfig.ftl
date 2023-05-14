@@ -17,6 +17,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
             .antMatchers("/users/register").permitAll()
+            .antMatchers("/h2-console/**").permitAll()
             .anyRequest().authenticated()
             .and()
             .formLogin()
@@ -25,6 +26,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .and()
             .logout()
             .permitAll();
+        http.csrf().ignoringAntMatchers("/h2-console/**");
+        http.headers().frameOptions().sameOrigin();
     }
 
     @Bean
