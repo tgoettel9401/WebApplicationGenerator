@@ -32,8 +32,12 @@ public class SecurityGenerator extends FileFolderGenerator {
      * @return Project with Security included
      */
     public Project create(Project project, ProjectRequest request) {
-        project = addSpringBackendSecurity(project, request);
-        project = addHtmlFrontendSecurity(project);
+        if (request.isBackendEnabled()) {
+            project = addSpringBackendSecurity(project, request);
+        }
+        if (request.isFrontendEnabled()) {
+            project = addHtmlFrontendSecurity(project, request);
+        }
         return project;
     }
 
@@ -42,7 +46,6 @@ public class SecurityGenerator extends FileFolderGenerator {
         project = registrationRequestGenerator.add(project, request);
         project = userServiceGenerator.add(project, request);
         project = userDataInitializationGenerator.add(project, request);
-        project = userControllerGenerator.add(project, request);
         project = roleEntityGenerator.add(project,request);
         project = roleRepositoryGenerator.add(project,request);
         project = userEntityGenerator.add(project,request);
@@ -50,7 +53,9 @@ public class SecurityGenerator extends FileFolderGenerator {
         return project;
     }
 
-    private Project addHtmlFrontendSecurity(Project project) {
+    private Project addHtmlFrontendSecurity(Project project, ProjectRequest request) {
+        // TODO: Handle multiple frontend strategies
+        project = userControllerGenerator.add(project, request);
         project = securityPagesGenerator.add(project);
         return project;
     }

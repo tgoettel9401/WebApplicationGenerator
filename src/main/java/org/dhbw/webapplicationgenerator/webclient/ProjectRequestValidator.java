@@ -98,7 +98,11 @@ public class ProjectRequestValidator {
         if (request.getSecurity().getDefaultPassword().isBlank()) {
             throw new ValidationException("Default-Password must not be empty");
         }
-        // TODO: Implement
+
+        // Security must only be enabled if Backend and Frontend are both enabled
+        if (request.isSecurityEnabled() && (!request.isFrontendEnabled() || !request.isBackendEnabled())) {
+            throw new ValidationException("If security is enabled, you have to activate both frontend and backend as well!");
+        }
     }
 
     private void validateRoles() {
