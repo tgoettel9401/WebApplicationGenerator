@@ -23,7 +23,7 @@ public interface ${entityClassName}Repository extends JpaRepository<${entityClas
     <#if relation.getRelationType().isFromMany()>
     List<${entityClassName}> findBy${relation.getEntityClassNamePlural()}Id(Long ${relation.getEntityName()}Id);
     <#else>
-    ${entityClassName} findBy${relation.getEntityClassName()}Id(Long ${relation.getEntityName()}Id);
+    ${entityClassName} findBy${relation.getEntityClassNamePlural()}Id(Long ${relation.getEntityName()}Id);
     </#if>
     </#list>
 }

@@ -90,8 +90,13 @@ public class ${entityClassName}Details extends VerticalLayout implements HasUrlP
             ${entityVariableName}.set${relation.getEntityClassNamePlural()}(${relation.getEntityNamePlural()});
                     </#if>
                 <#else>
+                    <#if relation.getRelationType().isFromMany()>
+            ${relation.getEntityClassName()} ${relation.getEntityName()} = ${relation.getRepositoryVariableName()}.findBy${entityClassNamePlural}Id(id);
+            ${entityVariableName}.set${relation.getEntityClassName()}(${relation.getEntityName()});
+                    <#else>
             ${relation.getEntityClassName()} ${relation.getEntityName()} = ${relation.getRepositoryVariableName()}.findBy${entityClassName}Id(id);
             ${entityVariableName}.set${relation.getEntityClassName()}(${relation.getEntityName()});
+                    </#if>
                 </#if>
             </#list>
         }
