@@ -21,8 +21,8 @@
             <#-- For all attributes add an input of the right DataType -->
             <#list attributes as attribute>
             <label for="${attribute.getName()}">${attribute.getTitle()}</label>
-            <input type="${attribute.getDataType().getInputType()}" id="${attribute.getName()}" name="${attribute.getName()}" class="input-group"
-               th:value="${r"${"}${entityVariableName}.get${attribute.getTitle()}()}">
+            <input type="${attribute.getDataType().getHtmlInputType()}" id="${attribute.getName()}" name="${attribute.getName()}" class="input-group"
+                   th:value="${r"${"}${entityVariableName}.get${attribute.getTitle()}()}">
             <br>
             </#list>
 

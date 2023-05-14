@@ -4,14 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Dependency {
+public class Plugin {
     private String groupId;
     private String artifactId;
     private String version;
-    private String scope;
-    private String type;
-    private boolean dependencyManagement = false;
+    private List<PluginExecution> executions = new ArrayList<>();
 }

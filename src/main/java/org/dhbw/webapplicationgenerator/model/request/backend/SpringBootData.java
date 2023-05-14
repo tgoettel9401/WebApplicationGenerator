@@ -11,7 +11,7 @@ public class SpringBootData implements JavaData {
     private String springBootVersion = "2.6.3";
     private String springDocVersion = "1.6.9";
     private String apiPath = "/api";
-    private String h2ConsolePath = "h2-console";
+    private String h2ConsolePath = "/h2-console";
     private boolean h2ConsoleEnabled = true;
     private String h2JdbcUrl = "jdbc:h2:mem:testdb";
 }

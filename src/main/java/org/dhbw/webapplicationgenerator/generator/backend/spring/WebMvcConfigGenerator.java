@@ -1,10 +1,11 @@
-package org.dhbw.webapplicationgenerator.generator.security.backend.java.spring;
+package org.dhbw.webapplicationgenerator.generator.backend.spring;
 
 import lombok.AllArgsConstructor;
 import org.dhbw.webapplicationgenerator.generator.util.FileFolderGenerator;
 import org.dhbw.webapplicationgenerator.generator.util.FreemarkerTemplateProcessor;
 import org.dhbw.webapplicationgenerator.generator.util.PackageNameResolver;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
+import org.dhbw.webapplicationgenerator.model.request.Strategy;
 import org.dhbw.webapplicationgenerator.model.request.datamodel.DataModel;
 import org.dhbw.webapplicationgenerator.model.request.datamodel.Entity;
 import org.dhbw.webapplicationgenerator.model.response.Project;
@@ -24,7 +25,9 @@ public class WebMvcConfigGenerator extends FileFolderGenerator {
     private final FreemarkerTemplateProcessor freemarkerTemplateProcessor;
 
     public Project create(Project project, ProjectRequest request, ProjectDirectory parent) {
-        create(request, parent);
+        if (request.getFrontend().getStrategy().equals(Strategy.THYMELEAF)) {
+            create(request, parent);
+        }
         return project;
     }
 

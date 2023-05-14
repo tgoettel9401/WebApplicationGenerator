@@ -5,9 +5,12 @@ import org.dhbw.webapplicationgenerator.generator.util.Utils;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.model.request.Strategy;
 import org.dhbw.webapplicationgenerator.model.request.backend.SpringBootData;
+import org.dhbw.webapplicationgenerator.model.request.frontend.VaadinData;
 import org.dhbw.webapplicationgenerator.webclient.exception.ValidationException;
+import org.dhbw.webapplicationgenerator.webclient.exception.WagException;
 import org.dhbw.webapplicationgenerator.webclient.validation.DataModelValidator;
 import org.dhbw.webapplicationgenerator.webclient.validation.DockerValidator;
+import org.dhbw.webapplicationgenerator.webclient.validation.Version;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -29,7 +32,7 @@ public class ProjectRequestValidator {
         validateProject(request);
         validateDeployment(request);
         validateBackend(request);
-        validateFrontend();
+        validateFrontend(request);
         validateDatabase();
         this.dataModelValidator.validate(request);
         validateSecurity(request);
@@ -65,6 +68,9 @@ public class ProjectRequestValidator {
         Strategy strategy = request.getBackend().getStrategy();
         if (Objects.requireNonNull(strategy) == Strategy.SPRING_BOOT) {
             SpringBootData data = (SpringBootData) request.getBackend().getData();
+            if (!parseVersion(data.getSpringBootVersion()).isSmallerThan(new Version(3,0,0))) {
+                throw new ValidationException("Only Spring Boot versions < 3.0.0 are supported");
+            }
             if (data.getArtifact() == null || data.getArtifact().length() == 0) {
                 throw new ValidationException("Artifact is empty");
             }
@@ -79,9 +85,13 @@ public class ProjectRequestValidator {
         }
     }
 
-    private void validateFrontend() {
-        // TODO: Implement
-        // Currently frontend data is empty, hence nothing needs to be validated here.
+    private void validateFrontend(ProjectRequest request) throws ValidationException {
+        // TODO: Also describe this phenomen in the thesis that not all versions are compatible with each other.
+        if (request.getBackend().getStrategy().equals(Strategy.SPRING_BOOT) && request.getFrontend().getStrategy().equals(Strategy.VAADIN)) {
+            VaadinData vaadinData = (VaadinData) request.getFrontend().getData();
+            SpringBootData springBootData = (SpringBootData) request.getBackend().getData();
+            validateVaadinAndSpringBootVersionCompatibility(springBootData, vaadinData);
+        }
     }
 
     private void validateDatabase() {
@@ -90,7 +100,7 @@ public class ProjectRequestValidator {
 
     private void validateSecurity(ProjectRequest request) throws ValidationException {
         // Skip validation if security is disabled
-        if (!request.getSecurity().isEnabled()) {
+        if (request.getSecurity() == null || !request.getSecurity().isEnabled()) {
             return;
         }
 
@@ -114,6 +124,54 @@ public class ProjectRequestValidator {
 
     private void throwUnknownException(String type, Strategy strategy) throws ValidationException {
         throw new ValidationException("Unknown " + Utils.capitalize(type) + "-Strategy " + strategy + " supplied");
+    }
+
+    private void validateVaadinAndSpringBootVersionCompatibility(SpringBootData springBootData, VaadinData vaadinData) throws ValidationException {
+        // Vaadin version 23 must use Spring-Boot version >2.6.6 and <3.0.0
+
+        Version vaadinVersion = parseVersion(vaadinData.getVersion());
+        Version springBootVersion = parseVersion(springBootData.getSpringBootVersion());
+
+        if (vaadinVersion.isSmallerThan(new Version(23, 0, 0))) {
+            throw new ValidationException("Only Vaadin versions >= 23.0.0 and < 24.0.0 are supported");
+        }
+
+        if (vaadinVersion.isGreaterThan(new Version(24,0,0))) {
+            throw new ValidationException("Only Vaadin versions >= 23.0.0 and < 24.0.0 are supported");
+        }
+
+        if (vaadinVersion.isGreaterThan(new Version(23,0,0))
+                && springBootVersion.isSmallerThan(new Version(2,6,6))) {
+            throw new ValidationException("Using Vaadin version 23, you must use Spring Boot version >= 2.6.6 and < 3.0.0");
+        }
+
+        if (vaadinVersion.isGreaterThan(new Version(23,0,0))
+                && !springBootVersion.isSmallerThan(new Version(3,0,0))) {
+            throw new ValidationException("Using Vaadin version 23, you must use Spring Boot version >= 2.6.6 and < 3.0.0");
+        }
+    }
+
+    private Version parseVersion(String versionString) {
+        String[] versionParts = versionString.split("\\.");
+        Version version = new Version();
+        int index = 1;
+        for (String versionPart : versionParts) {
+            switch(index) {
+                case 1:
+                    version.setFirstPart(Integer.valueOf(versionPart));
+                    break;
+                case 2:
+                    version.setSecondPart(Integer.valueOf(versionPart));
+                    break;
+                case 3:
+                    version.setThirdPart(Integer.valueOf(versionPart));
+                    break;
+                default:
+                    throw new WagException("Version with more than 3 parts has been supplied");
+            }
+            index++;
+        }
+        return version;
     }
 
 }

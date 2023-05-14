@@ -13,6 +13,10 @@ public class PackageNameResolver {
         return basePackage(request) + ".domain";
     }
 
+    public String resolveJavaFrontend(ProjectRequest request) {
+        return basePackage(request) + ".frontend";
+    }
+
     public String resolveTransferObjects(ProjectRequest request) {
         return basePackage(request) + ".transferObject";
     }
