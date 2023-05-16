@@ -14,10 +14,12 @@ import org.dhbw.webapplicationgenerator.generator.frontend.vaadin.VaadinGenerato
 import org.dhbw.webapplicationgenerator.generator.security.SecurityGenerator;
 import org.dhbw.webapplicationgenerator.generator.util.FileFolderGenerator;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
+import org.dhbw.webapplicationgenerator.model.request.Strategy;
 import org.dhbw.webapplicationgenerator.model.request.backend.BackendData;
 import org.dhbw.webapplicationgenerator.model.response.Project;
 import org.dhbw.webapplicationgenerator.model.response.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.util.FileCleaner;
+import org.dhbw.webapplicationgenerator.webclient.exception.WagException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -63,7 +65,12 @@ public class ProjectGenerator extends FileFolderGenerator {
 
         // Assign strategies.
         logger.info("Assigning strategies");
-        BackendStrategy backendStrategy = this.springBootGenerator; // TODO: Set generator according to request
+        BackendStrategy backendStrategy;
+        if (request.getBackend().getStrategy().equals(Strategy.SPRING_BOOT)) {
+            backendStrategy = this.springBootGenerator;
+        } else {
+            throw new WagException("Using not supported backend-strategy " + request.getBackend().getStrategy());
+        }
 
         FrontendStrategy frontendStrategy;
         switch(request.getFrontend().getStrategy()) {

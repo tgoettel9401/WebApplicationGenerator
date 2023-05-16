@@ -9,6 +9,7 @@ public class SpringBootData implements JavaData {
     private JavaBuildTool javaBuildTool;
     private String javaVersion = "11";
     private String springBootVersion = "2.6.3";
+    private String springDependencyManagementVersion = "1.1.0";
     private String springDocVersion = "1.6.9";
     private String apiPath = "/api";
     private String h2ConsolePath = "/h2-console";
