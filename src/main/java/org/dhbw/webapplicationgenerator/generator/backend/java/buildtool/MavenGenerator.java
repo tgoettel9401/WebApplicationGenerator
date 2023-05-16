@@ -5,6 +5,7 @@ import org.dhbw.webapplicationgenerator.generator.util.FreemarkerTemplateProcess
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.model.request.Strategy;
 import org.dhbw.webapplicationgenerator.model.request.backend.SpringBootData;
+import org.dhbw.webapplicationgenerator.model.request.frontend.VaadinData;
 import org.dhbw.webapplicationgenerator.model.response.Project;
 import org.dhbw.webapplicationgenerator.model.response.ProjectDirectory;
 import org.dhbw.webapplicationgenerator.util.ResourceFileHelper;
@@ -23,7 +24,7 @@ public class MavenGenerator extends JavaBuildToolGenerator {
 
     private static final String SPRING_BOOT_FRAMEWORK_GROUP_ID = "org.springframework.boot";
     private static final String VAADIN_GROUP_ID = "com.vaadin";
-    private static final String VAADIN_VERSION = "23.3.12"; // TODO: Add to Vaadin-Data of Frontend!
+    private static final String VAADIN_VERSION = "23.3.12";
 
     /**
      * Implementation for adding build-tool-files for Maven-projects. First it adds a folder .mvn with the necessary
@@ -68,7 +69,7 @@ public class MavenGenerator extends JavaBuildToolGenerator {
         return freemarkerTemplateProcessor.process("pom.ftl", dataModel, filename);
     }
 
-    private List<Dependency> createDependencies(ProjectRequest request) {
+    protected List<Dependency> createDependencies(ProjectRequest request) {
         SpringBootData data = (SpringBootData) request.getBackend().getData();
         List<Dependency> dependencies = new ArrayList<>();
         dependencies.add(new Dependency(SPRING_BOOT_FRAMEWORK_GROUP_ID, "spring-boot-starter-web", "", "", "", false));
@@ -80,7 +81,8 @@ public class MavenGenerator extends JavaBuildToolGenerator {
         }
 
         if (request.isFrontendEnabled() && request.getFrontend().getStrategy().equals(Strategy.VAADIN)) {
-            String vaadinVersion = VAADIN_VERSION; // TODO: Replace by request.
+            VaadinData vaadinData = (VaadinData) request.getFrontend().getData();
+            String vaadinVersion = vaadinData.getVersion();
             dependencies.add(new Dependency(VAADIN_GROUP_ID, "vaadin-bom", vaadinVersion, "import", "pom", true));
             dependencies.add(new Dependency(VAADIN_GROUP_ID, "vaadin-spring-boot-starter", vaadinVersion, "", "", false));
         }
@@ -99,8 +101,9 @@ public class MavenGenerator extends JavaBuildToolGenerator {
     }
 
     private List<Plugin> createPlugins(ProjectRequest request) {
+        VaadinData data = (VaadinData) request.getFrontend().getData();
         List<Plugin> plugins = new ArrayList<>();
-        String vaadinVersion = VAADIN_VERSION; // TODO: Replace by request.
+        String vaadinVersion = data.getVersion();
         plugins.add(getVaadinPlugin(vaadinVersion));
         return plugins;
     }
