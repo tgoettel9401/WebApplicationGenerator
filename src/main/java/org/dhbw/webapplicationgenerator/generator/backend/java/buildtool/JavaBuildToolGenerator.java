@@ -2,13 +2,21 @@ package org.dhbw.webapplicationgenerator.generator.backend.java.buildtool;
 
 import org.dhbw.webapplicationgenerator.generator.util.FileFolderGenerator;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
+import org.dhbw.webapplicationgenerator.model.request.Strategy;
 import org.dhbw.webapplicationgenerator.model.request.backend.JavaData;
+import org.dhbw.webapplicationgenerator.model.request.backend.SpringBootData;
+import org.dhbw.webapplicationgenerator.model.request.frontend.VaadinData;
 import org.dhbw.webapplicationgenerator.model.response.Project;
 import org.dhbw.webapplicationgenerator.model.response.ProjectDirectory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public abstract class JavaBuildToolGenerator extends FileFolderGenerator {
+
+    private static final String SPRING_BOOT_FRAMEWORK_GROUP_ID = "org.springframework.boot";
+    private static final String VAADIN_GROUP_ID = "com.vaadin";
 
     /**
      * Creates the build-tool files (dependent on the selected JavaBuild-Tool)
@@ -115,6 +123,67 @@ public abstract class JavaBuildToolGenerator extends FileFolderGenerator {
             currentChildDir = addDirectory(groupPart, Optional.of(currentChildDir));
         }
         addDirectory(data.getArtifact(), Optional.of(currentChildDir));
+    }
+
+    protected List<Dependency> createDependencies(ProjectRequest request) {
+        SpringBootData data = (SpringBootData) request.getBackend().getData();
+        List<Dependency> dependencies = new ArrayList<>();
+        dependencies.add(new Dependency(SPRING_BOOT_FRAMEWORK_GROUP_ID, "spring-boot-starter-web", "", "", "", false));
+        dependencies.add(new Dependency(SPRING_BOOT_FRAMEWORK_GROUP_ID, "spring-boot-starter-data-jpa", "", "", "", false));
+        dependencies.add(new Dependency(SPRING_BOOT_FRAMEWORK_GROUP_ID, "spring-boot-starter-data-rest", "", "", "", false));
+
+        if (request.isFrontendEnabled() && request.getFrontend().getStrategy().equals(Strategy.THYMELEAF)) {
+            dependencies.add(new Dependency(SPRING_BOOT_FRAMEWORK_GROUP_ID, "spring-boot-starter-thymeleaf", "", "", "", false));
+        }
+
+        if (request.isFrontendEnabled() && request.getFrontend().getStrategy().equals(Strategy.VAADIN)) {
+            VaadinData vaadinData = (VaadinData) request.getFrontend().getData();
+            String vaadinVersion = vaadinData.getVersion();
+            dependencies.add(new Dependency(VAADIN_GROUP_ID, "vaadin-bom", vaadinVersion, "import", "pom", true));
+            dependencies.add(new Dependency(VAADIN_GROUP_ID, "vaadin-spring-boot-starter", vaadinVersion, "", "", false));
+        }
+
+        dependencies.add(new Dependency("org.springdoc", "springdoc-openapi-ui", data.getSpringDocVersion(), "", "", false));
+        dependencies.add(new Dependency("org.springdoc", "springdoc-openapi-data-rest", data.getSpringDocVersion(), "", "", false));
+        dependencies.add(new Dependency("com.h2database", "h2", "", "runtime", "", false));
+
+        if (request.isSecurityEnabled()) {
+            dependencies.add(new Dependency(SPRING_BOOT_FRAMEWORK_GROUP_ID, "spring-boot-starter-security", "", "", "", false));
+            if (request.getFrontend().getStrategy().equals(Strategy.THYMELEAF)) {
+                dependencies.add(new Dependency("org.thymeleaf.extras", "thymeleaf-extras-springsecurity5", "", "", "", false));
+            }
+        }
+        return dependencies;
+    }
+
+    protected List<Plugin> createPlugins(ProjectRequest request) {
+        List<Plugin> plugins = new ArrayList<>();
+        if (request.getFrontend().getStrategy().equals(Strategy.VAADIN)) {
+            VaadinData data = (VaadinData) request.getFrontend().getData();
+            String vaadinVersion = data.getVersion();
+            plugins.add(getVaadinPlugin(vaadinVersion));
+        }
+        return plugins;
+    }
+
+    protected Plugin getVaadinPlugin(String vaadinVersion) {
+        Plugin plugin = new Plugin();
+        plugin.setGroupId(VAADIN_GROUP_ID);
+        plugin.setArtifactId("vaadin-maven-plugin");
+        plugin.setVersion(vaadinVersion);
+
+        List<PluginExecution> executions = new ArrayList<>();
+        PluginExecution execution = new PluginExecution();
+
+        List<PluginExecutionGoal> goals = new ArrayList<>();
+        PluginExecutionGoal goalPrepare = new PluginExecutionGoal("prepare-frontend");
+        PluginExecutionGoal goalBuild = new PluginExecutionGoal("build-frontend");
+        goals.add(goalPrepare);
+        goals.add(goalBuild);
+        execution.setGoals(goals);
+        executions.add(execution);
+        plugin.setExecutions(executions);
+        return plugin;
     }
 
 }

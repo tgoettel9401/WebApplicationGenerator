@@ -14,4 +14,21 @@ public class Dependency {
     private String scope;
     private String type;
     private boolean dependencyManagement = false;
+
+    public String getGradleLine() {
+        String line = "";
+        if (type.equals("test")) {
+            line = line.concat("testImplementation");
+        } else {
+            line = line.concat("implementation");
+        }
+        line = line.concat(" '");
+        line = line.concat(groupId + ":" + artifactId);
+        if (!version.isEmpty()) {
+            line = line.concat(":" + version);
+        }
+        line = line.concat("';");
+        return line;
+    }
+
 }
