@@ -29,7 +29,7 @@ public class BuildAndRunScriptGenerator extends FileFolderGenerator {
         Map<String, Object> dataModel = new HashMap<>();
         dataModel.put("imageName", dockerData.getImageName());
         dataModel.put("buildCommand", javaData.getJavaBuildTool().getBuildCommand());
-        dataModel.put("cleanCommand", javaData.getJavaBuildTool().getBuildCommand());
+        dataModel.put("cleanCommand", javaData.getJavaBuildTool().getCleanCommand());
 
         // Process the template and return the file
         String filename = "buildAndRun.sh";
