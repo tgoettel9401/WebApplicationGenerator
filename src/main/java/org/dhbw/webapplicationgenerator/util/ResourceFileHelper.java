@@ -31,7 +31,7 @@ public class ResourceFileHelper {
 
     public Optional<File> searchInResourceDirectory(String directory, String fileName) {
         ClassLoader classLoader = getClass().getClassLoader();
-        String fileNameWithPath = directory + "/" + fileName;
+        String fileNameWithPath = directory + '/' + fileName;
         if (classLoader.getResourceAsStream(fileNameWithPath) == null) {
             return Optional.empty();
         } else {
@@ -39,6 +39,7 @@ public class ResourceFileHelper {
             File file = new File(".tmp2/" + fileName);
             try {
                 Files.copy(inputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                inputStream.close();
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
