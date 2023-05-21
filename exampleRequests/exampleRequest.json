@@ -20,7 +20,7 @@
       "springBootVersion": "2.7.1",
       "springDocVersion": "1.6.13",
       "apiPath": "/api",
-      "h2ConsolePath": "/api",
+      "h2ConsolePath": "/h2-console",
       "h2ConsoleEnabled": true
     }
   },
