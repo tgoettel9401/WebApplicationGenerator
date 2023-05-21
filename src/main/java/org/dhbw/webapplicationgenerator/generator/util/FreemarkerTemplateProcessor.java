@@ -37,6 +37,7 @@ public class FreemarkerTemplateProcessor {
 
             // Process template, then create and return the file.
             template.process(dataModel, fileWriter);
+            fileWriter.close();
             return file;
 
         } catch (Exception e) {
