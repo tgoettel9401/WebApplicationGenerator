@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 
 import java.io.IOException;
 
-// TODO: Add custom deserializer also for relations and other stuff currently located in the transformer.
 public class DataTypeSerializer extends JsonDeserializer<DataType> {
 
     protected DataTypeSerializer() {

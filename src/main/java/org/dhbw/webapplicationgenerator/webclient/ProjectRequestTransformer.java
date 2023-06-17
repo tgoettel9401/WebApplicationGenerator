@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.model.request.Strategy;
 import org.dhbw.webapplicationgenerator.model.request.backend.Backend;
+import org.dhbw.webapplicationgenerator.model.request.backend.DatabaseProduct;
 import org.dhbw.webapplicationgenerator.model.request.backend.SpringBootData;
 import org.dhbw.webapplicationgenerator.model.request.database.Database;
 import org.dhbw.webapplicationgenerator.model.request.database.FlywayData;
@@ -68,6 +69,12 @@ public class ProjectRequestTransformer {
         if (Objects.requireNonNull(strategy) == Strategy.SPRING_BOOT) {
             JavaType type = new ObjectMapper().getTypeFactory().constructParametricType(Backend.class, SpringBootData.class);
             Backend<SpringBootData> springBoot = mapper.convertValue(request.getBackend(), type);
+            if (springBoot.getData().isEmbeddedH2() && springBoot.getData().getDatabaseConnectionString().isEmpty()) {
+                springBoot.getData().setDatabaseConnectionString("jdbc:h2:mem:testdb");
+            }
+            if (springBoot.getData().isEmbeddedH2()) {
+                springBoot.getData().setDatabaseProduct(DatabaseProduct.H2);
+            }
             request.setBackend(springBoot);
         } else {
             throw new WagException("Unknown Backend-Strategy supplied");

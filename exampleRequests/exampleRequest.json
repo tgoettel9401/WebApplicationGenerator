@@ -21,7 +21,10 @@
       "springDocVersion": "1.6.13",
       "apiPath": "/api",
       "h2ConsolePath": "/h2-console",
-      "h2ConsoleEnabled": true
+      "h2ConsoleEnabled": true,
+      "databaseConnectionString": "jdbc:postgresql://localhost:5432/postgres",
+      "databaseUsername": "postgres",
+      "databasePassword": "secret"
     }
   },
   "frontend": {

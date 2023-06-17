@@ -3,6 +3,7 @@ package org.dhbw.webapplicationgenerator.generator.backend.java.buildtool;
 import org.dhbw.webapplicationgenerator.generator.util.FileFolderGenerator;
 import org.dhbw.webapplicationgenerator.model.request.ProjectRequest;
 import org.dhbw.webapplicationgenerator.model.request.Strategy;
+import org.dhbw.webapplicationgenerator.model.request.backend.DatabaseProduct;
 import org.dhbw.webapplicationgenerator.model.request.backend.JavaData;
 import org.dhbw.webapplicationgenerator.model.request.backend.SpringBootData;
 import org.dhbw.webapplicationgenerator.model.request.frontend.VaadinData;
@@ -145,7 +146,12 @@ public abstract class JavaBuildToolGenerator extends FileFolderGenerator {
 
         dependencies.add(new Dependency("org.springdoc", "springdoc-openapi-ui", data.getSpringDocVersion(), "", "", false));
         dependencies.add(new Dependency("org.springdoc", "springdoc-openapi-data-rest", data.getSpringDocVersion(), "", "", false));
-        dependencies.add(new Dependency("com.h2database", "h2", "", "runtime", "", false));
+        dependencies.add(data.getDatabaseProduct().getDependency());
+
+        // If H2 is not selected as DB-product, we stil have to add the dependency because of using it during tests.
+        if (!data.getDatabaseProduct().equals(DatabaseProduct.H2)) {
+            dependencies.add(DatabaseProduct.H2.getDependency());
+        }
 
         if (request.isSecurityEnabled()) {
             dependencies.add(new Dependency(SPRING_BOOT_FRAMEWORK_GROUP_ID, "spring-boot-starter-security", "", "", "", false));
