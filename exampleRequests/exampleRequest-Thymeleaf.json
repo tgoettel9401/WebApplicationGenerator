@@ -22,6 +22,7 @@
       "apiPath": "/api",
       "h2ConsolePath": "/h2-console",
       "h2ConsoleEnabled": true,
+      "embeddedH2": true,
       "databaseProduct": "H2"
     }
   },
@@ -155,7 +156,9 @@
     {
       "name": "ADMIN",
       "resources": [
-        "student", "teacher", "courses"
+        "student",
+        "teacher",
+        "courses"
       ]
     },
     {
