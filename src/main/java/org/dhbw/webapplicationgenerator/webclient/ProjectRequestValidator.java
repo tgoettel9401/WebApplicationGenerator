@@ -86,7 +86,6 @@ public class ProjectRequestValidator {
     }
 
     private void validateFrontend(ProjectRequest request) throws ValidationException {
-        // TODO: Also describe this phenomen in the thesis that not all versions are compatible with each other.
         if (request.getBackend().getStrategy().equals(Strategy.SPRING_BOOT) && request.getFrontend().getStrategy().equals(Strategy.VAADIN)) {
             VaadinData vaadinData = (VaadinData) request.getFrontend().getData();
             SpringBootData springBootData = (SpringBootData) request.getBackend().getData();
