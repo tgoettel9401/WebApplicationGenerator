@@ -16,9 +16,9 @@ public class SpringBootData implements JavaData {
     private boolean embeddedH2 = false;
     @JsonDeserialize(using = DatabaseProductSerializer.class)
     private DatabaseProduct databaseProduct;
-    private String databaseConnectionString;
-    private String databaseUsername;
-    private String databasePassword;
+    private String databaseConnectionString = "";
+    private String databaseUsername = "";
+    private String databasePassword = "";
     private String h2ConsolePath = "/h2-console";
     private boolean h2ConsoleEnabled = true;
 }

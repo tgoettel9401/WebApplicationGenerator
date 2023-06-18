@@ -22,9 +22,7 @@
       "apiPath": "/api",
       "h2ConsolePath": "/h2-console",
       "h2ConsoleEnabled": true,
-      "databaseConnectionString": "jdbc:postgresql://localhost:5432/postgres",
-      "databaseUsername": "postgres",
-      "databasePassword": "secret"
+      "databaseProduct": "H2"
     }
   },
   "frontend": {
