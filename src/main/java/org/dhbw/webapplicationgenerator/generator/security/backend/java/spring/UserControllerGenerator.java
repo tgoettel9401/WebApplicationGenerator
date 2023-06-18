@@ -31,7 +31,7 @@ public class UserControllerGenerator extends FileFolderGenerator {
         ProjectDirectory controllerDirectory = addDirectory("controller",
                 Optional.of(getMainProjectDirectory(project, request)));
         Map<String, Object> dataModel = new HashMap<>();
-        dataModel.put("packageName", packageNameResolver.resolveConfig(request));
+        dataModel.put("packageName", packageNameResolver.resolveController(request));
         dataModel.put("applicationImports", getApplicationImports(request));
         String filename = "AppUserController" + JAVA_CLASS_ENDING;
         File file = freemarkerTemplateProcessor.process("AppUserController.ftl", dataModel, filename);
