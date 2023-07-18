@@ -34,19 +34,15 @@ public class FileFolderGenerator {
      */
     public ProjectDirectory getMainProjectDirectory(Project project, ProjectRequest request) {
         ProjectDirectory rootDir = (ProjectDirectory) project.getFileStructure();
-        ProjectDirectory srcDir = (ProjectDirectory) rootDir.getChildren().stream().filter(child -> child.getTitle().equals("src"))
-                .findFirst().orElseThrow(() -> new RuntimeException("Creating entity failed due to missing src folder"));
-        ProjectDirectory mainDir = (ProjectDirectory) srcDir.getChildren().stream().filter(child -> child.getTitle().equals("main"))
-                .findFirst().orElseThrow(() -> new RuntimeException("Creating entity failed due to missing main folder"));
-        ProjectDirectory groupDir = (ProjectDirectory) mainDir.getChildren().stream().filter(child1 -> child1.getTitle().equals("java"))
-                .findFirst().orElseThrow(() -> new RuntimeException("Creating entity failed due to missing java folder"));
+        ProjectDirectory srcDir = rootDir.findChildDirectory("src");
+        ProjectDirectory mainDir = srcDir.findChildDirectory("main");
+        ProjectDirectory groupDir = mainDir.findChildDirectory("java");
+
         JavaData javaData = (JavaData) request.getBackend().getData();
         for (String groupPart : javaData.getGroup().split("\\.")) {
-            groupDir = (ProjectDirectory) groupDir.getChildren().stream().filter(child -> child.getTitle().equals(groupPart)).findFirst()
-                    .orElseThrow(() -> new RuntimeException("Creating entity failed due to missing group folder"));
+            groupDir = groupDir.findChildDirectory(groupPart);
         }
-        return (ProjectDirectory) groupDir.getChildren().stream().filter(child -> child.getTitle().equals(javaData.getArtifact()))
-                .findFirst().orElseThrow(() -> new RuntimeException("Creating entity failed due to missing artifact folder"));
+        return groupDir.findChildDirectory(javaData.getArtifact());
     }
 
     /**

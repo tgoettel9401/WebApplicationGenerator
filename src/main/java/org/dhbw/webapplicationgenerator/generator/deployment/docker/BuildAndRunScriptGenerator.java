@@ -22,8 +22,6 @@ public class BuildAndRunScriptGenerator extends FileFolderGenerator {
 
         DockerData dockerData = (DockerData) request.getDeployment().getData();
         JavaData javaData = (JavaData) request.getBackend().getData();
-        // TODO: Alternatives if other programming languages! Maybe therefore add a getBuildCommand to BackendData
-        //  interface and implement this in JavaData?
 
         // Initialize Data Model for Freemarker
         Map<String, Object> dataModel = new HashMap<>();

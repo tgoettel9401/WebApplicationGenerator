@@ -26,7 +26,6 @@ public class MainTestFileGenerator extends FileFolderGenerator {
         return project;
     }
 
-    // TODO: Make this dependent on backend as well (as this is specific for SpringBoot here)
     public ProjectFile create(ProjectRequest request, ProjectDirectory parent) {
 
         // Initialize Data Model for Freemarker

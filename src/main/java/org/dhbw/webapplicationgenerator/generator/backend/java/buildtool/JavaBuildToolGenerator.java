@@ -62,19 +62,13 @@ public abstract class JavaBuildToolGenerator extends FileFolderGenerator {
      * @return ProjectDirectory for main
      */
     public ProjectDirectory getMainDirectory(ProjectDirectory rootDir, JavaData javaData) {
-        // TODO: Refactor, add findChild(String childName) to ProjectDirectory!
-        ProjectDirectory srcDir = (ProjectDirectory) rootDir.getChildren().stream().filter(child -> child.getTitle().equals("src"))
-                .findFirst().orElseThrow(() -> new RuntimeException("Finding main directory failed due to missing src folder"));
-        ProjectDirectory mainDir = (ProjectDirectory) srcDir.getChildren().stream().filter(child -> child.getTitle().equals("main"))
-                .findFirst().orElseThrow(() -> new RuntimeException("Finding main directory failed due to missing main folder"));
-        ProjectDirectory groupDir = (ProjectDirectory) mainDir.getChildren().stream().filter(child1 -> child1.getTitle().equals("java"))
-                .findFirst().orElseThrow(() -> new RuntimeException("Finding main directory failed due to missing java folder"));
+        ProjectDirectory srcDir = rootDir.findChildDirectory("src");
+        ProjectDirectory mainDir = srcDir.findChildDirectory("main");
+        ProjectDirectory groupDir = mainDir.findChildDirectory("java");
         for (String groupPart : javaData.getGroup().split("\\.")) {
-            groupDir = (ProjectDirectory) groupDir.getChildren().stream().filter(child -> child.getTitle().equals(groupPart)).findFirst()
-                    .orElseThrow(() -> new RuntimeException("Finding main directory failed due to missing group folder"));
+            groupDir = groupDir.findChildDirectory(groupPart);
         }
-        return (ProjectDirectory) groupDir.getChildren().stream().filter(child -> child.getTitle().equals(javaData.getArtifact()))
-                .findFirst().orElseThrow(() -> new RuntimeException("Finding main directory failed due to missing artifact folder"));
+        return groupDir.findChildDirectory(javaData.getArtifact());
     }
 
     /**
@@ -85,19 +79,13 @@ public abstract class JavaBuildToolGenerator extends FileFolderGenerator {
      */
     public ProjectDirectory getMainTestDirectory(Project project, JavaData javaData) {
         ProjectDirectory rootDir = (ProjectDirectory) project.getFileStructure();
-        // TODO: Refactor, add findChild(String childName) to ProjectDirectory!
-        ProjectDirectory srcDir = (ProjectDirectory) rootDir.getChildren().stream().filter(child -> child.getTitle().equals("src"))
-                .findFirst().orElseThrow(() -> new RuntimeException("Finding main directory failed due to missing test folder"));
-        ProjectDirectory testDir = (ProjectDirectory) srcDir.getChildren().stream().filter(child -> child.getTitle().equals("test"))
-                .findFirst().orElseThrow(() -> new RuntimeException("Finding main directory failed due to missing main folder"));
-        ProjectDirectory groupDir = (ProjectDirectory) testDir.getChildren().stream().filter(child1 -> child1.getTitle().equals("java"))
-                .findFirst().orElseThrow(() -> new RuntimeException("Finding main directory failed due to missing java folder"));
+        ProjectDirectory srcDir = rootDir.findChildDirectory("src");
+        ProjectDirectory mainDir = srcDir.findChildDirectory("test");
+        ProjectDirectory groupDir = mainDir.findChildDirectory("java");
         for (String groupPart : javaData.getGroup().split("\\.")) {
-            groupDir = (ProjectDirectory) groupDir.getChildren().stream().filter(child -> child.getTitle().equals(groupPart)).findFirst()
-                    .orElseThrow(() -> new RuntimeException("Finding main directory failed due to missing group folder"));
+            groupDir = groupDir.findChildDirectory(groupPart);
         }
-        return (ProjectDirectory) groupDir.getChildren().stream().filter(child -> child.getTitle().equals(javaData.getArtifact()))
-                .findFirst().orElseThrow(() -> new RuntimeException("Finding main directory failed due to missing artifact folder"));
+        return groupDir.findChildDirectory(javaData.getArtifact());
     }
 
     /**

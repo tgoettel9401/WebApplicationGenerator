@@ -28,7 +28,6 @@ public class VaadinGenerator extends FileFolderGenerator implements FrontendStra
      * @param mainSourceDirectoryFinder function to find the main source directory.
      * @return Updated Project
      */
-    // TODO: Refactor to remove directoryFinders.
     public Project create(ProjectRequest request, Project project,
                           UnaryOperator<ProjectDirectory> frontendDirectoryFinder,
                           UnaryOperator<ProjectDirectory> mainSourceDirectoryFinder) {
